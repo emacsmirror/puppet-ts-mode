@@ -5,7 +5,7 @@
 ;; Author:           Stefan Möding
 ;; Version:          0.1
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-03-05 16:01:46 stm>
+;; Updated:          <2024-03-05 16:37:34 stm>
 ;; Keywords:         Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 ;; Homepage:         https://github.com/smoeding/puppet-ts-mode
@@ -161,7 +161,6 @@ is added here because it is common and important.")
   "Face for resource types in Puppet."
   :group 'puppet)
 
-
 (defface puppet-builtin-face
   '((t :inherit font-lock-builtin-face))
   "Face for built-in functions in Puppet."
@@ -267,6 +266,10 @@ is added here because it is common and important.")
    :language 'puppet
    '((ERROR) @puppet-warning-face))
   "Font-Lock settings for `puppet-ts-mode'.")
+
+;;
+;; Indentation
+;;
 
 (defvar puppet-indent-one-level
   (rx bos
