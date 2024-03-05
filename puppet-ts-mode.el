@@ -5,7 +5,7 @@
 ;; Author:           Stefan Möding
 ;; Version:          0.1
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-03-05 16:37:34 stm>
+;; Updated:          <2024-03-05 16:48:00 stm>
 ;; Keywords:         Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 ;; Homepage:         https://github.com/smoeding/puppet-ts-mode
@@ -28,10 +28,10 @@
 ;; tree-sitter parser for Puppet.  You can install the parser using the
 ;; following Elisp snippet:
 ;;
-;;   (setq treesit-language-source-alist
-;;         (append treesit-language-source-alist
-;;                 '((puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
-;;   (treesit-install-language-grammar 'puppet)
+;; (add-to-list
+;;  'treesit-language-source-alist
+;;  '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
+;; (treesit-install-language-grammar 'puppet)
 ;;
 ;; Also consult the Emacs manual: (info "(elisp) Parsing Program Source")
 ;;
