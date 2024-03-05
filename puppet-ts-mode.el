@@ -6,7 +6,7 @@
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Version: 0.1
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-05 18:08:59 stm>
+;; Updated: <2024-03-05 18:19:45 stm>
 ;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 
@@ -287,18 +287,18 @@ is added here because it is common and important.")
    :feature 'error
    :language 'puppet
    '((ERROR) @puppet-warning-face))
-  "Font-Lock settings for `puppet-ts-mode'.")
+  "`treesit-font-lock-settings' for `puppet-ts-mode'.")
 
 
 ;; Indentation
-(defvar puppet-indent-one-level
+(defvar puppet--indent-one-level
   (rx bos
       (or "block" "hash" "selector" "resource_declaration" "case_statement"
           "parameter_list" "array")
       eos)
-  "Structures that will have their children indented by one more level.")
+  "Structures that will have their children indented by an additional level.")
 
-(defvar puppet-indent-like-parent
+(defvar puppet--indent-like-parent
   (rx bos
       (or "else_statement" "elsif_statement")
       eos)
@@ -306,34 +306,34 @@ is added here because it is common and important.")
 
 (defvar puppet-ts-indent-rules
   `((puppet
-     ((parent-is "source_file")
-      column-0 0)
+     ;; top-level statements start in column zero
+     ((parent-is "source_file") column-0 0)
      ;; block structures
      ((node-is "}") parent-bol 0)
      ((node-is "]") parent-bol 0)
-     ((parent-is ,puppet-indent-one-level) parent-bol puppet-indent-level)
+     ((parent-is ,puppet--indent-one-level) parent-bol puppet-indent-level)
      ;; compound statements
-     ((node-is ,puppet-indent-like-parent) parent-bol 0)
+     ((node-is ,puppet--indent-like-parent) parent-bol 0)
      ;; default
      (no-node parent 0)))
   "Indentation rules for `puppet-ts-mode'.")
 
 (defvar puppet-ts-mode-syntax-table
   (let ((table (make-syntax-table)))
-    ;; Our strings
+    ;; our strings
     (modify-syntax-entry ?\' "\"'"  table)
     (modify-syntax-entry ?\" "\"\"" table)
-    ;; C-style comments.
+    ;; C-style comments
     (modify-syntax-entry ?/ ". 14b" table)
     (modify-syntax-entry ?* ". 23b" table)
-    ;; Line comments
+    ;; line comments
     (modify-syntax-entry ?#  "<" table)
     (modify-syntax-entry ?\n ">" table)
-    ;; The backslash is our escape character
+    ;; the backslash is our escape character
     (modify-syntax-entry ?\\ "\\" table)
-    ;; The dollar sign is an expression prefix for variables
+    ;; the dollar sign is an expression prefix for variables
     (modify-syntax-entry ?$ "'" table)
-    ;; Fix various operators and punctionation.
+    ;; fix various operators and punctionation.
     (modify-syntax-entry ?<  "." table)
     (modify-syntax-entry ?>  "." table)
     (modify-syntax-entry ?&  "." table)
@@ -343,7 +343,7 @@ is added here because it is common and important.")
     (modify-syntax-entry ?+  "." table)
     (modify-syntax-entry ?-  "." table)
     (modify-syntax-entry ?\; "." table)
-    ;; Our parenthesis, braces and brackets
+    ;; our parenthesis, braces and brackets
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)
     (modify-syntax-entry ?\{ "(}" table)
@@ -351,11 +351,11 @@ is added here because it is common and important.")
     (modify-syntax-entry ?\[ "(]" table)
     (modify-syntax-entry ?\] ")[" table)
     table)
-  "Syntax table in use in `puppet-ts-mode' buffers.")
+  "Syntax table used in `puppet-ts-mode' buffers.")
 
 ;;;###autoload
 (define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
-  "Major mode for editing Puppet files, using tree-sitter library.
+  "Major mode for editing Puppet files, using the tree-sitter library.
 
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
