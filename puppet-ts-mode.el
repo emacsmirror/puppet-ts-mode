@@ -188,10 +188,10 @@ is added here because it is common and important.")
   :group 'puppet)
 
 (defvar puppet-ts-mode--feature-list
-  '((comment definition)
-    (keyword string resource-type builtin)
-    (assignment namespace constant literal escape-sequence function variable string-interpolation)
-    (bracket delimiter operator error misc-punctuation))
+  '((comment)
+    (keyword resource-type builtin string)
+    (constant variable string-interpolation)
+    (error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
 (defvar puppet-ts-mode--font-lock-settings
