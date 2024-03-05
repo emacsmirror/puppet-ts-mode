@@ -6,7 +6,7 @@
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Version: 0.1
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-05 18:19:45 stm>
+;; Updated: <2024-03-05 19:25:27 stm>
 ;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 
@@ -179,27 +179,28 @@ is added here because it is common and important.")
 ;;
 
 (defvar puppet--boolean-constants-regex
-  (eval `(rx bos (or ,@puppet--boolean-constants) eos))
+  (rx-to-string `(seq bos ,(cons 'or puppet--boolean-constants) eos) t)
   "Regex to match Puppet boolean constants.")
 
 (defvar puppet--attribute-name-constants-regex
-  (eval `(rx bos
-             (or ,@puppet--boolean-constants
-                 ,@puppet--language-constants)
-             eos))
+  (rx-to-string `(seq bos ,(cons 'or (append puppet--boolean-constants
+                                             puppet--language-constants))
+                      eos)
+                t)
   "Regex to match Puppet attribute name constants.")
 
 (defvar puppet--constants-regex
-  (eval `(rx bos
-             (or ,@(append puppet--boolean-constants
-                           puppet--file-attribute-constants
-                           puppet--package-attribute-constants
-                           puppet--service-attribute-constants))
-             eos))
+  (rx-to-string `(seq bos
+                      ,(cons 'or (append puppet--boolean-constants
+                                         puppet--file-attribute-constants
+                                         puppet--package-attribute-constants
+                                         puppet--service-attribute-constants))
+                      eos)
+                t)
   "Puppet constants for tree-sitter font-locking.")
 
-(defvar puppet--metaparams-regex
-  (eval `(rx bos (or ,@puppet--metaparameters) eos))
+(defvar puppet--metaparameters-regex
+  (rx-to-string `(seq bos ,(cons 'or puppet--metaparameters) eos) t)
   "Regex to match Puppet metaparameters.")
 
 (defvar puppet--builtin-functions-regex
@@ -260,7 +261,7 @@ is added here because it is common and important.")
      (class_inherits "inherits" @puppet-keyword-face)
      (defined_resource_type "define" @puppet-keyword-face)
      (attribute name: (identifier) @puppet-keyword-face
-                (:match ,puppet--metaparams-regex @puppet-keyword-face))
+                (:match ,puppet--metaparameters-regex @puppet-keyword-face))
      (binary_expression operator: [,@puppet--binary-operators]
                         @puppet-keyword-face)
      (field_expression (identifier) @puppet-keyword-face
