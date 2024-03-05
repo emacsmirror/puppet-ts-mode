@@ -10,11 +10,13 @@ This is puppet-ts-mode, a major mode to edit Puppet files using the tree-sitter 
 
 Emacs 29.1 or above with tree-sitter support is required.
 
-Tree-sitter starter guide: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=emacs-29
+The following Elisp code can be used to add the Puppet language parser to your Emacs setup.
 
 ```elisp
-(add-to-list
- 'treesit-language-source-alist
- '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
+(add-to-list 'treesit-language-source-alist
+             '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
+
 (treesit-install-language-grammar 'puppet)
 ```
+
+This requires some tools, notably a compiler toolchain, to be available on your machine. See the Tree-sitter starter guide: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=emacs-29
