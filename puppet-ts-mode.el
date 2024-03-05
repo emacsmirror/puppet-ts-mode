@@ -2,13 +2,13 @@
 
 ;; Copyright (c) 2024 Stefan Möding
 
-;; Author:           Stefan Möding
-;; Version:          0.1
-;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-03-05 16:48:00 stm>
-;; Keywords:         Puppet Treesitter
+;; Author: Stefan Möding
+;; URL: https://github.com/smoeding/puppet-ts-mode
+;; Version: 0.1
+;; Created: <2024-03-02 13:05:03 stm>
+;; Updated: <2024-03-05 18:08:59 stm>
+;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
-;; Homepage:         https://github.com/smoeding/puppet-ts-mode
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -22,16 +22,19 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 
+;; For a full copy of the GNU General Public License
+;; see <http://www.gnu.org/licenses/>.
+
 ;;; Commentary:
 
 ;; This is puppet-ts-mode, a major mode to edit Puppet files using the
-;; tree-sitter parser for Puppet.  You can install the parser using the
-;; following Elisp snippet:
+;; tree-sitter parser for Puppet.  You can compile and install the parser
+;; using the following Elisp snippet:
 ;;
-;; (add-to-list
-;;  'treesit-language-source-alist
-;;  '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
-;; (treesit-install-language-grammar 'puppet)
+;;    (add-to-list
+;;     'treesit-language-source-alist
+;;     '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
+;;    (treesit-install-language-grammar 'puppet)
 ;;
 ;; Also consult the Emacs manual: (info "(elisp) Parsing Program Source")
 ;;
@@ -41,7 +44,20 @@
 
 ;;; Code:
 
+
+;;; Requirements
+
+(eval-when-compile
+  (require 'rx))
+
 (require 'treesit)
+
+
+;;; Customization
+(defgroup puppet nil
+  "Manage Puppet manifests in Emacs."
+  :prefix "puppet-"
+  :group 'languages)
 
 (defcustom puppet-indent-level 2
   "Number of spaces for each indententation step."
@@ -51,95 +67,9 @@
 
 (defcustom puppet-indent-tabs-mode nil
   "Indentation can insert tabs in puppet mode if this is non-nil."
-  :type 'boolean
   :group 'puppet
+  :type 'boolean
   :safe 'booleanp)
-
-(defvar puppet--binary-operators
-  '("and" "or" "in")
-  "Binary operators used by Puppet.")
-
-(defvar puppet--boolean-constants
-  '("true" "false")
-  "Boolean constants used by Puppet.")
-
-(defvar puppet--language-constants
-  '("undef")
-  "Language constants used by Puppet.")
-
-(defvar puppet--file-attribute-constants
-  '("file" "directory" "link")
-  "Constants used for Puppet file resources.")
-
-(defvar puppet--package-attribute-constants
-  '("present" "absent" "installed" "latest")
-  "Constants used for Puppet package resources.")
-
-(defvar puppet--service-attribute-constants
-  '("running" "stopped")
-  "Constants used for Puppet service resources.")
-
-;;
-;; Regular expressions
-;;
-
-(defvar puppet--boolean-constants-regex
-  (eval `(rx bos (or ,@puppet--boolean-constants) eos))
-  "Regex to match Puppet boolean constants.")
-
-(defvar puppet--attribute-name-constants-regex
-  (eval `(rx bos (or ,@puppet--boolean-constants "default" "undef") eos))
-  "Regex to match Puppet attribute name constants.")
-
-(defvar puppet--constants-regex
-  (eval `(rx bos
-             (or ,@(append puppet--boolean-constants
-                           puppet--file-attribute-constants
-                           puppet--package-attribute-constants
-                           puppet--service-attribute-constants))
-             eos))
-  "Puppet constants for tree-sitter font-locking.")
-
-;; http://docs.puppetlabs.com/references/stable/metaparameter.html
-(defvar puppet--metaparams-regex
-  (rx bos
-      (or "alias" "audit" "before" "consume" "export" "loglevel" "noop"
-          "notify" "require" "schedule" "stage" "subscribe" "tag" "ensure")
-      eos)
-  "Puppet metaparameters for tree-sitter font-locking.
-Strictly speakting, 'ensure' is not a real metaparameter, but it
-is added here because it is common and important.")
-
-;; https://puppet.com/docs/puppet/latest/function.html
-(defvar puppet--builtin-functions-regex
-  (rx bos
-      (or "abs" "alert" "all" "annotate" "any" "assert_type" "binary_file"
-          "break" "call" "camelcase" "capitalize" "ceiling" "chomp" "chop"
-          "compare" "contain" "convert_to" "create_resources" "crit" "debug"
-          "defined" "dig" "digest" "downcase" "each" "emerg" "empty" "epp"
-          "err" "eyaml_lookup_key" "fail" "file" "filter" "find_file"
-          "find_template" "flatten" "floor" "fqdn_rand" "generate" "get"
-          "getvar" "group_by" "hiera" "hiera_array" "hiera_hash"
-          "hiera_include" "hocon_data" "import" "include" "index" "info"
-          "inline_epp" "inline_template" "join" "json_data" "keys" "length"
-          "lest" "lookup" "lstrip" "map" "match" "max" "md5" "min"
-          "module_directory" "new" "next" "notice" "partition" "realize"
-          "reduce" "regsubst" "require" "return" "reverse_each" "round"
-          "rstrip" "scanf" "sha1" "sha256" "shellquote" "size" "slice"
-          "sort" "split" "sprintf" "step" "strftime" "strip" "tag" "tagged"
-          "template" "then" "tree_each" "type" "unique" "unwrap" "upcase"
-          "values" "versioncmp" "warning" "with" "yaml_data"
-          ;; Bolt: https://puppet.com/docs/bolt/0.x/plan_functions.html
-          "apply" "apply_prep" "add_facts" "facts" "fail_plan" "file_upload"
-          "get_targets" "puppetdb_fact" "puppetdb_query" "run_command"
-          "run_plan" "run_script" "run_task" "set_feature" "set_var" "vars"
-          "without_default_logging")
-      eos)
-  "Internal functions provided by Puppet.")
-
-;;
-;; Faces
-;;
 
 (defface puppet-comment-face
   '((t :inherit font-lock-comment-face))
@@ -183,9 +113,101 @@ is added here because it is common and important.")
 
 (defface puppet-warning-face
   '((t :inherit font-lock-warning-face))
-  "Face for language errors in Puppet found by the `tree-sitter' parser."
+  "Face for language errors found by the parser."
   :group 'puppet)
 
+
+;;; Settings
+(defvar puppet--binary-operators
+  '("and" "or" "in")
+  "Binary operator keywords used by Puppet.")
+
+(defvar puppet--boolean-constants
+  '("true" "false")
+  "Boolean constants used by Puppet.")
+
+(defvar puppet--language-constants
+  '("default" "undef")
+  "Miscellaneous language constants used by Puppet.")
+
+(defvar puppet--file-attribute-constants
+  '("file" "directory" "link")
+  "Constants used for Puppet file resources.")
+
+(defvar puppet--package-attribute-constants
+  '("present" "absent" "installed" "latest")
+  "Constants used for Puppet package resources.")
+
+(defvar puppet--service-attribute-constants
+  '("running" "stopped")
+  "Constants used for Puppet service resources.")
+
+;; https://www.puppet.com/docs/puppet/latest/metaparameter.html
+(defvar puppet--metaparameters
+  '("alias" "audit" "before" "consume" "export" "loglevel" "noop"
+    "notify" "require" "schedule" "stage" "subscribe" "tag" "ensure")
+  "Puppet metaparameter attributes for all resource types.
+Strictly speakting, \"ensure\" is not a real metaparameter, but it
+is added here because it is common and important.")
+
+;; https://www.puppet.com/docs/puppet/latest/function.html
+(defvar puppet--builtin-functions
+  '("abs" "alert" "all" "annotate" "any" "assert_type" "binary_file" "break"
+    "call" "camelcase" "capitalize" "ceiling" "chomp" "chop" "compare"
+    "contain" "convert_to" "create_resources" "crit" "debug" "defined" "dig"
+    "digest" "downcase" "each" "emerg" "empty" "epp" "err" "eyaml_lookup_key"
+    "fail" "file" "filter" "find_file" "find_template" "flatten" "floor"
+    "fqdn_rand" "generate" "get" "getvar" "group_by" "hiera" "hiera_array"
+    "hiera_hash" "hiera_include" "hocon_data" "import" "include" "index"
+    "info" "inline_epp" "inline_template" "join" "json_data" "keys" "length"
+    "lest" "lookup" "lstrip" "map" "match" "max" "md5" "min"
+    "module_directory" "new" "next" "notice" "partition" "realize" "reduce"
+    "regsubst" "require" "return" "reverse_each" "round" "rstrip" "scanf"
+    "sha1" "sha256" "shellquote" "size" "slice" "sort" "split" "sprintf"
+    "step" "strftime" "strip" "tag" "tagged" "template" "then" "tree_each"
+    "type" "unique" "unwrap" "upcase" "values" "versioncmp" "warning" "with"
+    "yaml_data"
+    ;; Bolt: https://puppet.com/docs/bolt/0.x/plan_functions.html
+    "apply" "apply_prep" "add_facts" "facts" "fail_plan" "file_upload"
+    "get_targets" "puppetdb_fact" "puppetdb_query" "run_command" "run_plan"
+    "run_script" "run_task" "set_feature" "set_var" "vars"
+    "without_default_logging")
+  "Internal functions provided by Puppet.")
+
+;;
+;; Regular expressions
+;;
+
+(defvar puppet--boolean-constants-regex
+  (eval `(rx bos (or ,@puppet--boolean-constants) eos))
+  "Regex to match Puppet boolean constants.")
+
+(defvar puppet--attribute-name-constants-regex
+  (eval `(rx bos
+             (or ,@puppet--boolean-constants
+                 ,@puppet--language-constants)
+             eos))
+  "Regex to match Puppet attribute name constants.")
+
+(defvar puppet--constants-regex
+  (eval `(rx bos
+             (or ,@(append puppet--boolean-constants
+                           puppet--file-attribute-constants
+                           puppet--package-attribute-constants
+                           puppet--service-attribute-constants))
+             eos))
+  "Puppet constants for tree-sitter font-locking.")
+
+(defvar puppet--metaparams-regex
+  (eval `(rx bos (or ,@puppet--metaparameters) eos))
+  "Regex to match Puppet metaparameters.")
+
+(defvar puppet--builtin-functions-regex
+  (eval `(rx bos (or ,@puppet--builtin-functions) eos))
+  "Internal functions provided by Puppet.")
+
+
+;; Font-Lock
 (defvar puppet-ts-mode--feature-list
   '((comment)
     (keyword resource-type builtin string)
@@ -267,10 +289,8 @@ is added here because it is common and important.")
    '((ERROR) @puppet-warning-face))
   "Font-Lock settings for `puppet-ts-mode'.")
 
-;;
+
 ;; Indentation
-;;
-
 (defvar puppet-indent-one-level
   (rx bos
       (or "block" "hash" "selector" "resource_declaration" "case_statement"
