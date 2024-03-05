@@ -211,7 +211,8 @@ is added here because it is common and important.")
 
    :feature 'variable
    :language 'puppet
-   '((variable ["$" (identifier)]  @puppet-variable-name-face))
+   '((variable ["$" (identifier)] @puppet-variable-name-face)
+     (variable (class_identifier ["$" (identifier)] @puppet-variable-name-face)))
 
    :feature 'constant
    :language 'puppet
