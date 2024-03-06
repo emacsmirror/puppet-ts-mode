@@ -34,7 +34,7 @@
      (insert ,content)
      (goto-char (point-min))
      (puppet-ts-mode)
-     (font-lock-fontify-buffer)
+     (font-lock-ensure)
      ,@body))
 
 (defun puppet-test-face-at (pos &optional content)
