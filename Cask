@@ -1,5 +1,5 @@
 (source gnu)
 (source melpa)
 
-(development
- (depends-on "ert-runner"))
+(package-file "puppet-ts-mode.el")
+

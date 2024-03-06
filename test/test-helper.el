@@ -16,8 +16,7 @@
  'treesit-language-source-alist
  '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
 
-(unless (treesit-ready-p 'puppet)
-  (message "Compiling grammar")
+(unless (treesit-ready-p 'puppet t)
   (treesit-install-language-grammar 'puppet))
 
 ;;;; Load puppet-ts-mode

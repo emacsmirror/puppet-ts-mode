@@ -1,31 +1,38 @@
 # Makefile --- Puppet Treesitter Mode for Emacs
 
-CASK       = cask
-EMACS      = emacs
-EMACSFLAGS =
-TESTFLAGS  =
+CASK   := cask
+EMACS  := emacs
 
-SRCS       = puppet-ts-mode.el
-OBJS       = $(SRCS:.el=.elc)
+SRCS   := $(shell cask files)
+OBJS   := $(SRCS:.el=.elc)
+TESTS  := $(wildcard test/*-test.el)
+PKGDIR := $(shell $(CASK) package-directory)
 
-export EMACS
+#
+# rules
+#
 
-PKGDIR := $(shell EMACS=$(EMACS) $(CASK) package-directory)
-
-
-.PHONY: compile tests clean
+all: compile tests
 
 compile: $(OBJS)
 
-clean:
-	rm -f $(OBJS)
-
-tests: $(PKGDIR)
-	@$(CASK) exec ert-runner $(TESTFLAGS)
+tests: $(TESTS) | $(PKGDIR)
 
 %.elc: %.el | $(PKGDIR)
-	@$(CASK) exec $(EMACS) -Q --batch $(EMACSFLAGS) -f batch-byte-compile $<
+	@$(CASK) $(EMACS) -Q -batch -f batch-byte-compile $<
+
+test/%.el: FORCE
+	@$(CASK) $(EMACS) -Q -batch -L . -L test \
+		-l ert -l test/test-helper -l $@ \
+		-f ert-run-tests-batch-and-exit
 
 $(PKGDIR): Cask
 	@$(CASK) install
 	@touch $(PKGDIR)
+
+#
+# special targets
+#
+
+FORCE:
+.PHONY: compile tests
