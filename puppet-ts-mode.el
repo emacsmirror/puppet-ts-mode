@@ -6,7 +6,7 @@
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Version: 0.1
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-05 19:25:27 stm>
+;; Updated: <2024-03-06 11:23:08 stm>
 ;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 
@@ -295,7 +295,7 @@ is added here because it is common and important.")
 (defvar puppet--indent-one-level
   (rx bos
       (or "block" "hash" "selector" "resource_declaration" "case_statement"
-          "parameter_list" "array")
+          "function_call" "parameter_list" "array")
       eos)
   "Structures that will have their children indented by an additional level.")
 
