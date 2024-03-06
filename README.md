@@ -7,6 +7,16 @@ This is puppet-ts-mode, a major mode to edit Puppet manifests using the tree-sit
 
 **Note:** This is work in progress; many details concerning font-lock or indentation might not yet work as expected.  Most convenience functions of the old puppet-mode are not (yet) implemented.
 
+## Features
+
+The following features are planned:
+
+1. Syntax highlighting (*mostly done*)
+1. Indentation and alignment of parameter lists, expressions and statements (*started*)
+1. Cross-reference navigation (aka `xref`) to classes, defined types, data types or functions defined in other modules
+1. Skeletons for many standard Puppet statements and resource declarations
+1. Tag navigation (aka `imenu`)
+
 ## Installation
 
 Emacs 29.1 or above with tree-sitter support is required.
