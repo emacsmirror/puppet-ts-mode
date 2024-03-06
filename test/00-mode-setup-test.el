@@ -1,10 +1,10 @@
-;;; puppet-mode-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
+;;; 00-mode-setup-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2024 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-06 12:56:37 stm>
+;; Updated: <2024-03-06 13:11:14 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -27,22 +27,18 @@
 
 ;;; Code:
 
-(message "Loaded %s" (file-relative-name load-file-name))
+(message "Running test in %s" (file-relative-name load-file-name))
 
 
 ;;; Requirements
 (require 'ert)
 
-(require 'puppet-ts-mode)
-
-
-
+;;; Tests
 (ert-deftest puppet/feature-loaded ()
   :tags '(library)
   (should (featurep 'puppet-ts-mode)))
 
-
 (provide 'puppet-mode-test)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; puppet-mode-test.el ends here
+;;; 00-mode-setup-test.el ends here
