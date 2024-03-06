@@ -1,10 +1,10 @@
-;;; puppet-mode-test.el --- A package providing puppet-mode-test
+;;; puppet-mode-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2024 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-06 11:07:33 stm>
+;; Updated: <2024-03-06 12:56:37 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -26,6 +26,8 @@
 ;; Unit test suite for puppet-ts-mode
 
 ;;; Code:
+
+(message "Loaded %s" (file-relative-name load-file-name))
 
 
 ;;; Requirements
