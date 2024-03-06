@@ -23,7 +23,7 @@ clean:
 test: $(PKGDIR)
 	$(CASK) exec ert-runner $(TESTFLAGS)
 
-%.elc: %.el $(PKGDIR)
+%.elc: %.el | $(PKGDIR)
 	$(CASK) exec $(EMACS) -Q --batch $(EMACSFLAGS) -f batch-byte-compile $<
 
 $(PKGDIR): Cask
