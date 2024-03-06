@@ -1,10 +1,10 @@
-;;; 00-mode-setup-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
+;;; mode-setup-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2024 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-06 13:51:59 stm>
+;; Updated: <2024-03-06 15:40:21 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -51,4 +51,4 @@
 (provide 'puppet-mode-test)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; 00-mode-setup-test.el ends here
+;;; mode-setup-test.el ends here

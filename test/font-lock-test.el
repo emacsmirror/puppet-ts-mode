@@ -1,10 +1,10 @@
-;;; 10-font-lock-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
+;;; font-lock-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2024 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-06 15:35:04 stm>
+;; Updated: <2024-03-06 15:40:14 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -52,7 +52,7 @@ bar"
     (should (eq (puppet-test-face-at 1) 'puppet-comment-face))
     (should (eq (puppet-test-face-at 3) 'puppet-comment-face))
     (should (eq (puppet-test-face-at 7) 'puppet-comment-face))
-    (should (eq (puppet-test-face-at 8) 'puppet-comment-face))
+    (should-not (puppet-test-face-at 8))
     (should-not (puppet-test-face-at 9))))
 
 (ert-deftest puppet/fontify-c-style-comment ()
@@ -68,4 +68,4 @@ class */ bar"
 (provide 'puppet-mode-test)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; 10-font-lock-test.el ends here
+;;; font-lock-test.el ends here
