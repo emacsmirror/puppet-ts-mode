@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-06 14:54:29 stm>
+;; Updated: <2024-03-06 15:35:04 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -33,10 +33,37 @@
 ;;; Requirements
 (require 'ert)
 
+(declare-function puppet-test-face-at "test-helper.el" (pos &optional content))
+(declare-function puppet-test-with-temp-buffer (content &rest body))
+
 ;;; Tests
 (ert-deftest puppet/fontify-dq-string ()
   :tags '(fontification)
   (should (eq (puppet-test-face-at 8 "$foo = \"bar\"") 'puppet-string-face)))
+
+(ert-deftest puppet/fontify-sq-string ()
+  :tags '(fontification)
+  (should (eq (puppet-test-face-at 8 "$foo = 'bar'") 'puppet-string-face)))
+
+(ert-deftest puppet/fontify-line-comment ()
+  :tags '(fontification syntax-table)
+  (puppet-test-with-temp-buffer "# class
+bar"
+    (should (eq (puppet-test-face-at 1) 'puppet-comment-face))
+    (should (eq (puppet-test-face-at 3) 'puppet-comment-face))
+    (should (eq (puppet-test-face-at 7) 'puppet-comment-face))
+    (should (eq (puppet-test-face-at 8) 'puppet-comment-face))
+    (should-not (puppet-test-face-at 9))))
+
+(ert-deftest puppet/fontify-c-style-comment ()
+  :tags '(fontification syntax-table)
+  (puppet-test-with-temp-buffer "/*
+class */ bar"
+    (should (eq (puppet-test-face-at 1) 'puppet-comment-face))
+    (should (eq (puppet-test-face-at 4) 'puppet-comment-face))
+    (should (eq (puppet-test-face-at 8) 'puppet-comment-face))
+    (should (eq (puppet-test-face-at 11) 'puppet-comment-face))
+    (should-not (puppet-test-face-at 13))))
 
 (provide 'puppet-mode-test)
 
