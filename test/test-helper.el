@@ -24,7 +24,7 @@
        (dir (locate-dominating-file cur "Cask")))
   (load (expand-file-name "puppet-ts-mode" dir)))
 
-;;;; Utility functions
+;;;; Utility functions (adapted from puppet-mode)
 
 (defmacro puppet-test-with-temp-buffer (content &rest body)
   "Evaluate BODY in a temporary buffer with CONTENT."
@@ -54,8 +54,8 @@ Each symbol in this vector corresponding to the syntax code of
 its index.")
 
 (defun puppet-test-syntax-at (pos)
-  "Get the syntax at POS.
-Get the syntax class symbol at POS, or nil if there is no syntax a POS."
+  "Get the syntax class at POS.
+Returns nil if there is no syntax class set at POS."
   (let ((code (syntax-class (syntax-after pos))))
     (aref puppet-test-syntax-classes code)))
 
@@ -63,9 +63,9 @@ Get the syntax class symbol at POS, or nil if there is no syntax a POS."
   "Test indentation of Puppet CODE.
 The CODE argument is a string that should contain correctly
 indented Puppet code.  The code is indented using `indent-region'
-and the test succeeds if the result did not change"
+and the test succeeds if the result does not differ from CODE."
   (puppet-test-with-temp-buffer code
-                                (indent-region (point-min) (point-max))
-                                (should (string= (buffer-string) code))))
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string) code))))
 
 ;;; test-helper.el ends here
