@@ -4,7 +4,7 @@
 
 ;;; Code:
 
-(message "Running tests on Emacs %s" emacs-version)
+(message "Running on Emacs %s" emacs-version)
 
 (let* ((cur (if load-in-progress load-file-name buffer-file-name))
        (dir (locate-dominating-file cur "Cask")))

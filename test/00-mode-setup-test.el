@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-06 13:11:14 stm>
+;; Updated: <2024-03-06 13:16:48 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -27,7 +27,7 @@
 
 ;;; Code:
 
-(message "Running test in %s" (file-relative-name load-file-name))
+(message "\nRunning tests in %s" (file-relative-name load-file-name))
 
 
 ;;; Requirements
