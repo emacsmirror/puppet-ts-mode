@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-03-06 13:16:48 stm>
+;; Updated: <2024-03-06 13:51:59 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -27,16 +27,26 @@
 
 ;;; Code:
 
-(message "\nRunning tests in %s" (file-relative-name load-file-name))
+(message "Running tests in %s" (file-relative-name load-file-name))
 
 
 ;;; Requirements
 (require 'ert)
+(require 'treesit)
 
 ;;; Tests
-(ert-deftest puppet/feature-loaded ()
+(ert-deftest puppet/treesitter-loaded ()
+  :tags '(library)
+  (should (featurep 'treesit)))
+
+(ert-deftest puppet/treesitter-parser-loaded ()
+  :tags '(library)
+  (should (treesit-ready-p 'puppet)))
+
+(ert-deftest puppet/puppet-ts-mode-loaded ()
   :tags '(library)
   (should (featurep 'puppet-ts-mode)))
+
 
 (provide 'puppet-mode-test)
 
