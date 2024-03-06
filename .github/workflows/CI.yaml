@@ -46,3 +46,6 @@ jobs:
 
     - name: Byte Compile
       run: make compile
+
+    - name: Run Tests
+      run: make test
