@@ -1,12 +1,12 @@
 # Makefile --- Puppet Treesitter Mode for Emacs
 
-CASK   := cask
-EMACS  := emacs
+CASK    := cask
+EMACS   := emacs
 
-SRCS   := $(shell cask files)
-OBJS   := $(SRCS:.el=.elc)
-TESTS  := $(wildcard test/*-test.el)
-PKGDIR := $(shell $(CASK) package-directory)
+SRCS    := $(shell cask files)
+OBJS    := $(SRCS:.el=.elc)
+TESTS   := $(wildcard test/*-test.el)
+PKGDIR  := $(shell $(CASK) package-directory)
 
 #
 # rules

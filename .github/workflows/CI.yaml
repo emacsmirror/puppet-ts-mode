@@ -40,14 +40,14 @@ jobs:
         version: ${{ matrix.emacs_version }}
 
     - name: Cache Cask packages
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: cache-cask-packages
       with:
         path: .cask
         key: cache-cask-packages-000
 
     - name: Cache Cask executable
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: cache-cask-executable
       with:
         path: ~/.cask
@@ -61,12 +61,6 @@ jobs:
 
     - name: Update PATH
       run: echo "$HOME/.cask/bin" >> $GITHUB_PATH
-
-    # - name: Install Python
-    #   uses: actions/setup-python@v5
-    #   with:
-    #     python-version: '3.12'
-    #     architecture: 'x64'
 
     - name: Byte Compile
       run: make compile
