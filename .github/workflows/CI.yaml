@@ -1,0 +1,45 @@
+# CI.yaml --- Github action workflow definition
+---
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        emacs_version:
+          - 29.1
+          - 29.2
+          - snapshot
+
+    name: Emacs ${{ matrix.emacs_version }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install Python
+      uses: actions/setup-python@v5
+
+    - name: Install Emacs
+      uses: purcell/setup-emacs@master
+      with:
+        version: ${{ matrix.emacs_version }}
+
+    - name: Install Cask
+      uses: conao3/setup-cask@master
+      with:
+        version: 'snapshot'
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Byte Compile
+      run: make compile
