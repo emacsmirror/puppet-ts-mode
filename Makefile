@@ -5,24 +5,31 @@ EMACS   := emacs
 
 SRCS    := $(shell cask files)
 OBJS    := $(SRCS:.el=.elc)
-TESTS   := $(wildcard test/*-test.el)
+CHECKS  := $(wildcard test/*-test.el)
 PKGDIR  := $(shell $(CASK) package-directory)
 
 #
 # rules
 #
 
-all: compile tests
+all: compile check
 
 compile: $(OBJS)
 
-tests: $(TESTS) | $(PKGDIR)
+check: $(CHECKS) | $(PKGDIR)
+
+clean:
+	@$(CASK) clean-elc
+
+dist: $(OBJS) Cask
+	@$(CASK) pkg-file
+	@$(CASK) package
 
 %.elc: %.el | $(PKGDIR)
-	@$(CASK) $(EMACS) -Q -batch -f batch-byte-compile $<
+	@$(CASK) build
 
-test/%.el: FORCE
-	@$(CASK) $(EMACS) -Q -batch -L . -L test \
+test/%.el: .FORCE
+	@$(CASK) emacs -Q -batch -L . -L test \
 		-l ert -l test/test-helper -l $@ \
 		-f ert-run-tests-batch-and-exit
 
@@ -34,5 +41,5 @@ $(PKGDIR): Cask
 # special targets
 #
 
-FORCE:
-.PHONY: compile tests
+.FORCE:
+.PHONY: compile check clean dist
