@@ -35,6 +35,9 @@
      (insert ,content)
      (goto-char (point-min))
      (puppet-ts-mode)
+     ;; activate maximum decoration
+     (setq-local treesit-font-lock-level 4)
+     (treesit-font-lock-recompute-features)
      (font-lock-ensure)
      ,@body))
 
