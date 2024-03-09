@@ -16,7 +16,7 @@ all: compile check
 
 compile: $(OBJS)
 
-check: $(CHECKS) | $(PKGDIR)
+check: compile $(CHECKS)
 
 clean:
 	@$(CASK) clean-elc
@@ -25,7 +25,7 @@ dist: $(OBJS) Cask
 	@$(CASK) pkg-file
 	@$(CASK) package
 
-%.elc: %.el | $(PKGDIR)
+%.elc: %.el $(PKGDIR)
 	@$(CASK) build
 
 test/%.el: .FORCE
