@@ -262,6 +262,8 @@ is added here because it is common and important.")
    :language 'puppet
    `((call_function (name) @puppet-builtin-face
                     (:match ,puppet--builtin-functions-regex @puppet-builtin-face))
+     (named_access (name) @puppet-builtin-face
+                   (:match ,puppet--builtin-functions-regex @puppet-builtin-face))
      (attribute name: (name) @puppet-builtin-face
                 (:match ,puppet--metaparameters-regex @puppet-builtin-face))
      (attribute value: (name) @puppet-builtin-face
