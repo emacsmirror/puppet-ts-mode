@@ -6,7 +6,7 @@
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Version: 0.1.0
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-21 17:59:15 stm>
+;; Updated: <2024-04-21 18:39:59 stm>
 ;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 
@@ -372,7 +372,8 @@ is added here because it is common and important.")
   ;; Indentation
   ;;(setq-local indent-line-function #'puppet-indent-line)
   (setq indent-tabs-mode puppet-indent-tabs-mode)
-  (setq-local electric-indent-chars (append '(?\{ ?\}) electric-indent-chars))
+  (setq-local electric-indent-chars
+              (append '(?\{ ?\} ?\( ?\) ?: ?,) electric-indent-chars))
 
   ;; Paragaphs
   (setq-local paragraph-ignore-fill-prefix t)
