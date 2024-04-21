@@ -24,6 +24,7 @@ clean:
 dist: $(OBJS) Cask
 	@$(CASK) pkg-file
 	@$(CASK) package
+	@gzip --best dist/*.tar
 
 %.elc: %.el $(PKGDIR)
 	@$(CASK) build
