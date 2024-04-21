@@ -6,7 +6,7 @@
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Version: 0.1.0
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-21 17:35:01 stm>
+;; Updated: <2024-04-21 17:59:15 stm>
 ;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 
@@ -305,7 +305,7 @@ is added here because it is common and important.")
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
      ;; compound statements
-     ;; ((node-is ,puppet--indent-like-parent) parent-bol 0)
+     ((node-is ,puppet--indent-like-parent) parent-bol 0)
      ;; ((parent-is ,puppet--indent-one-level) parent-bol puppet-indent-level)
      ;; default
      (no-node parent-bol 0)
