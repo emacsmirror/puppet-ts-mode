@@ -25,7 +25,7 @@ The following Elisp code can be used to add the Puppet language parser to your E
 
 ```elisp
 (add-to-list 'treesit-language-source-alist
-             '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
+             '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
 ```
 
 Then install the parser for the Puppet language using the following command. This requires some tools-- notably a compiler toolchain -- to be available on your machine.

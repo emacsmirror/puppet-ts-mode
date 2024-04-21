@@ -6,7 +6,7 @@
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Version: 0.1.0
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-21 18:39:59 stm>
+;; Updated: <2024-04-21 18:46:03 stm>
 ;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 
@@ -33,7 +33,7 @@
 ;;
 ;;    (add-to-list
 ;;     'treesit-language-source-alist
-;;     '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
+;;     '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
 ;;    (treesit-install-language-grammar 'puppet)
 ;;
 ;; Also consult the Emacs manual: (info "(elisp) Parsing Program Source")
