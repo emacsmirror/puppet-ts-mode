@@ -290,9 +290,9 @@ is added here because it is common and important.")
 (defvar puppet--indent-one-level
   (rx bos
       (or "array" "body" "hash" "selector" "resource" "parameter_list"
-          "call_function" "case_expression"  "if_expression" "unless_expression"
+          "case_expression"  "if_expression" "unless_expression"
           "class_definition" "define_definition" "function_definition"
-          "node_definition" "plan_definition")
+          "node_definition" "plan_definition" "call_function")
       eos)
   "Structures that will have their children indented by an additional level.")
 
