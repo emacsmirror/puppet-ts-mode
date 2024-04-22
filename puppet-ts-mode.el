@@ -6,7 +6,7 @@
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Version: 0.1.0
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-21 18:46:03 stm>
+;; Updated: <2024-04-22 11:07:13 stm>
 ;; Keywords: Puppet Treesitter
 ;; Package-Requires: ((emacs "29.1"))
 
@@ -204,79 +204,85 @@ is added here because it is common and important.")
   ;; Level 4 adds everything else that can be fontified: delimiters,
   ;; operators, brackets, punctuation, all functions, properties,
   ;; variables, etc.
-  '((comment)
+  '((comment definition)
     (keyword resource-type builtin string)
     (constant variable string-interpolation)
     (operator error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
 (defvar puppet-ts-mode--font-lock-settings
-  (treesit-font-lock-rules
-   :feature 'comment
-   :language 'puppet
-   '((comment) @puppet-comment-face)
+  `(:feature comment
+    :language puppet
+    ((comment) @puppet-comment-face)
 
-   :feature 'string
-   :language 'puppet
-   '((string) @puppet-string-face)
+    :feature string
+    :language puppet
+    ((string) @puppet-string-face)
 
-   :feature 'string-interpolation
-   :language 'puppet
-   :override t
-   '((string (interpolation) @puppet-variable-name-face))
+    :feature string-interpolation
+    :language puppet
+    :override t
+    ((string (interpolation) @puppet-variable-name-face))
 
-   :feature 'variable
-   :language 'puppet
-   '((variable ["$" (name)] @puppet-variable-name-face))
-
-   :feature 'constant
-   :language 'puppet
-   '(((boolean) @puppet-constant-face)
-     ((default) @puppet-constant-face)
-     ((undef) @puppet-constant-face))
-
-   :feature 'keyword
-   :language 'puppet
-   `((if_expression "if" @puppet-keyword-face)
-     (elsif_clause "elsif" @puppet-keyword-face)
-     (else_clause "else" @puppet-keyword-face)
-     (unless_expression "unless" @puppet-keyword-face)
-     (case_expression "unless" @puppet-keyword-face)
-     (class_definition ["class" "inherits"] @puppet-keyword-face)
+    :feature definition
+    :language puppet
+    ((class_definition ["class" "inherits"] @puppet-keyword-face)
      (define_definition "define" @puppet-keyword-face)
      (function_definition "function" @puppet-keyword-face)
      (node_definition "node" @puppet-keyword-face)
      (plan_definition "plan" @puppet-keyword-face)
+     ;; names of defined classes, defined types, functions, nodes, ...
+     (classname (name) @puppet-resource-type-face))
+
+    :feature variable
+    :language puppet
+    ((variable ["$" (name)] @puppet-variable-name-face))
+
+    :feature constant
+    :language puppet
+    (((boolean) @puppet-constant-face)
+     ((default) @puppet-constant-face)
+     ((undef) @puppet-constant-face))
+
+    :feature keyword
+    :language puppet
+    ((if_expression "if" @puppet-keyword-face)
+     (elsif_clause "elsif" @puppet-keyword-face)
+     (else_clause "else" @puppet-keyword-face)
+     (unless_expression "unless" @puppet-keyword-face)
+     (case_expression "unless" @puppet-keyword-face)
      (resource ["and" "or" "in"] @puppet-keyword-face))
 
-   :feature 'resource-type
-   :language 'puppet
-   '((resource_type (name) @puppet-resource-type-face)
+    :feature resource-type
+    :language puppet
+    ((resource_type (name) @puppet-resource-type-face)
      (resource [(virtual) (exported)] @puppet-resource-type-face)
-     ;; names of defined classes, defined types, functions, nodes, ...
-     (classname (name) @puppet-resource-type-face)
      ;; data and resource reference types
      (type (classref) @puppet-resource-type-face))
 
-   :feature 'builtin
-   :language 'puppet
-   `((call_function (name) @puppet-builtin-face
-                    (:match ,puppet--builtin-functions-regex @puppet-builtin-face))
+    :feature builtin
+    :language puppet
+    ((call_function (name) @puppet-builtin-face
+                    (:match ,puppet--builtin-functions-regex
+                            @puppet-builtin-face))
      (named_access (name) @puppet-builtin-face
-                   (:match ,puppet--builtin-functions-regex @puppet-builtin-face))
+                   (:match ,puppet--builtin-functions-regex
+                           @puppet-builtin-face))
      (attribute name: (name) @puppet-builtin-face
-                (:match ,puppet--metaparameters-regex @puppet-builtin-face))
+                (:match ,puppet--metaparameters-regex
+                        @puppet-builtin-face))
      (attribute value: (name) @puppet-builtin-face
-                (:match ,puppet--constants-regex @puppet-builtin-face)))
+                (:match ,puppet--constants-regex
+                        @puppet-builtin-face)))
 
-   :feature 'operator
-   :language 'puppet
-   '((resource "!") @puppet-negation-char-face)
+    :feature operator
+    :language puppet
+    ((resource "!") @puppet-negation-char-face)
 
-   :feature 'error
-   :language 'puppet
-   :override t
-   '((ERROR) @puppet-warning-face))
+    :feature error
+    :language puppet
+    :override t
+    ((ERROR) @puppet-warning-face))
   "`treesit-font-lock-settings' for `puppet-ts-mode'.")
 
 
@@ -386,11 +392,12 @@ is added here because it is common and important.")
 
     ;; Font-Lock
     (setq-local treesit-font-lock-feature-list puppet-ts-mode--feature-list)
-    (setq-local treesit-font-lock-settings puppet-ts-mode--font-lock-settings)
+    (setq-local treesit-font-lock-settings
+                (apply #'treesit-font-lock-rules
+                       puppet-ts-mode--font-lock-settings))
 
     ;; Indentation
     (setq-local treesit-simple-indent-rules puppet-ts-indent-rules)
-    ;;(setq-local treesit--indent-verbose t)
 
     (treesit-major-mode-setup)))
 
