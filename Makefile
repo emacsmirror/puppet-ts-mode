@@ -21,11 +21,6 @@ check: compile $(CHECKS)
 clean:
 	@$(CASK) clean-elc
 
-dist: $(OBJS) Cask
-	@$(CASK) pkg-file
-	@$(CASK) package
-	@gzip --best dist/*.tar
-
 %.elc: %.el $(PKGDIR)
 	@$(CASK) build
 
@@ -43,4 +38,4 @@ $(PKGDIR): Cask
 #
 
 .FORCE:
-.PHONY: compile check clean dist
+.PHONY: all compile check clean
