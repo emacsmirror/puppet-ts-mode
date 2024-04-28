@@ -36,8 +36,6 @@ Then install the parser for the Puppet language using the following command. Thi
 
 This command can also be used to update the parser to the latest version from time to time.
 
-See the Tree-sitter starter guide: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=emacs-29
-
 ## License
 
 Puppet Treesitter Mode is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
