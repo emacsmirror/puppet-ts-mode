@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-28 16:18:24 stm>
+;; Updated:          <2024-04-28 16:37:22 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -199,6 +199,10 @@ is added here because it is common and important.")
   "Face for the name of a function being called in Puppet."
   :group 'puppet)
 
+(defface puppet-operator-face
+  '((t :inherit font-lock-operator-face))
+  "Face for operators.")
+
 (defface puppet-negation-char-face
   '((t :inherit font-lock-negation-char-face))
   "Face for negation characters."
@@ -226,8 +230,8 @@ is added here because it is common and important.")
   ;; operators, brackets, punctuation, all functions, properties,
   ;; variables, etc.
   '((comment definition)
-    (keyword function resource-type builtin string)
-    (constant variable interpolation number)
+    (keyword resource-type builtin string)
+    (constant number variable interpolation function)
     (operator error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
@@ -244,10 +248,6 @@ is added here because it is common and important.")
     :language puppet
     :override t
     ((interpolation) @puppet-variable-name-face)
-
-    :feature operator
-    :language puppet
-    ((unary operator: "!" @puppet-negation-char-face))
 
     :feature variable
     :language puppet
@@ -310,10 +310,17 @@ is added here because it is common and important.")
     :feature resource-type
     :language puppet
     (((resource_type [(name) (virtual) (exported)] @puppet-resource-type-face))
+     ;; arguments to statement functions
      ((statement_function
        (argument_list (argument (name) @puppet-resource-type-face))))
      ;; data and resource reference types
      ((type) @puppet-resource-type-face))
+
+    :feature operator
+    :language puppet
+    ((unary operator: "!" @puppet-negation-char-face)
+     (unary operator: _  @puppet-operator-face)
+     (binary operator: _ @puppet-operator-face))
 
     :feature error
     :language puppet

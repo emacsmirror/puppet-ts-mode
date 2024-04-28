@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-28 16:25:15 stm>
+;; Updated: <2024-04-28 16:49:43 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -101,6 +101,16 @@
     (should (eq (puppet-test-face-at 6) 'puppet-number-face))
     (should (eq (puppet-test-face-at 7) 'puppet-number-face))
     (should (eq (puppet-test-face-at 9) 'puppet-number-face))))
+
+;;; Operators
+
+(ert-deftest puppet/operator-negation ()
+  (puppet-test-with-temp-buffer "$x = !true"
+    (should (eq (puppet-test-face-at 6) 'puppet-negation-char-face))))
+
+(ert-deftest puppet/operator-compare ()
+  (puppet-test-with-temp-buffer "$x > $y"
+    (should (eq (puppet-test-face-at 4) 'puppet-operator-face))))
 
 
 ;;; Comments
