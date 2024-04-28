@@ -5,7 +5,7 @@
 ;; Author: Stefan Möding
 ;; Version: 0.1.0
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-27 11:34:46 stm>
+;; Updated: <2024-04-28 13:43:12 stm>
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Keywords: puppet, treesitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -51,10 +51,10 @@
 
 ;;; Requirements
 
+(require 'treesit)
+
 (eval-when-compile
   (require 'rx))
-
-(require 'treesit)
 
 
 ;;; Customization
@@ -327,34 +327,68 @@ is added here because it is common and important.")
   :type 'boolean
   :safe 'booleanp)
 
-(defvar puppet--indent-one-level
-  (rx bos
-      (or "array" "block" "hash" "selector"
-          "argument_list" "parameter_list" "attribute_list"
-          "case"  "if" "unless"
-          "class_definition" "define_definition" "function_definition"
-          "node_definition" "plan_definition" "function_call"
-          "resource_type" "resource_body" "resource_reference")
-      eos)
-  "Nodes that will have their children indented by an additional level.")
+(defsubst puppet-find-ancestor-node (node regex)
+  "Find ancestor of NODE with a node type that matched REGEX."
+  (treesit-parent-until node
+                        #'(lambda (x)
+                            (string-match-p regex (treesit-node-type x)))
+                        t))
 
-(defvar puppet--indent-like-parent
-  (rx bos
-      (or "else" "elsif")
-      eos)
-  "Statements that will be indented the same level as their parent.")
+(defun puppet-ancestor-definition-bol (node parent _bol)
+  "Search ancestors of NODE or PARENT for a Puppet definition.
+
+The search starts with PARENT if NODE is NIL.  This happens if no
+node can start at the position, e.g. there is an empty line.
+Return the beginning of line position for the Puppet definition."
+  (let ((ancestor (puppet-find-ancestor-node
+                   (or node parent)     ; Start with parent if node is nil
+                   (regexp-opt '("class_definition" "define_definition"
+                                 "function_definition")))))
+    (if ancestor
+        (save-excursion
+          (goto-char (treesit-node-start ancestor))
+          (back-to-indentation)
+          (point)))))
+
+(defun puppet-ancestor-resource-bol (node parent _bol)
+  "Search ancestors of NODE or PARENT for a Puppet resource.
+
+The search starts with PARENT if NODE is NIL.  This happens if no
+node can start at the position, e.g. there is an empty line.
+Return the beginning of line position for the Puppet resource."
+  (let ((ancestor (puppet-find-ancestor-node
+                   (or node parent)     ; Start with parent if node is nil
+                   (regexp-opt '("resource_type" "resource_reference")))))
+    (if ancestor
+        (save-excursion
+          (goto-char (treesit-node-start ancestor))
+          (back-to-indentation)
+          (point)))))
+
+(setq treesit-simple-indent-presets
+      (append treesit-simple-indent-presets
+              (list (cons 'definition-bol #'puppet-ancestor-definition-bol)
+                    (cons 'resource-bol #'puppet-ancestor-resource-bol))))
 
 (defvar puppet-ts-indent-rules
   `((puppet
      ;; top-level statements start in column zero
-     ((parent-is "manifest") parent 0)
+     ((parent-is "manifest") column-0 0)
      ;; block structure
-     ((node-is ,(regexp-opt '( "]" "}" ")"))) parent-bol 0)
-     ;; compound statements
-     ((parent-is ,puppet--indent-one-level) parent-bol puppet-indent-level)
-     ((node-is ,puppet--indent-like-parent) parent-bol 0)
-     ;; default
-     (no-node prev-line 0)
+     ((node-is ")") parent-bol 0)
+     ((node-is "]") parent-bol 0)
+     ((node-is "}") parent-bol 0)
+     ((parent-is "block") parent-bol puppet-indent-level)
+     ((node-is "elsif") parent-bol 0)
+     ((node-is "else") parent-bol 0)
+     ((node-is "case_option") parent-bol puppet-indent-level)
+     ((node-is "selector_option") parent-bol puppet-indent-level)
+     ((parent-is "resource_type") resource-bol puppet-indent-level)
+     ((parent-is "resource_body") resource-bol puppet-indent-level)
+     ((parent-is "resource_reference") resource-bol puppet-indent-level)
+     ((node-is "attribute") resource-bol puppet-indent-level)
+     ((parent-is "attribute_list") resource-bol puppet-indent-level)
+     ((parent-is "parameter_list") definition-bol puppet-indent-level)
      (catch-all parent-bol 0)))
   "Indentation rules for `puppet-ts-mode'.")
 
