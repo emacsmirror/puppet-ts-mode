@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-28 16:10:03 stm>
+;; Updated:          <2024-04-28 16:18:24 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -204,6 +204,11 @@ is added here because it is common and important.")
   "Face for negation characters."
   :group 'puppet)
 
+(defface puppet-number-face
+  '((t :inherit font-lock-number-face))
+  "Face for numbers."
+  :group 'puppet)
+
 (defface puppet-warning-face
   '((t :inherit font-lock-warning-face))
   "Face for language errors found by the parser."
@@ -222,7 +227,7 @@ is added here because it is common and important.")
   ;; variables, etc.
   '((comment definition)
     (keyword function resource-type builtin string)
-    (constant variable interpolation)
+    (constant variable interpolation number)
     (operator error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
@@ -254,6 +259,10 @@ is added here because it is common and important.")
      ((false) @puppet-constant-face)
      ((default) @puppet-constant-face)
      ((undef) @puppet-constant-face))
+
+    :feature number
+    :language puppet
+    ((number) @puppet-number-face)
 
     :feature definition
     :language puppet

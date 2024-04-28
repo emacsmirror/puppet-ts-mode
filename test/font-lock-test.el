@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-28 13:14:18 stm>
+;; Updated: <2024-04-28 16:25:15 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -74,6 +74,33 @@
     (should (eq (puppet-test-face-at 6) 'puppet-variable-name-face))
     (should (eq (puppet-test-face-at 14) 'puppet-variable-name-face))
     (should (eq (puppet-test-face-at 16) 'puppet-string-face))))
+
+
+;;; Numbers
+
+(ert-deftest puppet/number-integer ()
+  (puppet-test-with-temp-buffer "$x = 42"
+    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 7) 'puppet-number-face))))
+
+(ert-deftest puppet/number-float ()
+  (puppet-test-with-temp-buffer "$x = 4.2"
+    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 7) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 8) 'puppet-number-face))))
+
+(ert-deftest puppet/number-scientific ()
+  (puppet-test-with-temp-buffer "$x = 4.2e12"
+    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 7) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 9) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 11) 'puppet-number-face))))
+
+(ert-deftest puppet/number-hex ()
+  (puppet-test-with-temp-buffer "$x = 0x42"
+    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 7) 'puppet-number-face))
+    (should (eq (puppet-test-face-at 9) 'puppet-number-face))))
 
 
 ;;; Comments
