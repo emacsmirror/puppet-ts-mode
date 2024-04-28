@@ -14,7 +14,7 @@
 
 (add-to-list
  'treesit-language-source-alist
- '(puppet "https://github.com/tree-sitter-grammars/tree-sitter-puppet"))
+ '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
 
 (unless (treesit-ready-p 'puppet t)
   (treesit-install-language-grammar 'puppet))
