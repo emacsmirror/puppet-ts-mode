@@ -2,12 +2,13 @@
 
 ;; Copyright (c) 2024 Stefan Möding
 
-;; Author: Stefan Möding
-;; Version: 0.1.0
-;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-28 14:24:11 stm>
-;; URL: https://github.com/smoeding/puppet-ts-mode
-;; Keywords: puppet, treesitter
+;; Author:           Stefan Möding <stm@kill-9.net>
+;; Maintainer:       Stefan Möding <stm@kill-9.net>
+;; Version:          0.1.0
+;; Created:          <2024-03-02 13:05:03 stm>
+;; Updated:          <2024-04-28 16:08:10 stm>
+;; URL:              https://github.com/smoeding/puppet-ts-mode
+;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -27,19 +28,17 @@
 
 ;;; Commentary:
 
-;; This package defines a tree-sitter enabled major mode for Puppet that
-;; provides support for indentation, font-locking, imenu (not yet), and
-;; structural navigation (not yet).
-;;
-;; Before the mode can be used, the tree-sitter parser for Puppet must be
-;; installed.  This can be done by using the following Elisp snippet:
+;; This package provides Puppet syntax highlighting, indentation and
+;; navigation using Tree-sitter.  To use the `puppet-ts-mode' major mode you
+;; will need the appropriate grammar installed.  This can be done by using
+;; the following Elisp snippet:
 ;;
 ;;    (add-to-list
 ;;     'treesit-language-source-alist
 ;;     '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
 ;;    (treesit-install-language-grammar 'puppet)
 ;;
-;; Note that a compiler toolchain is required for this to work.  You shoul
+;; Note that a compiler toolchain is required for this to work.  You should
 ;; also consult the Emacs manual: (info "(elisp) Parsing Program Source")
 ;;
 ;; Caution: Currently this is work in progress; many details concerning
