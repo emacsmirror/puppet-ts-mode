@@ -3,9 +3,9 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml/badge.svg)](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml)
 
-This is puppet-ts-mode, a major mode to edit Puppet manifests using the tree-sitter parser for Puppet.
+This is a major mode to edit Puppet manifests using a tree-sitter parser.
 
-**Note:** This is work in progress; many details concerning font-lock or indentation might not yet work as expected.  Most convenience functions of the old puppet-mode are not (yet) implemented.
+**Note:** This is still work in progress; many details concerning font-lock or indentation might not yet work as expected. Most convenience functions of the old puppet-mode are not (yet) implemented.
 
 ## Features
 
@@ -28,7 +28,7 @@ The following Elisp code can be used to add the Puppet language parser to your E
              '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
 ```
 
-Then install the parser for the Puppet language using the following command. This requires some tools-- notably a compiler toolchain -- to be available on your machine.
+Then install the parser for the Puppet language using the following command. This requires some tools -- notably a compiler toolchain -- to be available on your machine.
 
 ```elisp
 (treesit-install-language-grammar 'puppet)
