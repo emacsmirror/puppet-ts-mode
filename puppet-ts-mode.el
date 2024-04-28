@@ -5,7 +5,7 @@
 ;; Author: Stefan Möding
 ;; Version: 0.1.0
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-28 13:43:12 stm>
+;; Updated: <2024-04-28 14:24:11 stm>
 ;; URL: https://github.com/smoeding/puppet-ts-mode
 ;; Keywords: puppet, treesitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -339,7 +339,9 @@ is added here because it is common and important.")
 
 The search starts with PARENT if NODE is NIL.  This happens if no
 node can start at the position, e.g. there is an empty line.
-Return the beginning of line position for the Puppet definition."
+Return the beginning of line position for the Puppet definition.
+
+The signature of this function is defined by Tree-Sitter."
   (let ((ancestor (puppet-find-ancestor-node
                    (or node parent)     ; Start with parent if node is nil
                    (regexp-opt '("class_definition" "define_definition"
@@ -355,7 +357,9 @@ Return the beginning of line position for the Puppet definition."
 
 The search starts with PARENT if NODE is NIL.  This happens if no
 node can start at the position, e.g. there is an empty line.
-Return the beginning of line position for the Puppet resource."
+Return the beginning of line position for the Puppet resource.
+
+The signature of this function is defined by Tree-Sitter."
   (let ((ancestor (puppet-find-ancestor-node
                    (or node parent)     ; Start with parent if node is nil
                    (regexp-opt '("resource_type" "resource_reference")))))
@@ -365,6 +369,7 @@ Return the beginning of line position for the Puppet resource."
           (back-to-indentation)
           (point)))))
 
+;; Make our functions usable as indent anchors by tree-sitter
 (setq treesit-simple-indent-presets
       (append treesit-simple-indent-presets
               (list (cons 'definition-bol #'puppet-ancestor-definition-bol)
