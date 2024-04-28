@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-28 16:08:10 stm>
+;; Updated:          <2024-04-28 16:10:03 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -85,32 +85,32 @@ is added here because it is common and important.")
 
 ;; https://www.puppet.com/docs/puppet/latest/function.html
 (defvar puppet--builtin-functions
-  '("abs" "alert" "all" "annotate" "any" "assert_type" "binary_file" "break"
-    "call" "camelcase" "capitalize" "ceiling" "chomp" "chop" "compare"
-    "contain" "convert_to" "create_resources" "crit" "debug" "defined" "dig"
-    "digest" "downcase" "each" "emerg" "empty" "epp" "err" "eyaml_lookup_key"
-    "fail" "file" "filter" "find_file" "find_template" "flatten" "floor"
-    "fqdn_rand" "generate" "get" "getvar" "group_by" "hiera" "hiera_array"
-    "hiera_hash" "hiera_include" "hocon_data" "import" "include" "index"
-    "info" "inline_epp" "inline_template" "join" "json_data" "keys" "length"
+  '("abs" "alert" "all" "annotate" "any" "assert_type" "binary_file"
+    "break" "call" "camelcase" "capitalize" "ceiling" "chomp" "chop"
+    "compare" "convert_to" "create_resources" "defined" "dig" "digest"
+    "downcase" "each" "emerg" "empty" "epp" "eyaml_lookup_key" "file"
+    "filter" "find_file" "find_template" "flatten" "floor" "fqdn_rand"
+    "generate" "get" "getvar" "group_by" "hiera" "hiera_array"
+    "hiera_hash" "hiera_include" "hocon_data" "import" "index"
+    "inline_epp" "inline_template" "join" "json_data" "keys" "length"
     "lest" "lookup" "lstrip" "map" "match" "max" "md5" "min"
-    "module_directory" "new" "next" "notice" "partition" "realize" "reduce"
-    "regsubst" "require" "return" "reverse_each" "round" "rstrip" "scanf"
-    "sha1" "sha256" "shellquote" "size" "slice" "sort" "split" "sprintf"
-    "step" "strftime" "strip" "tag" "tagged" "template" "then" "tree_each"
-    "type" "unique" "unwrap" "upcase" "values" "versioncmp" "warning" "with"
+    "module_directory" "new" "next" "partition" "realize" "reduce"
+    "regsubst" "return" "reverse_each" "round" "rstrip" "scanf" "sha1"
+    "sha256" "shellquote" "size" "slice" "sort" "split" "sprintf"
+    "step" "strftime" "strip" "tagged" "template" "then" "tree_each"
+    "type" "unique" "unwrap" "upcase" "values" "versioncmp" "with"
     "yaml_data"
     ;; Bolt: https://puppet.com/docs/bolt/0.x/plan_functions.html
     "apply" "apply_prep" "add_facts" "facts" "fail_plan" "file_upload"
-    "get_targets" "puppetdb_fact" "puppetdb_query" "run_command" "run_plan"
-    "run_script" "run_task" "set_feature" "set_var" "vars"
+    "get_targets" "puppetdb_fact" "puppetdb_query" "run_command"
+    "run_plan" "run_script" "run_task" "set_feature" "set_var" "vars"
     "without_default_logging")
   "Internal functions provided by Puppet.")
 
 (defvar puppet--statement-functions
-  '("include" "require" "contain" "tag"       ; Catalog statements
-    "debug" "info" "notice" "warning" "err"   ; Logging statements
-    "fail")                                   ; Failure statements
+  '("include" "require" "contain" "tag"            ; Catalog statements
+    "debug" "info" "notice" "warning" "err" "crit" ; Logging statements
+    "fail")                                        ; Failure statements
   "Statement functions provided by Puppet.")
 
 ;; Regular expressions
@@ -133,7 +133,8 @@ is added here because it is common and important.")
 
 (defvar puppet--builtin-functions-regex
   (rx-to-string `(seq bos
-                      ,(cons 'or puppet--builtin-functions)
+                      ,(cons 'or (append puppet--builtin-functions
+                                         puppet--statement-functions))
                       eos)
                 'no-group)
   "Internal functions provided by Puppet.")
