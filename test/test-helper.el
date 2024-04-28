@@ -34,10 +34,9 @@
   `(with-temp-buffer
      (insert ,content)
      (goto-char (point-min))
-     (puppet-ts-mode)
      ;; activate maximum decoration
-     (setq-local treesit-font-lock-level 4)
-     (treesit-font-lock-recompute-features)
+     (custom-set-variables '(treesit-font-lock-level 4))
+     (puppet-ts-mode)
      (font-lock-ensure)
      ,@body))
 
