@@ -16,7 +16,7 @@ all: compile check
 
 compile: $(OBJS)
 
-check: compile $(CHECKS)
+check: compile $(CHECKS) clean
 
 clean:
 	@$(CASK) clean-elc
