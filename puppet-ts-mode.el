@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-28 16:37:22 stm>
+;; Updated:          <2024-04-29 09:01:21 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -304,7 +304,7 @@ is added here because it is common and important.")
      ((elsif "elsif" @puppet-keyword-face))
      ((else "else" @puppet-keyword-face))
      ((unless "unless" @puppet-keyword-face))
-     ((case "unless" @puppet-keyword-face))
+     ((case "case" @puppet-keyword-face))
      (binary operator: ["and" "or" "in"] @puppet-keyword-face))
 
     :feature resource-type
