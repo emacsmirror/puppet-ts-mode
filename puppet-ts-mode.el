@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-29 09:01:21 stm>
+;; Updated:          <2024-04-29 13:31:44 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -385,31 +385,58 @@ The signature of this function is defined by Tree-Sitter."
           (back-to-indentation)
           (point)))))
 
+(defun puppet-ancestor-function-bol (node parent _bol)
+  "Search ancestors of NODE or PARENT for a Puppet function call.
+
+The search starts with PARENT if NODE is NIL.  This happens if no
+node can start at the position, e.g. there is an empty line.
+Return the beginning of line position for the Puppet resource.
+
+The signature of this function is defined by Tree-Sitter."
+  (let ((ancestor (puppet-find-ancestor-node
+                   (or node parent)     ; Start with parent if node is nil
+                   (regexp-opt '("function_call")))))
+    (if ancestor
+        (save-excursion
+          (goto-char (treesit-node-start ancestor))
+          (back-to-indentation)
+          (point)))))
+
 ;; Make our functions usable as indent anchors by tree-sitter
 (setq treesit-simple-indent-presets
       (append treesit-simple-indent-presets
               (list (cons 'definition-bol #'puppet-ancestor-definition-bol)
-                    (cons 'resource-bol #'puppet-ancestor-resource-bol))))
+                    (cons 'resource-bol #'puppet-ancestor-resource-bol)
+                    (cons 'function-bol #'puppet-ancestor-function-bol))))
 
 (defvar puppet-ts-indent-rules
   `((puppet
      ;; top-level statements start in column zero
      ((parent-is "manifest") column-0 0)
-     ;; block structure
+     ;; blocks
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
      ((node-is "}") parent-bol 0)
      ((parent-is "block") parent-bol puppet-indent-level)
+     ;; compound statements
      ((node-is "elsif") parent-bol 0)
      ((node-is "else") parent-bol 0)
-     ((node-is "case_option") parent-bol puppet-indent-level)
-     ((node-is "selector_option") parent-bol puppet-indent-level)
+     ;; arrays
+     ((match "array_element" nil nil 1 1) parent-bol puppet-indent-level)
+     ((match "array_element" nil nil 2 nil) prev-sibling 0)
+     ((parent-is "array") parent-bol puppet-indent-level)
+     ;; structures and expressions
+     ((parent-is "case") parent-bol puppet-indent-level)
+     ((parent-is "hash") parent-bol puppet-indent-level)
+     ((parent-is "selector") parent-bol puppet-indent-level)
+     ((parent-is "function_call") parent-bol puppet-indent-level)
      ((parent-is "resource_type") resource-bol puppet-indent-level)
      ((parent-is "resource_body") resource-bol puppet-indent-level)
      ((parent-is "resource_reference") resource-bol puppet-indent-level)
      ((node-is "attribute") resource-bol puppet-indent-level)
      ((parent-is "attribute_list") resource-bol puppet-indent-level)
      ((parent-is "parameter_list") definition-bol puppet-indent-level)
+     ((parent-is "argument_list") function-bol puppet-indent-level)
      (catch-all parent-bol 0)))
   "Indentation rules for `puppet-ts-mode'.")
 
