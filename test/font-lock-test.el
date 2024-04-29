@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-28 16:49:43 stm>
+;; Updated: <2024-04-29 13:21:45 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -25,17 +25,19 @@
 
 ;; Unit test suite for puppet-ts-mode
 
+;; Most test cases are taken from the original puppet-mode.
+
 ;;; Code:
 
-(message "Running tests in %s" (file-relative-name load-file-name))
+(message "Booting Emacs %s and run tests from %s"
+         emacs-version (file-relative-name load-file-name))
 
 
 ;;; Requirements
 (require 'ert)
 
-(declare-function puppet-test-face-at "test-helper.el" (pos &optional content))
 (declare-function puppet-test-with-temp-buffer (content &rest body))
-(declare-function puppet-test-syntax-at (pos))
+(declare-function puppet-test-face-at (pos &optional content))
 
 
 ;;; Strings
@@ -388,9 +390,6 @@ bar"
     (should (eq (puppet-test-face-at 12) 'puppet-resource-type-face))
     (should (eq (puppet-test-face-at 14) 'puppet-resource-type-face))
     (should (eq (puppet-test-face-at 16) 'puppet-resource-type-face))))
-
-
-(provide 'font-lock-test)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; font-lock-test.el ends here

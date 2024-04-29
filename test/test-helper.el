@@ -4,8 +4,6 @@
 
 ;;; Code:
 
-(message "Running on Emacs %s" emacs-version)
-
 (require 'ert)
 
 ;;;; Install & load grammar
