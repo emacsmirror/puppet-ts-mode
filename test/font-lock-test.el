@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-30 07:56:22 stm>
+;; Updated: <2024-04-30 08:14:34 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -273,7 +273,7 @@ bar"
     (should (eq (puppet-test-face-at 23) 'puppet-ts-resource-type))
     (should-not (puppet-test-face-at 25))))
 
-(ert-deftest puppet-font-lock-keywords/plan ()
+(ert-deftest puppet/plan ()
   (puppet-test-with-temp-buffer "plan foo::bar($foo) { }"
     ;; The keyword
     (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
@@ -308,14 +308,14 @@ bar"
     (should-not (puppet-test-face-at 6))
     (should-not (puppet-test-face-at 8))))
 
-(ert-deftest puppet-font-lock-keywords/resource-collector ()
+(ert-deftest puppet/resource-collector ()
   (puppet-test-with-temp-buffer "Foo::Bar <||>"
     (should (eq (puppet-test-face-at 1) 'puppet-ts-resource-type))
     (should (eq (puppet-test-face-at 4) 'puppet-ts-resource-type))
     (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
     (should-not (puppet-test-face-at 10))))
 
-(ert-deftest puppet-font-lock-keywords/exported-resource-collector ()
+(ert-deftest puppet/exported-resource-collector ()
   (puppet-test-with-temp-buffer "Foo::Bar <<| |>>}"
     (should (eq (puppet-test-face-at 1) 'puppet-ts-resource-type))
     (should (eq (puppet-test-face-at 4) 'puppet-ts-resource-type))
@@ -323,7 +323,7 @@ bar"
     (should-not (puppet-test-face-at 10))
     (should-not (puppet-test-face-at 11))))
 
-(ert-deftest puppet-font-lock-keywords/resource-collector-not-capitalized ()
+(ert-deftest puppet/resource-collector-not-capitalized ()
   (puppet-test-with-temp-buffer "Foo::bar <<| |>>"
     (should-not (puppet-test-face-at 6))
     (should-not (puppet-test-face-at 10))
