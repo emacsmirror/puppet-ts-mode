@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-30 07:24:16 stm>
+;; Updated:          <2024-04-30 07:44:29 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -232,8 +232,8 @@ is added here because it is common and important.")
   ;; operators, brackets, punctuation, all functions, properties,
   ;; variables, etc.
   '((comment definition)
-    (keyword resource-type builtin string)
-    (constant number variable interpolation function)
+    (keyword resource-type string)
+    (constant number variable interpolation builtin function)
     (operator error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
