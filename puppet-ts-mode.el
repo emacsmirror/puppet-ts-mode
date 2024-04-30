@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-29 13:31:44 stm>
+;; Updated:          <2024-04-30 07:24:16 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -51,8 +51,10 @@
 ;;; Requirements
 
 (require 'treesit)
+(require 'xref)
 
 (eval-when-compile
+  (require 'cl-macs)
   (require 'rx))
 
 
@@ -441,6 +443,125 @@ The signature of this function is defined by Tree-Sitter."
   "Indentation rules for `puppet-ts-mode'.")
 
 
+;; Xref
+
+(defcustom puppet-module-path
+  '("/etc/puppetlabs/code/environments/production/modules")
+  "Directories to search for modules when resolving cross references.
+
+The list can contain multiple directories to allow more than
+a single search location (for example to have a local directory
+tree for development).  Each directory should be a top-level
+directory that has the module directories as subdirectories.  The
+list is searched in order and the search is terminated when the
+first match is found.
+
+Remote directories as defined by TRAMP are possible but slow when
+accessed."
+  :group 'puppet
+  :type '(repeat directory))
+
+(defun puppet-module-root (file)
+  "Return the Puppet module root directory for FILE.
+
+Walk up the directory tree until a directory is found, that
+either contains a \"manifests\", \"lib\" or \"types\" subdir.
+Return the directory name or nil if no directory is found."
+  (locate-dominating-file
+   file
+   (lambda (path)
+     (and (file-accessible-directory-p path)
+          (or (file-readable-p (expand-file-name "manifests" path))
+              (file-readable-p (expand-file-name "lib" path))
+              (file-readable-p (expand-file-name "types" path)))))))
+
+(defun puppet-autoload-path (identifier &optional directory extension)
+  "Resolve IDENTIFIER into Puppet module and relative autoload path.
+
+Use DIRECTORY as module subdirectory \(defaults to \"manifests\"
+and EXTENSION as file extension \(defaults to \".pp\") when
+building the path.
+
+Return a cons cell where the first part is the module name and
+the second part is a relative path name below that module where
+the identifier should be defined according to the Puppet autoload
+rules."
+  (let* ((components (split-string identifier "::"))
+         (module (car components))
+         (path (cons (or directory "manifests")
+                     (butlast (cdr components))))
+         (file (if (cdr components)
+                   (car (last components))
+                 "init")))
+    (cons module
+          (concat (mapconcat #'file-name-as-directory path "")
+                  file
+                  (or extension ".pp")))))
+
+(defun puppet--xref-backend ()
+  "The Xref backend for `puppet-ts-mode'."
+  'puppet)
+
+(cl-defmethod xref-backend-identifier-at-point ((_backend (eql puppet)))
+  "Return the Puppet identifier at point."
+  (let ((thing (thing-at-point 'symbol)))
+    (and thing (substring-no-properties thing))))
+
+(cl-defmethod xref-backend-definitions ((_backend (eql puppet)) identifier)
+  "Find the definitions of a Puppet resource IDENTIFIER.
+
+First the location of the visited file is checked.  Then all
+directories from `puppet-module-path' are searched for the module
+and the file according to Puppet's autoloading rules."
+  (let* ((resource (downcase (if (string-prefix-p "::" identifier)
+                                 (substring identifier 2)
+                               identifier)))
+         (pupfiles (puppet-autoload-path resource))
+         (typfiles (puppet-autoload-path resource "types"))
+         (funfiles (puppet-autoload-path resource "functions"))
+         (xrefs '()))
+    (if pupfiles
+        (let* ((module (car pupfiles))
+               ;; merged list of relative path names to classes/defines/types
+               (pathlist (mapcar #'cdr (list pupfiles typfiles funfiles)))
+               ;; list of directories where this module might be
+               (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
+                                puppet-module-path))
+               ;; the regexp to find the resource definition in the file
+               (resdef (concat "^\\(class\\|define\\|type\\|function\\)\\s-+"
+                               resource
+                               "\\((\\|{\\|\\s-\\|$\\)"))
+               ;; files to visit when searching for the resource
+               (files '()))
+          ;; Check the current module directory (if the buffer actually visits
+          ;; a file) and all module subdirectories from `puppet-module-path'.
+          (dolist (dir (if buffer-file-name
+                           (cons (puppet-module-root buffer-file-name) moddirs)
+                         moddirs))
+            ;; Try all relative path names below the module directory that
+            ;; might contain the resource; save the file name if the file
+            ;; exists and we haven't seen it (we might try to check a file
+            ;; twice if the current module is also below one of the dirs in
+            ;; `puppet-module-path').
+            (dolist (path pathlist)
+              (let ((file (expand-file-name path dir)))
+                (if (and (not (member file files))
+                         (file-readable-p file))
+                    (setq files (cons file files))))))
+          ;; Visit all found files to finally locate the resource definition
+          (dolist (file files)
+            (with-temp-buffer
+              (insert-file-contents-literally file)
+              (save-match-data
+                (when (re-search-forward resdef nil t)
+                  (push (xref-make
+                         (match-string-no-properties 0)
+                         (xref-make-file-location
+                          file (line-number-at-pos (match-beginning 1)) 0))
+                        xrefs)))))))
+    xrefs))
+
+
 ;; Major mode definition
 
 (defvar puppet-ts-mode-syntax-table
@@ -489,6 +610,16 @@ The signature of this function is defined by Tree-Sitter."
 (define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
   "Major mode for editing Puppet files, using the tree-sitter library.
 
+The mode supports the cross-referencing system documented in the
+Info node `Xref'.  The customization variable `puppet-module-path'
+contains a list of directories that are searched to find locally
+installed Puppet modules.
+
+Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
+with point on an identifier \(a Puppet class, defined type,
+custom function or data type) jumps to the definition of that
+identifier.
+
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
 
@@ -508,6 +639,9 @@ The signature of this function is defined by Tree-Sitter."
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local paragraph-start "\f\\|[ \t]*$\\|#$")
   (setq-local paragraph-separate "\\([ \t\f]*\\|#\\)$")
+
+  ;; Xref
+  (add-hook 'xref-backend-functions #'puppet--xref-backend)
 
   ;; Treesitter
   (when (treesit-ready-p 'puppet)
