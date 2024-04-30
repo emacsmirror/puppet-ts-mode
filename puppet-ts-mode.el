@@ -30,7 +30,7 @@
 
 ;; This package provides Puppet syntax highlighting, indentation and
 ;; navigation using Tree-sitter.  To use the `puppet-ts-mode' major mode you
-;; will need the appropriate grammar installed.  This can be done by using
+;; will need to install the appropriate grammar.  This can be done by using
 ;; the following Elisp snippet:
 ;;
 ;;    (add-to-list
@@ -404,7 +404,7 @@ The signature of this function is defined by Tree-Sitter."
           (back-to-indentation)
           (point)))))
 
-;; Make our functions usable as indent anchors by tree-sitter
+;; Make the custom function usable as indent anchors by tree-sitter
 (setq treesit-simple-indent-presets
       (append treesit-simple-indent-presets
               (list (cons 'definition-bol #'puppet-ancestor-definition-bol)
