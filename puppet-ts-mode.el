@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-30 07:44:29 stm>
+;; Updated:          <2024-04-30 07:47:31 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -60,9 +60,9 @@
 
 ;;; Customization
 
-(defgroup puppet nil
+(defgroup puppet-ts nil
   "Write Puppet manifests in Emacs."
-  :prefix "puppet-"
+  :prefix "puppet-ts-"
   :group 'languages)
 
 (defvar puppet--file-attribute-constants
@@ -154,71 +154,72 @@ is added here because it is common and important.")
 (defface puppet-comment-face
   '((t :inherit font-lock-comment-face))
   "Face for comments in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-string-face
   '((t :inherit font-lock-string-face))
   "Face for strings in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-keyword-face
   '((t :inherit font-lock-keyword-face))
   "Face for keywords in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-resource-type-face
   '((t :inherit font-lock-type-face))
   "Face for resource types in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-builtin-face
   '((t :inherit font-lock-builtin-face))
   "Face for built-in functions in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-constant-face
   '((t :inherit font-lock-constant-face))
   "Face for a constant in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-variable-name-face
   '((t :inherit font-lock-variable-name-face))
   "Face for the name of a variable in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-variable-use-face
   '((t :inherit font-lock-variable-use-face))
   "Face for the name of a variable being referenced in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-function-name-face
   '((t :inherit font-lock-function-name-face))
   "Face for the name of a function in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-function-call-face
   '((t :inherit font-lock-function-call-face))
   "Face for the name of a function being called in Puppet."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-operator-face
   '((t :inherit font-lock-operator-face))
-  "Face for operators.")
+  "Face for operators."
+  :group 'puppet-ts)
 
 (defface puppet-negation-char-face
   '((t :inherit font-lock-negation-char-face))
   "Face for negation characters."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-number-face
   '((t :inherit font-lock-number-face))
   "Face for numbers."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 (defface puppet-warning-face
   '((t :inherit font-lock-warning-face))
   "Face for language errors found by the parser."
-  :group 'puppet)
+  :group 'puppet-ts)
 
 
 ;; Font-Lock
@@ -335,13 +336,13 @@ is added here because it is common and important.")
 
 (defcustom puppet-indent-level 2
   "Number of spaces for each indententation step."
-  :group 'puppet
+  :group 'puppet-ts
   :type 'integer
   :safe 'integerp)
 
 (defcustom puppet-indent-tabs-mode nil
   "Indentation can insert tabs in puppet mode if this is non-nil."
-  :group 'puppet
+  :group 'puppet-ts
   :type 'boolean
   :safe 'booleanp)
 
@@ -458,7 +459,7 @@ first match is found.
 
 Remote directories as defined by TRAMP are possible but slow when
 accessed."
-  :group 'puppet
+  :group 'puppet-ts
   :type '(repeat directory))
 
 (defun puppet-module-root (file)
