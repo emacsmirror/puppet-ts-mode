@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-29 13:21:45 stm>
+;; Updated: <2024-04-30 07:56:22 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -43,76 +43,76 @@
 ;;; Strings
 
 (ert-deftest puppet/fontify-dq-string ()
-  (should (eq (puppet-test-face-at 8 "$foo = \"bar\"") 'puppet-string-face)))
+  (should (eq (puppet-test-face-at 8 "$foo = \"bar\"") 'puppet-ts-string)))
 
 (ert-deftest puppet/fontify-sq-string ()
-  (should (eq (puppet-test-face-at 8 "$foo = 'bar'") 'puppet-string-face)))
+  (should (eq (puppet-test-face-at 8 "$foo = 'bar'") 'puppet-ts-string)))
 
 (ert-deftest puppet/escape-in-dq-string ()
   (puppet-test-with-temp-buffer "\"foo\\n\""
-    (should (eq (puppet-test-face-at 1) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 5) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-string-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 5) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-string))))
 
 ;; Interpolation is not (yet) detected in a single quoted string
 
 (ert-deftest puppet/variable-expansion-in-sq-string ()
   (puppet-test-with-temp-buffer "'${::foo::bar} yeah'"
-    (should (eq (puppet-test-face-at 1) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 2) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 3) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 14) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 16) 'puppet-string-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 3) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-string))))
 
 (ert-deftest puppet/variable-expansion-in-dq-string ()
   (puppet-test-with-temp-buffer "\"${::foo::bar} yeah\""
-    (should (eq (puppet-test-face-at 1) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 2) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 3) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 14) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 16) 'puppet-string-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 3) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-string))))
 
 
 ;;; Numbers
 
 (ert-deftest puppet/number-integer ()
   (puppet-test-with-temp-buffer "$x = 42"
-    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-number-face))))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-number))))
 
 (ert-deftest puppet/number-float ()
   (puppet-test-with-temp-buffer "$x = 4.2"
-    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 8) 'puppet-number-face))))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 8) 'puppet-ts-number))))
 
 (ert-deftest puppet/number-scientific ()
   (puppet-test-with-temp-buffer "$x = 4.2e12"
-    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 9) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 11) 'puppet-number-face))))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 9) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 11) 'puppet-ts-number))))
 
 (ert-deftest puppet/number-hex ()
   (puppet-test-with-temp-buffer "$x = 0x42"
-    (should (eq (puppet-test-face-at 6) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-number-face))
-    (should (eq (puppet-test-face-at 9) 'puppet-number-face))))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-number))
+    (should (eq (puppet-test-face-at 9) 'puppet-ts-number))))
 
 ;;; Operators
 
 (ert-deftest puppet/operator-negation ()
   (puppet-test-with-temp-buffer "$x = !true"
-    (should (eq (puppet-test-face-at 6) 'puppet-negation-char-face))))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-negation-char))))
 
 (ert-deftest puppet/operator-compare ()
   (puppet-test-with-temp-buffer "$x > $y"
-    (should (eq (puppet-test-face-at 4) 'puppet-operator-face))))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-operator))))
 
 
 ;;; Comments
@@ -120,9 +120,9 @@
 (ert-deftest puppet/fontify-line-comment ()
   (puppet-test-with-temp-buffer "# class
 bar"
-    (should (eq (puppet-test-face-at 1) 'puppet-comment-face))
-    (should (eq (puppet-test-face-at 3) 'puppet-comment-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-comment-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-comment))
+    (should (eq (puppet-test-face-at 3) 'puppet-ts-comment))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-comment))
     (should-not (puppet-test-face-at 8))
     (should-not (puppet-test-face-at 9))))
 
@@ -132,10 +132,10 @@ bar"
 ;; (ert-deftest puppet/fontify-c-style-comment ()
 ;;   (puppet-test-with-temp-buffer "/*
 ;; class */ bar"
-;;     (should (eq (puppet-test-face-at 1) 'puppet-comment-face))
-;;     (should (eq (puppet-test-face-at 4) 'puppet-comment-face))
-;;     (should (eq (puppet-test-face-at 8) 'puppet-comment-face))
-;;     (should (eq (puppet-test-face-at 11) 'puppet-comment-face))
+;;     (should (eq (puppet-test-face-at 1) 'puppet-ts-comment))
+;;     (should (eq (puppet-test-face-at 4) 'puppet-ts-comment))
+;;     (should (eq (puppet-test-face-at 8) 'puppet-ts-comment))
+;;     (should (eq (puppet-test-face-at 11) 'puppet-ts-comment))
 ;;     (should-not (puppet-test-face-at 13))))
 
 
@@ -184,15 +184,15 @@ bar"
 ;; (ert-deftest puppet/invalid-regular-expression ()
 ;;   (puppet-test-with-temp-buffer "$foo = / class $foo/"
 ;;     (should-not (puppet-test-face-at 8))
-;;     (should (eq (puppet-test-face-at 10) 'puppet-keyword-face))
-;;     (should (eq (puppet-test-face-at 16) 'puppet-variable-name-face))
+;;     (should (eq (puppet-test-face-at 10) 'puppet-ts-keyword))
+;;     (should (eq (puppet-test-face-at 16) 'puppet-ts-variable-name))
 ;;     (should-not (puppet-test-face-at 20))))
 
 
 ;;; Keywords
 
 (ert-deftest puppet/keyword-in-symbol ()
-  (should (eq (puppet-test-face-at 7 "class fooclass { }") 'puppet-resource-type-face)))
+  (should (eq (puppet-test-face-at 7 "class fooclass { }") 'puppet-ts-resource-type)))
 
 (ert-deftest puppet/keyword-in-parameter-name ()
   (should-not (puppet-test-face-at 16 "class { 'foo': node_foo => bar }")))
@@ -202,105 +202,105 @@ bar"
 
 (ert-deftest puppet/simple-variable ()
   (puppet-test-with-temp-buffer "$foo = 5"
-    (should (eq (puppet-test-face-at 1) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-variable-name-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-variable-name))
     ;; The operator should not get highlighted
     (should-not (puppet-test-face-at 6))))
 
 (ert-deftest puppet/simple-variable-no-space ()
   (puppet-test-with-temp-buffer "$foo=5"
-    (should (eq (puppet-test-face-at 1) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-variable-name-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-variable-name))
     ;; The operator should not get highlighted
     (should-not (puppet-test-face-at 5))))
 
 (ert-deftest puppet/variable-with-scope ()
   (puppet-test-with-temp-buffer "$foo::bar = 5"
-    (should (eq (puppet-test-face-at 1) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 2) 'puppet-variable-name-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
     ;; Scope operator
-    (should (eq (puppet-test-face-at 5) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-variable-name-face))))
+    (should (eq (puppet-test-face-at 5) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-variable-name))))
 
 (ert-deftest puppet/variable-in-top-scope ()
   (puppet-test-with-temp-buffer "$::foo = 5"
-    (should (eq (puppet-test-face-at 1) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 2) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-variable-name-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-variable-name))))
 
 (ert-deftest puppet/variable-before-colon ()
   (puppet-test-with-temp-buffer "package { $::foo: }"
-    (should (eq (puppet-test-face-at 11) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 12) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 14) 'puppet-variable-name-face))
-    (should (eq (puppet-test-face-at 16) 'puppet-variable-name-face))
+    (should (eq (puppet-test-face-at 11) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-variable-name))
     (should-not (puppet-test-face-at 17))))
 
 (ert-deftest puppet/class ()
   (puppet-test-with-temp-buffer "class foo::bar { }"
     ;; The keyword
-    (should (eq (puppet-test-face-at 1) 'puppet-keyword-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
     ;; The scope
-    (should (eq (puppet-test-face-at 7) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-resource-type))
     ;; The scope operator
-    (should (eq (puppet-test-face-at 10) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 10) 'puppet-ts-resource-type))
     ;; The name
-    (should (eq (puppet-test-face-at 12) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))
     ;; The braces
     (should-not (puppet-test-face-at 16))))
 
 (ert-deftest puppet/define ()
   (puppet-test-with-temp-buffer "define foo::bar($foo) { }"
     ;; The keyword
-    (should (eq (puppet-test-face-at 1) 'puppet-keyword-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
     ;; The scope
-    (should (eq (puppet-test-face-at 8) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 8) 'puppet-ts-resource-type))
     ;; The scope operator
-    (should (eq (puppet-test-face-at 11) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 11) 'puppet-ts-resource-type))
     ;; The name
-    (should (eq (puppet-test-face-at 13) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 13) 'puppet-ts-resource-type))
     ;; The parenthesis
     (should-not (puppet-test-face-at 16))
     ;; The parameter
-    (should (eq (puppet-test-face-at 17) 'puppet-variable-name-face))
+    (should (eq (puppet-test-face-at 17) 'puppet-ts-variable-name))
     (should-not (puppet-test-face-at 21))))
 
 (ert-deftest puppet/node ()
   (puppet-test-with-temp-buffer "node puppet.example.com { }"
-    (should (eq (puppet-test-face-at 1) 'puppet-keyword-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 12) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 23) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 23) 'puppet-ts-resource-type))
     (should-not (puppet-test-face-at 25))))
 
 (ert-deftest puppet-font-lock-keywords/plan ()
   (puppet-test-with-temp-buffer "plan foo::bar($foo) { }"
     ;; The keyword
-    (should (eq (puppet-test-face-at 1) 'puppet-keyword-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
     ;; The scope
-    (should (eq (puppet-test-face-at 6) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
     ;; The scope operator
-    (should (eq (puppet-test-face-at 9) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 9) 'puppet-ts-resource-type))
     ;; The name
-    (should (eq (puppet-test-face-at 11) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 11) 'puppet-ts-resource-type))
     ;; The parenthesis
     (should-not (puppet-test-face-at 14))
     ;; The parameter
-    (should (eq (puppet-test-face-at 15) 'puppet-variable-name-face))
+    (should (eq (puppet-test-face-at 15) 'puppet-ts-variable-name))
     (should-not (puppet-test-face-at 19))))
 
 (ert-deftest puppet/resource ()
   (puppet-test-with-temp-buffer "foo::bar { 'title': }"
-    (should (eq (puppet-test-face-at 1) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
     (should-not (puppet-test-face-at 10))))
 
 (ert-deftest puppet/resource-default ()
   (puppet-test-with-temp-buffer "Foo::Bar { }"
-    (should (eq (puppet-test-face-at 1) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
     (should-not (puppet-test-face-at 10))))
 
 (ert-deftest puppet/resource-default-not-capitalized ()
@@ -310,16 +310,16 @@ bar"
 
 (ert-deftest puppet-font-lock-keywords/resource-collector ()
   (puppet-test-with-temp-buffer "Foo::Bar <||>"
-    (should (eq (puppet-test-face-at 1) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
     (should-not (puppet-test-face-at 10))))
 
 (ert-deftest puppet-font-lock-keywords/exported-resource-collector ()
   (puppet-test-with-temp-buffer "Foo::Bar <<| |>>}"
-    (should (eq (puppet-test-face-at 1) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 4) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 6) 'puppet-resource-type-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
     (should-not (puppet-test-face-at 10))
     (should-not (puppet-test-face-at 11))))
 
@@ -330,66 +330,66 @@ bar"
     (should-not (puppet-test-face-at 11))))
 
 (ert-deftest puppet/negation ()
-  (should (eq (puppet-test-face-at 8 "$foo = !$bar") 'puppet-negation-char-face)))
+  (should (eq (puppet-test-face-at 8 "$foo = !$bar") 'puppet-ts-negation-char)))
 
 (ert-deftest puppet/builtin-metaparameter ()
   (puppet-test-with-temp-buffer "class { 'foo': alias => foo }"
-    (should (eq (puppet-test-face-at 16) 'puppet-builtin-face))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-builtin))
     (should-not (puppet-test-face-at 22))))
 
 (ert-deftest puppet/builtin-metaparameter-no-space ()
   (puppet-test-with-temp-buffer "class { 'foo': alias=>foo }"
-    (should (eq (puppet-test-face-at 16) 'puppet-builtin-face))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-builtin))
     (should-not (puppet-test-face-at 21))))
 
 (ert-deftest puppet/builtin-function ()
   (puppet-test-with-temp-buffer "template('foo/bar')"
-    (should (eq (puppet-test-face-at 1) 'puppet-builtin-face))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-builtin))
     (should-not (puppet-test-face-at 9))
-    (should (eq (puppet-test-face-at 10) 'puppet-string-face))))
+    (should (eq (puppet-test-face-at 10) 'puppet-ts-string))))
 
 (ert-deftest puppet/builtin-function-in-parameter-name ()
   (puppet-test-with-temp-buffer "package { 'foo': ensure => installed }"
-    (should (eq (puppet-test-face-at 18) 'puppet-builtin-face))
+    (should (eq (puppet-test-face-at 18) 'puppet-ts-builtin))
     (should-not (puppet-test-face-at 24))))
 
 (ert-deftest puppet/type-argument-to-contain ()
   (puppet-test-with-temp-buffer "contain foo::bar"
-    (should (eq (puppet-test-face-at 1) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 9) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 12) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 14) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 16) 'puppet-resource-type-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 9) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-resource-type))))
 
 (ert-deftest puppet/string-argument-to-contain ()
   (puppet-test-with-temp-buffer "contain 'foo::bar'"
-    (should (eq (puppet-test-face-at 1) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 9) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 10) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 13) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 15) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 17) 'puppet-string-face))
-    (should (eq (puppet-test-face-at 18) 'puppet-string-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 9) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 10) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 13) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 15) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 17) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 18) 'puppet-ts-string))))
 
 (ert-deftest puppet/type-argument-to-include ()
   (puppet-test-with-temp-buffer "include foo::bar"
-    (should (eq (puppet-test-face-at 1) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 9) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 12) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 14) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 16) 'puppet-resource-type-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 9) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-resource-type))))
 
 (ert-deftest puppet/type-argument-to-require ()
   (puppet-test-with-temp-buffer "require foo::bar"
-    (should (eq (puppet-test-face-at 1) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 7) 'puppet-builtin-face))
-    (should (eq (puppet-test-face-at 9) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 12) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 14) 'puppet-resource-type-face))
-    (should (eq (puppet-test-face-at 16) 'puppet-resource-type-face))))
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-builtin))
+    (should (eq (puppet-test-face-at 9) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-resource-type))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; font-lock-test.el ends here

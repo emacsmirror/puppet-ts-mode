@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-30 07:50:54 stm>
+;; Updated:          <2024-04-30 07:53:55 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -151,72 +151,72 @@ is added here because it is common and important.")
 
 ;;; Faces
 
-(defface puppet-comment-face
+(defface puppet-ts-comment
   '((t :inherit font-lock-comment-face))
   "Face for comments in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-string-face
+(defface puppet-ts-string
   '((t :inherit font-lock-string-face))
   "Face for strings in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-keyword-face
+(defface puppet-ts-keyword
   '((t :inherit font-lock-keyword-face))
   "Face for keywords in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-resource-type-face
+(defface puppet-ts-resource-type
   '((t :inherit font-lock-type-face))
   "Face for resource types in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-builtin-face
+(defface puppet-ts-builtin
   '((t :inherit font-lock-builtin-face))
   "Face for built-in functions in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-constant-face
+(defface puppet-ts-constant
   '((t :inherit font-lock-constant-face))
   "Face for a constant in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-variable-name-face
+(defface puppet-ts-variable-name
   '((t :inherit font-lock-variable-name-face))
   "Face for the name of a variable in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-variable-use-face
+(defface puppet-ts-variable-use
   '((t :inherit font-lock-variable-use-face))
   "Face for the name of a variable being referenced in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-function-name-face
+(defface puppet-ts-function-name
   '((t :inherit font-lock-function-name-face))
   "Face for the name of a function in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-function-call-face
+(defface puppet-ts-function-call
   '((t :inherit font-lock-function-call-face))
   "Face for the name of a function being called in Puppet."
   :group 'puppet-ts)
 
-(defface puppet-operator-face
+(defface puppet-ts-operator
   '((t :inherit font-lock-operator-face))
   "Face for operators."
   :group 'puppet-ts)
 
-(defface puppet-negation-char-face
+(defface puppet-ts-negation-char
   '((t :inherit font-lock-negation-char-face))
   "Face for negation characters."
   :group 'puppet-ts)
 
-(defface puppet-number-face
+(defface puppet-ts-number
   '((t :inherit font-lock-number-face))
   "Face for numbers."
   :group 'puppet-ts)
 
-(defface puppet-warning-face
+(defface puppet-ts-warning
   '((t :inherit font-lock-warning-face))
   "Face for language errors found by the parser."
   :group 'puppet-ts)
@@ -241,94 +241,94 @@ is added here because it is common and important.")
 (defvar puppet-ts-mode--font-lock-settings
   `(:feature comment
     :language puppet
-    ((comment) @puppet-comment-face)
+    ((comment) @puppet-ts-comment)
 
     :feature string
     :language puppet
-    ((string) @puppet-string-face)
+    ((string) @puppet-ts-string)
 
     :feature interpolation
     :language puppet
     :override t
-    ((interpolation) @puppet-variable-name-face)
+    ((interpolation) @puppet-ts-variable-name)
 
     :feature variable
     :language puppet
-    ((variable ["$" (name)] @puppet-variable-name-face))
+    ((variable ["$" (name)] @puppet-ts-variable-name))
 
     :feature constant
     :language puppet
-    (((true) @puppet-constant-face)
-     ((false) @puppet-constant-face)
-     ((default) @puppet-constant-face)
-     ((undef) @puppet-constant-face))
+    (((true) @puppet-ts-constant)
+     ((false) @puppet-ts-constant)
+     ((default) @puppet-ts-constant)
+     ((undef) @puppet-ts-constant))
 
     :feature number
     :language puppet
-    ((number) @puppet-number-face)
+    ((number) @puppet-ts-number)
 
     :feature definition
     :language puppet
-    ((class_definition ["class" "inherits"] @puppet-keyword-face)
-     (define_definition "define" @puppet-keyword-face)
-     (function_definition "function" @puppet-keyword-face)
-     (node_definition "node" @puppet-keyword-face)
-     (plan_definition "plan" @puppet-keyword-face)
+    ((class_definition ["class" "inherits"] @puppet-ts-keyword)
+     (define_definition "define" @puppet-ts-keyword)
+     (function_definition "function" @puppet-ts-keyword)
+     (node_definition "node" @puppet-ts-keyword)
+     (plan_definition "plan" @puppet-ts-keyword)
      ;; names of defined classes, defined types, functions, nodes, ...
-     (classname (name) @puppet-resource-type-face)
+     (classname (name) @puppet-ts-resource-type)
      ;; hostnames in a node definition
-     (hostname (dotted_name) @puppet-resource-type-face))
+     (hostname (dotted_name) @puppet-ts-resource-type))
 
     :feature builtin
     :language puppet
-    ((statement_function (name) @puppet-builtin-face
+    ((statement_function (name) @puppet-ts-builtin
                          (:match ,puppet--statement-functions-regex
-                                 @puppet-builtin-face))
-     (function_call (name) @puppet-builtin-face
+                                 @puppet-ts-builtin))
+     (function_call (name) @puppet-ts-builtin
                     (:match ,puppet--builtin-functions-regex
-                            @puppet-builtin-face))
-     (named_access (name) @puppet-builtin-face
+                            @puppet-ts-builtin))
+     (named_access (name) @puppet-ts-builtin
                    (:match ,puppet--builtin-functions-regex
-                           @puppet-builtin-face))
-     (attribute name: (name) @puppet-builtin-face
+                           @puppet-ts-builtin))
+     (attribute name: (name) @puppet-ts-builtin
                 (:match ,puppet--metaparameters-regex
-                        @puppet-builtin-face))
-     (attribute value: (name) @puppet-builtin-face
+                        @puppet-ts-builtin))
+     (attribute value: (name) @puppet-ts-builtin
                 (:match ,puppet--constants-regex
-                        @puppet-builtin-face)))
+                        @puppet-ts-builtin)))
 
     :feature function
     :language puppet
-    ((function_call (name) @puppet-function-name-face))
+    ((function_call (name) @puppet-ts-function-name))
 
     :feature keyword
     :language puppet
-    (((if "if" @puppet-keyword-face))
-     ((elsif "elsif" @puppet-keyword-face))
-     ((else "else" @puppet-keyword-face))
-     ((unless "unless" @puppet-keyword-face))
-     ((case "case" @puppet-keyword-face))
-     (binary operator: ["and" "or" "in"] @puppet-keyword-face))
+    (((if "if" @puppet-ts-keyword))
+     ((elsif "elsif" @puppet-ts-keyword))
+     ((else "else" @puppet-ts-keyword))
+     ((unless "unless" @puppet-ts-keyword))
+     ((case "case" @puppet-ts-keyword))
+     (binary operator: ["and" "or" "in"] @puppet-ts-keyword))
 
     :feature resource-type
     :language puppet
-    (((resource_type [(name) (virtual) (exported)] @puppet-resource-type-face))
+    (((resource_type [(name) (virtual) (exported)] @puppet-ts-resource-type))
      ;; arguments to statement functions
      ((statement_function
-       (argument_list (argument (name) @puppet-resource-type-face))))
+       (argument_list (argument (name) @puppet-ts-resource-type))))
      ;; data and resource reference types
-     ((type) @puppet-resource-type-face))
+     ((type) @puppet-ts-resource-type))
 
     :feature operator
     :language puppet
-    ((unary operator: "!" @puppet-negation-char-face)
-     (unary operator: _  @puppet-operator-face)
-     (binary operator: _ @puppet-operator-face))
+    ((unary operator: "!" @puppet-ts-negation-char)
+     (unary operator: _  @puppet-ts-operator)
+     (binary operator: _ @puppet-ts-operator))
 
     :feature error
     :language puppet
     :override t
-    ((ERROR) @puppet-warning-face))
+    ((ERROR) @puppet-ts-warning))
   "`treesit-font-lock-settings' for `puppet-ts-mode'.")
 
 
