@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-30 07:53:55 stm>
+;; Updated:          <2024-04-30 08:10:13 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -65,20 +65,20 @@
   :prefix "puppet-ts-"
   :group 'languages)
 
-(defvar puppet--file-attribute-constants
+(defvar puppet-ts--file-attribute-constants
   '("file" "directory" "link")
   "Attributes for file resources formatted as constants.")
 
-(defvar puppet--package-attribute-constants
+(defvar puppet-ts--package-attribute-constants
   '("present" "absent" "installed" "latest")
   "Attributes for package resources formatted as constants.")
 
-(defvar puppet--service-attribute-constants
+(defvar puppet-ts--service-attribute-constants
   '("running" "stopped")
   "Attributes for service resources formatted as constants.")
 
 ;; https://www.puppet.com/docs/puppet/latest/metaparameter.html
-(defvar puppet--metaparameters
+(defvar puppet-ts--metaparameters
   '("alias" "audit" "before" "consume" "export" "loglevel" "noop"
     "notify" "require" "schedule" "stage" "subscribe" "tag" "ensure")
   "Metaparameter attributes for all resource types.
@@ -86,7 +86,7 @@ Strictly speakting, \"ensure\" is not a real metaparameter, but it
 is added here because it is common and important.")
 
 ;; https://www.puppet.com/docs/puppet/latest/function.html
-(defvar puppet--builtin-functions
+(defvar puppet-ts--builtin-functions
   '("abs" "alert" "all" "annotate" "any" "assert_type" "binary_file"
     "break" "call" "camelcase" "capitalize" "ceiling" "chomp" "chop"
     "compare" "convert_to" "create_resources" "defined" "dig" "digest"
@@ -109,7 +109,7 @@ is added here because it is common and important.")
     "without_default_logging")
   "Internal functions provided by Puppet.")
 
-(defvar puppet--statement-functions
+(defvar puppet-ts--statement-functions
   '("include" "require" "contain" "tag"            ; Catalog statements
     "debug" "info" "notice" "warning" "err" "crit" ; Logging statements
     "fail")                                        ; Failure statements
@@ -117,33 +117,33 @@ is added here because it is common and important.")
 
 ;; Regular expressions
 
-(defvar puppet--constants-regex
+(defvar puppet-ts--constants-regex
   (rx-to-string `(seq bos
-                      ,(cons 'or (append puppet--file-attribute-constants
-                                         puppet--package-attribute-constants
-                                         puppet--service-attribute-constants))
+                      ,(cons 'or (append puppet-ts--service-attribute-constants
+                                         puppet-ts--package-attribute-constants
+                                         puppet-ts--file-attribute-constants))
                       eos)
                 'no-group)
   "Puppet constants for tree-sitter font-locking.")
 
-(defvar puppet--metaparameters-regex
+(defvar puppet-ts--metaparameters-regex
   (rx-to-string `(seq bos
-                      ,(cons 'or puppet--metaparameters)
+                      ,(cons 'or puppet-ts--metaparameters)
                       eos)
                 'no-group)
   "Regex to match Puppet metaparameters.")
 
-(defvar puppet--builtin-functions-regex
+(defvar puppet-ts--builtin-functions-regex
   (rx-to-string `(seq bos
-                      ,(cons 'or (append puppet--builtin-functions
-                                         puppet--statement-functions))
+                      ,(cons 'or (append puppet-ts--builtin-functions
+                                         puppet-ts--statement-functions))
                       eos)
                 'no-group)
   "Internal functions provided by Puppet.")
 
-(defvar puppet--statement-functions-regex
+(defvar puppet-ts--statement-functions-regex
   (rx-to-string `(seq bos
-                      ,(cons 'or puppet--statement-functions)
+                      ,(cons 'or puppet-ts--statement-functions)
                       eos)
                 'no-group)
   "Statement functions provided by Puppet.")
@@ -224,7 +224,7 @@ is added here because it is common and important.")
 
 ;; Font-Lock
 
-(defvar puppet-ts-mode--feature-list
+(defvar puppet-ts-mode-feature-list
   ;; Level 1 usually contains only comments and definitions.
   ;; Level 2 usually adds keywords, strings, data types, etc.
   ;; Level 3 usually represents full-blown fontifications, including
@@ -238,8 +238,9 @@ is added here because it is common and important.")
     (operator error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
-(defvar puppet-ts-mode--font-lock-settings
-  `(:feature comment
+(defvar puppet-ts-mode-font-lock-settings
+  `( ;;
+    :feature comment
     :language puppet
     ((comment) @puppet-ts-comment)
 
@@ -282,19 +283,19 @@ is added here because it is common and important.")
     :feature builtin
     :language puppet
     ((statement_function (name) @puppet-ts-builtin
-                         (:match ,puppet--statement-functions-regex
+                         (:match ,puppet-ts--statement-functions-regex
                                  @puppet-ts-builtin))
      (function_call (name) @puppet-ts-builtin
-                    (:match ,puppet--builtin-functions-regex
+                    (:match ,puppet-ts--builtin-functions-regex
                             @puppet-ts-builtin))
      (named_access (name) @puppet-ts-builtin
-                   (:match ,puppet--builtin-functions-regex
+                   (:match ,puppet-ts--builtin-functions-regex
                            @puppet-ts-builtin))
      (attribute name: (name) @puppet-ts-builtin
-                (:match ,puppet--metaparameters-regex
+                (:match ,puppet-ts--metaparameters-regex
                         @puppet-ts-builtin))
      (attribute value: (name) @puppet-ts-builtin
-                (:match ,puppet--constants-regex
+                (:match ,puppet-ts--constants-regex
                         @puppet-ts-builtin)))
 
     :feature function
@@ -334,26 +335,26 @@ is added here because it is common and important.")
 
 ;; Indentation
 
-(defcustom puppet-indent-level 2
+(defcustom puppet-ts-indent-level 2
   "Number of spaces for each indententation step."
   :group 'puppet-ts
   :type 'integer
   :safe 'integerp)
 
-(defcustom puppet-indent-tabs-mode nil
+(defcustom puppet-ts-indent-tabs-mode nil
   "Indentation can insert tabs in puppet mode if this is non-nil."
   :group 'puppet-ts
   :type 'boolean
   :safe 'booleanp)
 
-(defsubst puppet-find-ancestor-node (node regex)
+(defsubst puppet-ts-find-ancestor-node (node regex)
   "Find ancestor of NODE with a node type that matched REGEX."
   (treesit-parent-until node
                         #'(lambda (x)
                             (string-match-p regex (treesit-node-type x)))
                         t))
 
-(defun puppet-ancestor-definition-bol (node parent _bol)
+(defun puppet-ts-ancestor-definition-bol (node parent _bol)
   "Search ancestors of NODE or PARENT for a Puppet definition.
 
 The search starts with PARENT if NODE is NIL.  This happens if no
@@ -361,7 +362,7 @@ node can start at the position, e.g. there is an empty line.
 Return the beginning of line position for the Puppet definition.
 
 The signature of this function is defined by Tree-Sitter."
-  (let ((ancestor (puppet-find-ancestor-node
+  (let ((ancestor (puppet-ts-find-ancestor-node
                    (or node parent)     ; Start with parent if node is nil
                    (regexp-opt '("class_definition" "define_definition"
                                  "function_definition")))))
@@ -371,7 +372,7 @@ The signature of this function is defined by Tree-Sitter."
           (back-to-indentation)
           (point)))))
 
-(defun puppet-ancestor-resource-bol (node parent _bol)
+(defun puppet-ts-ancestor-resource-bol (node parent _bol)
   "Search ancestors of NODE or PARENT for a Puppet resource.
 
 The search starts with PARENT if NODE is NIL.  This happens if no
@@ -379,7 +380,7 @@ node can start at the position, e.g. there is an empty line.
 Return the beginning of line position for the Puppet resource.
 
 The signature of this function is defined by Tree-Sitter."
-  (let ((ancestor (puppet-find-ancestor-node
+  (let ((ancestor (puppet-ts-find-ancestor-node
                    (or node parent)     ; Start with parent if node is nil
                    (regexp-opt '("resource_type" "resource_reference")))))
     (if ancestor
@@ -388,7 +389,7 @@ The signature of this function is defined by Tree-Sitter."
           (back-to-indentation)
           (point)))))
 
-(defun puppet-ancestor-function-bol (node parent _bol)
+(defun puppet-ts-ancestor-function-bol (node parent _bol)
   "Search ancestors of NODE or PARENT for a Puppet function call.
 
 The search starts with PARENT if NODE is NIL.  This happens if no
@@ -396,7 +397,7 @@ node can start at the position, e.g. there is an empty line.
 Return the beginning of line position for the Puppet resource.
 
 The signature of this function is defined by Tree-Sitter."
-  (let ((ancestor (puppet-find-ancestor-node
+  (let ((ancestor (puppet-ts-find-ancestor-node
                    (or node parent)     ; Start with parent if node is nil
                    (regexp-opt '("function_call")))))
     (if ancestor
@@ -408,9 +409,9 @@ The signature of this function is defined by Tree-Sitter."
 ;; Make the custom function usable as indent anchors by tree-sitter
 (setq treesit-simple-indent-presets
       (append treesit-simple-indent-presets
-              (list (cons 'definition-bol #'puppet-ancestor-definition-bol)
-                    (cons 'resource-bol #'puppet-ancestor-resource-bol)
-                    (cons 'function-bol #'puppet-ancestor-function-bol))))
+              (list (cons 'definition-bol #'puppet-ts-ancestor-definition-bol)
+                    (cons 'resource-bol #'puppet-ts-ancestor-resource-bol)
+                    (cons 'function-bol #'puppet-ts-ancestor-function-bol))))
 
 (defvar puppet-ts-indent-rules
   `((puppet
@@ -420,33 +421,33 @@ The signature of this function is defined by Tree-Sitter."
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
      ((node-is "}") parent-bol 0)
-     ((parent-is "block") parent-bol puppet-indent-level)
+     ((parent-is "block") parent-bol puppet-ts-indent-level)
      ;; compound statements
      ((node-is "elsif") parent-bol 0)
      ((node-is "else") parent-bol 0)
      ;; arrays
-     ((match "array_element" nil nil 1 1) parent-bol puppet-indent-level)
+     ((match "array_element" nil nil 1 1) parent-bol puppet-ts-indent-level)
      ((match "array_element" nil nil 2 nil) prev-sibling 0)
-     ((parent-is "array") parent-bol puppet-indent-level)
+     ((parent-is "array") parent-bol puppet-ts-indent-level)
      ;; structures and expressions
-     ((parent-is "case") parent-bol puppet-indent-level)
-     ((parent-is "hash") parent-bol puppet-indent-level)
-     ((parent-is "selector") parent-bol puppet-indent-level)
-     ((parent-is "function_call") parent-bol puppet-indent-level)
-     ((parent-is "resource_type") resource-bol puppet-indent-level)
-     ((parent-is "resource_body") resource-bol puppet-indent-level)
-     ((parent-is "resource_reference") resource-bol puppet-indent-level)
-     ((node-is "attribute") resource-bol puppet-indent-level)
-     ((parent-is "attribute_list") resource-bol puppet-indent-level)
-     ((parent-is "parameter_list") definition-bol puppet-indent-level)
-     ((parent-is "argument_list") function-bol puppet-indent-level)
+     ((parent-is "case") parent-bol puppet-ts-indent-level)
+     ((parent-is "hash") parent-bol puppet-ts-indent-level)
+     ((parent-is "selector") parent-bol puppet-ts-indent-level)
+     ((parent-is "function_call") parent-bol puppet-ts-indent-level)
+     ((parent-is "resource_type") resource-bol puppet-ts-indent-level)
+     ((parent-is "resource_body") resource-bol puppet-ts-indent-level)
+     ((parent-is "resource_reference") resource-bol puppet-ts-indent-level)
+     ((node-is "attribute") resource-bol puppet-ts-indent-level)
+     ((parent-is "attribute_list") resource-bol puppet-ts-indent-level)
+     ((parent-is "parameter_list") definition-bol puppet-ts-indent-level)
+     ((parent-is "argument_list") function-bol puppet-ts-indent-level)
      (catch-all parent-bol 0)))
   "Indentation rules for `puppet-ts-mode'.")
 
 
 ;; Xref
 
-(defcustom puppet-module-path
+(defcustom puppet-ts-module-path
   '("/etc/puppetlabs/code/environments/production/modules")
   "Directories to search for modules when resolving cross references.
 
@@ -462,7 +463,7 @@ accessed."
   :group 'puppet-ts
   :type '(repeat directory))
 
-(defun puppet-module-root (file)
+(defun puppet-ts-module-root (file)
   "Return the Puppet module root directory for FILE.
 
 Walk up the directory tree until a directory is found, that
@@ -476,7 +477,7 @@ Return the directory name or nil if no directory is found."
               (file-readable-p (expand-file-name "lib" path))
               (file-readable-p (expand-file-name "types" path)))))))
 
-(defun puppet-autoload-path (identifier &optional directory extension)
+(defun puppet-ts-autoload-path (identifier &optional directory extension)
   "Resolve IDENTIFIER into Puppet module and relative autoload path.
 
 Use DIRECTORY as module subdirectory \(defaults to \"manifests\"
@@ -499,7 +500,7 @@ rules."
                   file
                   (or extension ".pp")))))
 
-(defun puppet--xref-backend ()
+(defun puppet-ts--xref-backend ()
   "The Xref backend for `puppet-ts-mode'."
   'puppet)
 
@@ -512,14 +513,14 @@ rules."
   "Find the definitions of a Puppet resource IDENTIFIER.
 
 First the location of the visited file is checked.  Then all
-directories from `puppet-module-path' are searched for the module
+directories from `puppet-ts-module-path' are searched for the module
 and the file according to Puppet's autoloading rules."
   (let* ((resource (downcase (if (string-prefix-p "::" identifier)
                                  (substring identifier 2)
                                identifier)))
-         (pupfiles (puppet-autoload-path resource))
-         (typfiles (puppet-autoload-path resource "types"))
-         (funfiles (puppet-autoload-path resource "functions"))
+         (pupfiles (puppet-ts-autoload-path resource))
+         (typfiles (puppet-ts-autoload-path resource "types"))
+         (funfiles (puppet-ts-autoload-path resource "functions"))
          (xrefs '()))
     (if pupfiles
         (let* ((module (car pupfiles))
@@ -527,23 +528,25 @@ and the file according to Puppet's autoloading rules."
                (pathlist (mapcar #'cdr (list pupfiles typfiles funfiles)))
                ;; list of directories where this module might be
                (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
-                                puppet-module-path))
+                                puppet-ts-module-path))
                ;; the regexp to find the resource definition in the file
                (resdef (concat "^\\(class\\|define\\|type\\|function\\)\\s-+"
                                resource
                                "\\((\\|{\\|\\s-\\|$\\)"))
                ;; files to visit when searching for the resource
                (files '()))
-          ;; Check the current module directory (if the buffer actually visits
-          ;; a file) and all module subdirectories from `puppet-module-path'.
+          ;; Check the current module directory (if the buffer actually
+          ;; visits a file) and all module subdirectories from
+          ;; `puppet-ts-module-path'.
           (dolist (dir (if buffer-file-name
-                           (cons (puppet-module-root buffer-file-name) moddirs)
+                           (cons (puppet-ts-module-root buffer-file-name)
+                                 moddirs)
                          moddirs))
             ;; Try all relative path names below the module directory that
             ;; might contain the resource; save the file name if the file
             ;; exists and we haven't seen it (we might try to check a file
             ;; twice if the current module is also below one of the dirs in
-            ;; `puppet-module-path').
+            ;; `puppet-ts-module-path').
             (dolist (path pathlist)
               (let ((file (expand-file-name path dir)))
                 (if (and (not (member file files))
@@ -603,7 +606,7 @@ and the file according to Puppet's autoloading rules."
 (defvar puppet-ts-mode-map
   (let ((map (make-sparse-keymap)))
     ;; Editing
-    ;;(define-key map (kbd "C-c C-a") #'puppet-align-block)
+    ;;(define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
     map)
   "Keymap for Puppet Mode buffers.")
 
@@ -612,9 +615,9 @@ and the file according to Puppet's autoloading rules."
   "Major mode for editing Puppet files, using the tree-sitter library.
 
 The mode supports the cross-referencing system documented in the
-Info node `Xref'.  The customization variable `puppet-module-path'
-contains a list of directories that are searched to find locally
-installed Puppet modules.
+Info node `Xref'.  The variable `puppet-ts-module-path' contains
+a list of directories that are searched to find installed Puppet
+modules.
 
 Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
 with point on an identifier \(a Puppet class, defined type,
@@ -631,8 +634,8 @@ identifier.
   (setq-local parse-sexp-ignore-comments t)
 
   ;; Indentation
-  ;;(setq-local indent-line-function #'puppet-indent-line)
-  (setq indent-tabs-mode puppet-indent-tabs-mode)
+  ;;(setq-local indent-line-function #'puppet-ts-indent-line)
+  (setq indent-tabs-mode puppet-ts-indent-tabs-mode)
   (setq-local electric-indent-chars
               (append '(?\{ ?\} ?\( ?\) ?: ?,) electric-indent-chars))
 
@@ -642,17 +645,17 @@ identifier.
   (setq-local paragraph-separate "\\([ \t\f]*\\|#\\)$")
 
   ;; Xref
-  (add-hook 'xref-backend-functions #'puppet--xref-backend)
+  (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
 
   ;; Treesitter
   (when (treesit-ready-p 'puppet)
     (treesit-parser-create 'puppet)
 
     ;; Font-Lock
-    (setq-local treesit-font-lock-feature-list puppet-ts-mode--feature-list)
+    (setq-local treesit-font-lock-feature-list puppet-ts-mode-feature-list)
     (setq-local treesit-font-lock-settings
                 (apply #'treesit-font-lock-rules
-                       puppet-ts-mode--font-lock-settings))
+                       puppet-ts-mode-font-lock-settings))
 
     ;; Indentation
     (setq-local treesit-simple-indent-rules puppet-ts-indent-rules)
