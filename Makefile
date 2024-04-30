@@ -12,14 +12,15 @@ PKGDIR  := $(shell $(CASK) package-directory)
 # rules
 #
 
-all: compile check lint
+all: compile check lint clean
 
 compile: $(OBJS)
 
-check: compile $(CHECKS) clean
+check: compile $(CHECKS)
 
 clean:
 	@$(CASK) clean-elc
+	@$(RM) *-autoloads.el
 
 lint: lint-package lint-elisp
 
