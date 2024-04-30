@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-30 07:50:07 stm>
+;; Updated:          <2024-04-30 07:50:54 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -54,7 +54,7 @@
 (require 'xref)
 
 (eval-when-compile
-  (require 'cl-macs)
+  (require 'cl-lib)
   (require 'rx))
 
 
