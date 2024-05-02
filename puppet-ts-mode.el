@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 12:21:21 stm>
+;; Updated:          <2024-05-02 12:49:33 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -56,6 +56,7 @@
 
 (eval-when-compile
   (require 'cl-lib)
+  (require 'skeleton)
   (require 'rx))
 
 
@@ -514,6 +515,221 @@ The current block is the innermost block that point is in."
       ("resource_reference" (align beg end)))))
 
 
+;;; Skeletons
+
+(defun puppet-ts-dissect-filename (file)
+  "Return list of path components for FILE.
+The first list element is the basename of FILE and the remaining
+elements are the names of each directory from FILE to the root of
+the filesystem."
+  (cl-loop for path = (file-name-sans-extension file)
+           then (directory-file-name (file-name-directory path))
+           ;; stop iteration at the root of the directory
+           ;; tree (should work for Windows & Unix/Linux)
+           until (or (string-suffix-p ":" path)
+                     (string-equal (file-name-directory path) path))
+           collect (file-name-nondirectory path)))
+
+(defun puppet-ts-filename-parser (file)
+  "Return list of path components for the Puppet manifest FILE.
+The first element of the list will be the module name and the
+remaining elements are the relative path components below the
+‘manifests’ subdirectory.  The names of the path components are
+only derived from the file name by using the Puppet auto-loader
+rules.  FILE must be an absolute file name.
+
+The module name \"unidentified\" is returned if a module name
+can't be inferred from the file name.
+
+If the directory name contains characters that are not legal for
+a Puppet module name, then all leading characters including the
+last illegal character are removed from the module name.  The
+function will for example return ‘foo’ as module name even if the
+module is using the ‘puppet-foo’ directory (e.g. for module
+development in a user's home directory)."
+  (if (stringp file)
+      (let* ((parts (puppet-ts-dissect-filename file))
+             ;; Remove "init" if it is the first element
+             (compact (if (string-equal (car parts) "init")
+                          (cdr parts)
+                        parts)))
+        (cons
+         ;; module name with illegal prefixes removed or "unidentified" if
+         ;; path is not compliant with the standard Puppet file hierarchy
+         (replace-regexp-in-string
+          "^.*[^a-z0-9_]" "" (or (cadr (member "manifests" parts))
+                                 "unidentified"))
+         ;; remaining path components
+         (cdr (member "manifests" (reverse compact)))))
+    '("unidentified")))
+
+(defun puppet-ts-file-module-name (file)
+  "Return the module name for the Puppet class in FILE."
+  (car (puppet-ts-filename-parser file)))
+
+(defun puppet-ts-file-class-name (file)
+  "Return the class name for the Puppet class in FILE."
+  (mapconcat #'identity (puppet-ts-filename-parser file) "::"))
+
+(defun puppet-ts-file-type-name (file)
+  "Return the Puppet type name for FILE.
+FILE must be an absolute path name and should conform to the
+standard Puppet module layout.  The Puppet type name is returned
+if can be derived from FILE.  Otherwise NIL is returned.
+
+If the function is called with the file name of a provider, the
+appropriate type name is returned."
+  (let ((path (puppet-ts-dissect-filename file)))
+    (cond ((and (equal (nth 1 path) "type")
+                (equal (nth 2 path) "puppet"))
+           (car path))
+          ((and (equal (nth 2 path) "provider")
+                (equal (nth 3 path) "puppet"))
+           (cadr path)))))
+
+(defun puppet-ts-file-provider-name (file)
+  "Return the Puppet provider name for FILE.
+FILE must be an absolute path name and should conform to the
+standard Puppet module layout.  The provider name is returned if
+it can be derived from FILE.  Otherwise NIL is returned."
+  (let ((path (puppet-ts-dissect-filename file)))
+    (if (and (equal (nth 2 path) "provider")
+             (equal (nth 3 path) "puppet"))
+        (car path))))
+
+(define-skeleton puppet-ts-keyword-class
+  "Insert \"class\" skeleton."
+  nil
+  "class " (puppet-ts-file-class-name (buffer-file-name)) " (" > \n
+  ") {" > \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-ts-keyword-define
+  "Insert \"class\" skeleton."
+  nil
+  "define " (puppet-ts-file-class-name (buffer-file-name)) " (" > \n
+  ") {" > \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-ts-keyword-node
+  "Insert \"node\" skeleton."
+  nil
+  "node " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-ts-keyword-if
+  "Insert \"if\" statement."
+  nil
+  "if " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-ts-keyword-elsif
+  "Insert \"elsif\" statement."
+  nil
+  "elsif " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-ts-keyword-else
+  "Insert \"else\" statement."
+  nil
+  "else {" > \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-ts-keyword-unless
+  "Insert \"unless\" statement."
+  nil
+  "unless " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-ts-keyword-case
+  "Insert \"case\" statement."
+  nil
+  "case " > - " {" \n
+  "default: {" > \n
+  "}" > \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-keyword-selector
+  "Insert \"?\" selector."
+  nil
+  "? {" > \n
+  "default => " > - "," \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-anchor
+  "Insert the \"anchor\" resource type."
+  nil
+  "anchor { " > - ": }" \n)
+
+(define-skeleton puppet-ts-type-class
+  "Insert the \"class\" resource type."
+  nil
+  "class { " > - ":" \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-exec
+  "Insert the \"exec\" resource type."
+  nil
+  "exec { " > - ":" \n
+  "path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin', ]," > \n
+  "user => 'root'," > \n
+  "cwd  => '/'," > \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-file
+  "Insert the \"file\" resource type."
+  nil
+  "file { " > - ":" \n
+  "ensure => file," > \n
+  "owner  => 'root'," > \n
+  "group  => 'root'," > \n
+  "mode   => '0644'," > \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-group
+  "Insert the \"group\" resource type."
+  nil
+  "group { " > - ":" \n
+  "ensure => present," > \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-host
+  "Insert the \"host\" resource type."
+  nil
+  "host { " > - ":" \n
+  "ensure => present," > \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-notify
+  "Insert the \"notify\" resource type."
+  nil
+  "notify { " > - ": }" \n)
+
+(define-skeleton puppet-ts-type-package
+  "Insert the \"package\" resource type."
+  nil
+  "package { " > - ":" \n
+  "ensure => present," > \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-service
+  "Insert the \"service\" resource type."
+  nil
+  "service { " > - ":" \n
+  "ensure => running," > \n
+  "enable => true," > \n
+  "}" > \n)
+
+(define-skeleton puppet-ts-type-user
+  "Insert the \"user\" resource type."
+  nil
+  "user { " > - ":" \n
+  "ensure   => present," > \n
+  "shell    => '/bin/bash'," > \n
+  "password => '*'," > \n
+  "}" > \n)
+
+
 ;; Xref
 
 (defcustom puppet-ts-module-path
@@ -695,6 +911,30 @@ and the file according to Puppet's autoloading rules."
   (let ((map (make-sparse-keymap)))
     ;; Editing
     (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
+    ;; (define-key map (kbd "C-c C-'") #'puppet-toggle-string-quotes)
+    ;; (define-key map (kbd "C-c C-;") #'puppet-clear-string)
+    ;; (define-key map (kbd "$") #'puppet-interpolate)
+    ;; Skeletons for types
+    (define-key map (kbd "C-c C-t a") #'puppet-ts-type-anchor)
+    (define-key map (kbd "C-c C-t c") #'puppet-ts-type-class)
+    (define-key map (kbd "C-c C-t e") #'puppet-ts-type-exec)
+    (define-key map (kbd "C-c C-t f") #'puppet-ts-type-file)
+    (define-key map (kbd "C-c C-t g") #'puppet-ts-type-group)
+    (define-key map (kbd "C-c C-t h") #'puppet-ts-type-host)
+    (define-key map (kbd "C-c C-t n") #'puppet-ts-type-notify)
+    (define-key map (kbd "C-c C-t p") #'puppet-ts-type-package)
+    (define-key map (kbd "C-c C-t s") #'puppet-ts-type-service)
+    (define-key map (kbd "C-c C-t u") #'puppet-ts-type-user)
+    ;; Skeletons for keywords
+    (define-key map (kbd "C-c C-k c") #'puppet-ts-keyword-class)
+    (define-key map (kbd "C-c C-k d") #'puppet-ts-keyword-define)
+    (define-key map (kbd "C-c C-k n") #'puppet-ts-keyword-node)
+    (define-key map (kbd "C-c C-k i") #'puppet-ts-keyword-if)
+    (define-key map (kbd "C-c C-k e") #'puppet-ts-keyword-elsif)
+    (define-key map (kbd "C-c C-k o") #'puppet-ts-keyword-else)
+    (define-key map (kbd "C-c C-k u") #'puppet-ts-keyword-unless)
+    (define-key map (kbd "C-c C-k s") #'puppet-ts-keyword-case)
+    (define-key map (kbd "C-c C-k ?") #'puppet-ts-keyword-selector)
     map)
   "Keymap for Puppet Mode buffers.")
 
