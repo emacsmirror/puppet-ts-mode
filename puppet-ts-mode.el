@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 17:34:43 stm>
+;; Updated:          <2024-05-02 17:59:49 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1") (cycle-quotes "0.1"))
@@ -872,6 +872,35 @@ and the file according to Puppet's autoloading rules."
   (treesit-install-language-grammar 'puppet))
 
 
+;; User callable functions
+
+(defun puppet-ts-interpolate (suppress)
+  "Insert \"${}\" when point is in a double quoted string.
+
+A single \"$\" is inserted if point is not in a double quoted
+string.  With prefix argument SUPPRESS the braces are always left
+out."
+  (interactive "P*")
+  (self-insert-command 1)
+  (unless suppress
+    (let ((node (treesit-parent-until
+                 (treesit-node-at (point))
+                 (lambda (x) (string= (treesit-node-type x) "string"))
+                 t)))
+      ;; Check if we are inside a string node and the string is terminated by
+      ;; a " character.
+      (if (and node (= (char-before (treesit-node-end node)) ?\"))
+          (if mark-active
+              (progn
+                ;; Surround the region
+                (goto-char (region-beginning))
+                (insert "{")
+                (goto-char (region-end))
+                (insert "}"))
+            (insert "{}")
+            (forward-char -1))))))
+
+
 ;; Major mode definition
 
 (defvar puppet-ts-mode-syntax-table
@@ -915,7 +944,7 @@ and the file according to Puppet's autoloading rules."
     (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
     (define-key map (kbd "C-c C-'") #'cycle-quotes)
     ;; (define-key map (kbd "C-c C-;") #'puppet-clear-string)
-    ;; (define-key map (kbd "$") #'puppet-interpolate)
+    (define-key map (kbd "$") #'puppet-ts-interpolate)
     ;; Skeletons for types
     (define-key map (kbd "C-c C-t a") #'puppet-ts-type-anchor)
     (define-key map (kbd "C-c C-t c") #'puppet-ts-type-class)
@@ -943,6 +972,13 @@ and the file according to Puppet's autoloading rules."
 ;;;###autoload
 (define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
   "Major mode for editing Puppet files, using the tree-sitter library.
+
+Typing a \"$\" character inside a double quoted string will
+trigger the variable interpolation syntax.  The \"$\" character
+will be followed by a pair of braces so that the variable name to
+be interpolated can be entered immediately.  The region will be
+used as variable name if it is active when the \"$\" character is
+entered.
 
 When point is in a string, the quotes can be changed from single
 to double and back using the function `cycle-quotes' (bound to
