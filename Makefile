@@ -67,4 +67,4 @@ $(PKGDIR): Cask
 #
 
 .FORCE:
-.PHONY: all compile check clean lint lint-package lint-elisp
+.PHONY: all compile check clean lint lint-package lint-elisp grammar
