@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 08:34:33 stm>
+;; Updated:          <2024-05-02 11:29:23 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -477,37 +477,41 @@ The signature of this function is defined by Tree-Sitter."
      (modes . '(puppet-ts-mode))))
   "Rules for excluding lines from alignment for Puppet.")
 
-(defconst puppet-ts-align-parser-regex
-  (rx (or "parameter_list" "resource_type" "resource_reference"))
+(defconst puppet-ts-align-node-types-regex
+  (rx (or "hash" "parameter_list" "resource_type" "resource_reference"))
   "List of parser items that can be aligned.")
 
-(defun puppet-ts-find-alignment-range (location)
-  "Identify the range of a block that can be aligned.
+(defun puppet-ts-find-alignment-node (location)
+  "Identify the innermost node of a block that can be aligned.
 
 Walk the parse tree upwards starting from LOCATION and check the
-nodes we find.  Terminate the search if a node is found, that we
-know how to align.  The constant `puppet-ts-align-parser-regex'
-has a regex of these nodes.
+nodes we find.  Terminate the search if we know how to align the
+current node.  The constant `puppet-ts-align-node-types-regex'
+has the regex of the acceptable node types.
 
-Return a list (NODENAME BEGIN END) or nil if nothing is found."
+Return the node or nil if nothing is found."
   (save-excursion
     (cl-loop for     node = (treesit-node-on location location)
              then    (treesit-node-parent node)
              always  node
              for     type = (treesit-node-type node)
-             until   (string-match-p puppet-ts-align-parser-regex type)
-             ;;do    (message "check range for node %s" type)
-             finally return (list type
-                                  (treesit-node-start node)
-                                  (treesit-node-end node)))))
+             until   (string-match-p puppet-ts-align-node-types-regex type)
+             ;;do    (message "check align node %s" type)
+             finally return node)))
 
 (defun puppet-ts-align-block ()
-  "Align the current parameter or attribute list."
+  "Align the current parameter or attribute block.
+
+The current block is the innermost block that point is in."
   (interactive "*")
-  (let ((struct (puppet-ts-find-alignment-range (point))))
-    ;;(message "about to align %S" struct)
-    (when struct
-      (apply #'align (cdr struct)))))
+  (when-let* ((node (puppet-ts-find-alignment-node (point)))
+              (beg (treesit-node-start node))
+              (end (treesit-node-end node)))
+    ;;(message "about to align %S" (treesit-node-type node))
+    (pcase (treesit-node-type node)
+      ("parameter_list" (align beg end))
+      ("resource_type" (align beg end))
+      ("resource_reference" (align beg end)))))
 
 
 ;; Xref
