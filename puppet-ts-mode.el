@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 11:29:23 stm>
+;; Updated:          <2024-05-02 12:21:21 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -633,6 +633,25 @@ and the file according to Puppet's autoloading rules."
                           file (line-number-at-pos (match-beginning 1)) 0))
                         xrefs)))))))
     xrefs))
+
+
+;; Language grammar
+
+(defconst puppet-ts-mode-treesit-language-source
+  '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "main"))
+  "The language source entry for `treesit-language-source-alist'.")
+
+(defun puppet-ts-mode-install-grammar ()
+  "Install the language grammar for `puppet-ts-mode'."
+  (interactive)
+  ;; Remove the entry if it exists
+  (setq treesit-language-source-alist
+        (assq-delete-all 'puppet treesit-language-source-alist))
+  ;; Add correct entry
+  (add-to-list 'treesit-language-source-alist
+               puppet-ts-mode-treesit-language-source)
+  ;; Install the grammar
+  (treesit-install-language-grammar 'puppet))
 
 
 ;; Major mode definition
