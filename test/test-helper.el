@@ -6,16 +6,9 @@
 
 (require 'ert)
 
-;;;; Install & load grammar
+;;;; Load grammar
 
 (require 'treesit)
-
-(add-to-list
- 'treesit-language-source-alist
- '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
-
-(unless (treesit-ready-p 'puppet t)
-  (treesit-install-language-grammar 'puppet))
 
 ;;;; Load puppet-ts-mode
 

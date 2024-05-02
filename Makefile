@@ -16,6 +16,11 @@ all: compile check lint clean
 
 compile: $(OBJS)
 
+build:
+	@$(CASK) $(EMACS) --batch \
+	-L '$(abspath .)' \
+	-l puppet-ts-mode -f puppet-ts-mode-install-grammar
+
 check: compile $(CHECKS)
 
 clean:
