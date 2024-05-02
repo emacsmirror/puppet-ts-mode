@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-04-30 08:10:13 stm>
+;; Updated:          <2024-05-02 08:34:33 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -51,6 +51,7 @@
 ;;; Requirements
 
 (require 'treesit)
+(require 'align)
 (require 'xref)
 
 (eval-when-compile
@@ -445,6 +446,70 @@ The signature of this function is defined by Tree-Sitter."
   "Indentation rules for `puppet-ts-mode'.")
 
 
+;; Alignment
+
+(add-to-list 'align-sq-string-modes 'puppet-mode)
+(add-to-list 'align-dq-string-modes 'puppet-mode)
+(add-to-list 'align-open-comment-modes 'puppet-mode)
+
+(defconst puppet-ts-mode-align-rules
+  '((puppet-resource-arrow
+     (regexp . "\\(\\s-*\\)=>\\(\\s-*\\)")
+     (group  . (1 2))
+     (modes  . '(puppet-ts-mode))
+     (separate . entire))
+    (puppet-param-default
+     (regexp . "\\(\\s-+\\)$[a-z_][a-zA-Z0-9_]*\\(\\s-*\\)=\\(\\s-*\\)")
+     (group  . (1 2 3))
+     (modes  . '(puppet-ts-mode)))
+    (puppet-param-nodefault
+     (regexp . "\\(\\s-+\\)$[a-z_][a-zA-Z0-9_]*")
+     (modes  . '(puppet-ts-mode))))
+  "Align rules for Puppet attributes and parameters.")
+
+(defconst puppet-ts-mode-align-exclude-rules
+  '((puppet-nested
+     (regexp . "\\s-*=>\\s-*\\({[^}]*}\\)")
+     (modes  . '(puppet-ts-mode))
+     (separate . entire))
+    (puppet-comment
+     (regexp . "^\\s-*#\\(.*\\)")
+     (modes . '(puppet-ts-mode))))
+  "Rules for excluding lines from alignment for Puppet.")
+
+(defconst puppet-ts-align-parser-regex
+  (rx (or "parameter_list" "resource_type" "resource_reference"))
+  "List of parser items that can be aligned.")
+
+(defun puppet-ts-find-alignment-range (location)
+  "Identify the range of a block that can be aligned.
+
+Walk the parse tree upwards starting from LOCATION and check the
+nodes we find.  Terminate the search if a node is found, that we
+know how to align.  The constant `puppet-ts-align-parser-regex'
+has a regex of these nodes.
+
+Return a list (NODENAME BEGIN END) or nil if nothing is found."
+  (save-excursion
+    (cl-loop for     node = (treesit-node-on location location)
+             then    (treesit-node-parent node)
+             always  node
+             for     type = (treesit-node-type node)
+             until   (string-match-p puppet-ts-align-parser-regex type)
+             ;;do    (message "check range for node %s" type)
+             finally return (list type
+                                  (treesit-node-start node)
+                                  (treesit-node-end node)))))
+
+(defun puppet-ts-align-block ()
+  "Align the current parameter or attribute list."
+  (interactive "*")
+  (let ((struct (puppet-ts-find-alignment-range (point))))
+    ;;(message "about to align %S" struct)
+    (when struct
+      (apply #'align (cdr struct)))))
+
+
 ;; Xref
 
 (defcustom puppet-ts-module-path
@@ -606,7 +671,7 @@ and the file according to Puppet's autoloading rules."
 (defvar puppet-ts-mode-map
   (let ((map (make-sparse-keymap)))
     ;; Editing
-    ;;(define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
+    (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
     map)
   "Keymap for Puppet Mode buffers.")
 
@@ -646,6 +711,10 @@ identifier.
 
   ;; Xref
   (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
+
+  ;; Alignment
+  (setq align-mode-rules-list puppet-ts-mode-align-rules)
+  (setq align-mode-exclude-rules-list puppet-ts-mode-align-exclude-rules)
 
   ;; Treesitter
   (when (treesit-ready-p 'puppet)
