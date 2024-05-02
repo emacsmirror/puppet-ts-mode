@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 15:38:45 stm>
+;; Updated:          <2024-05-02 16:03:58 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1") (cycle-quotes "0.1"))
@@ -53,6 +53,8 @@
 (require 'treesit)
 (require 'align)
 (require 'xref)
+
+(require 'cycle-quotes)
 
 (eval-when-compile
   (require 'cl-lib)
@@ -911,7 +913,7 @@ and the file according to Puppet's autoloading rules."
   (let ((map (make-sparse-keymap)))
     ;; Editing
     (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
-    ;; (define-key map (kbd "C-c C-'") #'puppet-toggle-string-quotes)
+    (define-key map (kbd "C-c C-'") #'cycle-quotes)
     ;; (define-key map (kbd "C-c C-;") #'puppet-clear-string)
     ;; (define-key map (kbd "$") #'puppet-interpolate)
     ;; Skeletons for types
@@ -941,6 +943,10 @@ and the file according to Puppet's autoloading rules."
 ;;;###autoload
 (define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
   "Major mode for editing Puppet files, using the tree-sitter library.
+
+When point is in a string, the quotes can be changed from single
+to double and back using the function `cycle-quotes' (bound to
+\\[cycle-quotes]).
 
 The mode supports the cross-referencing system documented in the
 Info node `Xref'.  The variable `puppet-ts-module-path' contains
