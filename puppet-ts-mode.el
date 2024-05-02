@@ -6,10 +6,10 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 12:49:33 stm>
+;; Updated:          <2024-05-02 15:38:45 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
-;; Package-Requires: ((emacs "29.1"))
+;; Package-Requires: ((emacs "29.1") (cycle-quotes "0.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
