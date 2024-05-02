@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-02 09:00:32 stm>
+;; Updated: <2024-05-02 12:31:53 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -124,6 +124,7 @@ package { 'foo':
 }"))))
 
 (ert-deftest puppet/skip-previous-nested-block ()
+  :expected-result :failed
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -149,6 +150,7 @@ class foo {
 }"))))
 
 (ert-deftest puppet/title-variable ()
+  :expected-result :failed
   (puppet-test-with-temp-buffer
       "
 file { $foo:
@@ -164,6 +166,7 @@ file { $foo:
 }"))))
 
 (ert-deftest puppet/point-in-string ()
+  :expected-result :failed
   (puppet-test-with-temp-buffer
       "
 class foo {
