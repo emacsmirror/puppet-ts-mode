@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 16:03:58 stm>
+;; Updated:          <2024-05-02 17:34:43 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1") (cycle-quotes "0.1"))
@@ -354,8 +354,8 @@ is added here because it is common and important.")
 (defsubst puppet-ts-find-ancestor-node (node regex)
   "Find ancestor of NODE with a node type that matched REGEX."
   (treesit-parent-until node
-                        #'(lambda (x)
-                            (string-match-p regex (treesit-node-type x)))
+                        (lambda (x)
+                          (string-match-p regex (treesit-node-type x)))
                         t))
 
 (defun puppet-ts-ancestor-definition-bol (node parent _bol)
