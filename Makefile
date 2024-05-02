@@ -16,11 +16,6 @@ all: compile check lint clean
 
 compile: $(OBJS)
 
-build:
-	@$(CASK) $(EMACS) --batch \
-	-L '$(abspath .)' \
-	-l puppet-ts-mode -f puppet-ts-mode-install-grammar
-
 check: compile $(CHECKS)
 
 clean:
@@ -49,6 +44,11 @@ lint-elisp:
 	-l elisp-lint \
 	-f elisp-lint-files-batch --no-indent-character --no-fill-column \
 	$(SRCS)
+
+grammar: $(PKGDIR)
+	@$(CASK) $(EMACS) --batch \
+	-L '$(abspath .)' \
+	-l puppet-ts-mode -f puppet-ts-mode-install-grammar
 
 %.elc: %.el $(PKGDIR)
 	@$(CASK) build
