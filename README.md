@@ -21,20 +21,23 @@ The following features are planned:
 
 Emacs 29.1 or above with tree-sitter support is required.
 
-The following Elisp code can be used to add the Puppet language parser to your Emacs setup.
+The following Elisp code should be used to install the Puppet language parser.  This requires some tools -- notably a compiler toolchain -- to be available on your machine.
 
 ```elisp
-(add-to-list 'treesit-language-source-alist
-             '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
+(require 'puppet-ts-mode)
+(puppet-ts-mode-install-grammar)
 ```
 
-Then install the parser for the Puppet language using the following command. This requires some tools -- notably a compiler toolchain -- to be available on your machine.
+Using the function provided by the package ensures that a version of the parser matching the package will be installed.  These commands should also be used to update the parser to the corrent version when the package is updated.
 
-```elisp
-(treesit-install-language-grammar 'puppet)
-```
+## Supporting packages
 
-This command can also be used to update the parser to the latest version from time to time.
+Some other packages are useful to support your workflow when editing Puppet code.  While these packages are not integrated in `puppet-ts-mode`, they can be installed in addition if you like them.
+
+Examples:
+
+* *cycle-quotes* Cycle between quote styles
+* *change-inner* Change contents based on semantic units
 
 ## License
 
