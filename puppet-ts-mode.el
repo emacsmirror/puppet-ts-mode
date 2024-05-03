@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-03 10:16:44 stm>
+;; Updated:          <2024-05-03 14:40:03 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1") (cycle-quotes "0.1"))
@@ -987,6 +987,9 @@ with point on an identifier (a class, defined type, data type or
 custom function) jumps to the definition of that identifier.
 This is quick and does not need any sort of database, since the
 name of the source file can be infered from the identifier.
+
+A number of skeletons have been implemented to make insertion of
+often used code fragments simpler.
 
 The mode needs a tree-sitter grammar to be able to parse Puppet
 code.  The grammar matching the package version can be installed

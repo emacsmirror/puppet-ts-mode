@@ -55,7 +55,36 @@ Navigation to foreign classes only needs a list of directories to search (see th
 
 ### Skeletons for many standard Puppet statements and resource declarations
 
-*mostly done*
+If you are not using `yasnipet` or another template package, you can use the implemented skeletons to insert often used types and keywords.
+
+#### Skeletons for types
+
+Key                  | Skeleton
+---------------------|---------------
+<kbd>C-c C-t a</kbd> | type `anchor`
+<kbd>C-c C-t c</kbd> | type `class`
+<kbd>C-c C-t e</kbd> | type `exec`
+<kbd>C-c C-t f</kbd> | type `file`
+<kbd>C-c C-t g</kbd> | type `group`
+<kbd>C-c C-t h</kbd> | type `host`
+<kbd>C-c C-t n</kbd> | type `notify`
+<kbd>C-c C-t p</kbd> | type `package`
+<kbd>C-c C-t s</kbd> | type `service`
+<kbd>C-c C-t u</kbd> | type `user`
+
+#### Skeletons for keywords
+
+Key                  | Skeleton
+---------------------|-------------------
+<kbd>C-c C-k c</kbd> | keyword `class`
+<kbd>C-c C-k d</kbd> | keyword `define`
+<kbd>C-c C-k n</kbd> | keyword `node`
+<kbd>C-c C-k i</kbd> | keyword `if`
+<kbd>C-c C-k e</kbd> | keyword `elsif`
+<kbd>C-c C-k o</kbd> | keyword `else`
+<kbd>C-c C-k u</kbd> | keyword `unless`
+<kbd>C-c C-k s</kbd> | keyword `case`
+<kbd>C-c C-k ?</kbd> | keyword `selector`
 
 ### Tag navigation
 
