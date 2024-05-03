@@ -23,7 +23,7 @@ The following features are planned for this mode.
 
 Navigation from a referenced class, defined type, data type or function to the file where this corresponding type is defined (aka `xref`) is fully implemented.
 
-Let's say you are editing the following `acme` class:
+**Example:** Let's say you are editing the following `acme` class:
 
 ``` puppet
 # a class managing everything
@@ -56,6 +56,14 @@ Navigation to foreign classes only needs a list of directories to search (see th
 ### Skeletons for many standard Puppet statements and resource declarations
 
 If you are not using `yasnipet` or another template package, you can use the implemented skeletons to insert often used types and keywords.
+
+**Example:** Typing <kbd>C-c C-t p</kbd> will insert the following snippet leaving point just before the colon:
+
+``` puppet
+package { :
+  ensure => present,
+}
+```
 
 #### Skeletons for types
 
