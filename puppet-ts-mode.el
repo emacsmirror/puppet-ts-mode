@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-03 15:40:38 stm>
+;; Updated:          <2024-05-03 16:51:13 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -33,13 +33,16 @@
 ;; will need to install the appropriate grammar.  This can be done by using
 ;; the following Elisp snippet:
 ;;
-;;    (add-to-list
-;;     'treesit-language-source-alist
-;;     '(puppet "https://github.com/smoeding/tree-sitter-puppet"))
-;;    (treesit-install-language-grammar 'puppet)
+;;    (require 'puppet-ts-mode)
+;;    (puppet-ts-mode-install-grammar)
 ;;
-;; Note that a compiler toolchain is required for this to work.  You should
-;; also consult the Emacs manual: (info "(elisp) Parsing Program Source")
+;; Using the function provided by the package ensures that a version of the
+;; parser matching the package will be installed.  These commands should also
+;; be used to update the parser to the corrent version when the package is
+;; updated.
+;;
+;; Note that a compiler toolchain is required for this to work.  You may also
+;; want to consult the Emacs manual: (info "(elisp) Parsing Program Source")
 ;;
 ;; Caution: Currently this is work in progress; many details concerning
 ;; font-lock or indentation might not yet work as expected.  Most convenience
