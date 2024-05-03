@@ -36,8 +36,8 @@ Some other packages are useful to support your workflow when editing Puppet code
 
 Examples:
 
-* *cycle-quotes* Cycle between quote styles
-* *change-inner* Change contents based on semantic units
+* `cycle-quotes`: Cycle between quote styles
+* `change-inner`: Change contents based on semantic units
 
 ## License
 
