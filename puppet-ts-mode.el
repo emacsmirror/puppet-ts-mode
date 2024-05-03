@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-03 08:34:05 stm>
+;; Updated:          <2024-05-03 08:56:21 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1") (cycle-quotes "0.1"))
@@ -983,9 +983,13 @@ a list of directories that are searched to find installed Puppet
 modules.
 
 Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
-with point on an identifier \(a Puppet class, defined type,
+with point on an identifier (a Puppet class, defined type,
 custom function or data type) jumps to the definition of that
 identifier.
+
+The mode needs a tree-sitter grammar to be able to parse Puppet
+code.  The grammar matching the package version can be installed
+using the function `puppet-ts-mode-install-grammar'.
 
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
