@@ -13,11 +13,11 @@ The following features are planned for this mode.
 
 ### Syntax highlighting
 
-*mostly done*
+*mostly done...*
 
 ### Indentation and alignment of parameter lists, expressions and statements
 
-*started*
+*started...*
 
 ### Cross-reference navigation
 
@@ -97,6 +97,8 @@ Key                  | Skeleton
 ### Tag navigation
 
 (aka `imenu`)
+
+*not started...*
 
 ## Installation
 
