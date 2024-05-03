@@ -16,15 +16,15 @@ all: compile check lint clean
 
 compile: $(OBJS)
 
-check: compile $(CHECKS)
+check: $(CHECKS)
 
-clean:
+clean: $(PKGDIR)
 	@$(CASK) clean-elc
 	@$(RM) *-autoloads.el
 
 lint: lint-package lint-elisp
 
-lint-package:
+lint-package: $(PKGDIR)
 	@$(CASK) $(EMACS) --batch \
 	--eval "(require 'package)" \
 	--eval "(setq package-archives '((\"melpa\" . \"http://melpa.org/packages/\")))" \
@@ -33,7 +33,7 @@ lint-package:
 	-L '$(abspath .)' \
 	-l package-lint -f package-lint-batch-and-exit $(SRCS)
 
-lint-elisp:
+lint-elisp: $(PKGDIR)
 	@$(CASK) $(EMACS) --batch \
 	--eval "(require 'package)" \
 	--eval "(setq package-archives '((\"melpa\" . \"http://melpa.org/packages/\")))" \
