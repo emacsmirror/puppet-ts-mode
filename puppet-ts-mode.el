@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-02 17:59:49 stm>
+;; Updated:          <2024-05-03 08:34:05 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1") (cycle-quotes "0.1"))
@@ -53,8 +53,6 @@
 (require 'treesit)
 (require 'align)
 (require 'xref)
-
-(require 'cycle-quotes)
 
 (eval-when-compile
   (require 'cl-lib)
@@ -942,7 +940,6 @@ out."
   (let ((map (make-sparse-keymap)))
     ;; Editing
     (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
-    (define-key map (kbd "C-c C-'") #'cycle-quotes)
     ;; (define-key map (kbd "C-c C-;") #'puppet-clear-string)
     (define-key map (kbd "$") #'puppet-ts-interpolate)
     ;; Skeletons for types
@@ -979,10 +976,6 @@ will be followed by a pair of braces so that the variable name to
 be interpolated can be entered immediately.  The region will be
 used as variable name if it is active when the \"$\" character is
 entered.
-
-When point is in a string, the quotes can be changed from single
-to double and back using the function `cycle-quotes' (bound to
-\\[cycle-quotes]).
 
 The mode supports the cross-referencing system documented in the
 Info node `Xref'.  The variable `puppet-ts-module-path' contains
