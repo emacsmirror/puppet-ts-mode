@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-03 16:51:13 stm>
+;; Updated:          <2024-05-14 12:59:15 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -735,7 +735,7 @@ it can be derived from FILE.  Otherwise NIL is returned."
 
 ;; Xref
 
-(defcustom puppet-ts-module-path
+(defcustom puppet-ts-module-directories
   '("/etc/puppetlabs/code/environments/production/modules")
   "Directories to search for modules when resolving cross references.
 
@@ -801,8 +801,8 @@ rules."
   "Find the definitions of a Puppet resource IDENTIFIER.
 
 First the location of the visited file is checked.  Then all
-directories from `puppet-ts-module-path' are searched for the module
-and the file according to Puppet's autoloading rules."
+directories from `puppet-ts-module-directories' are searched for
+the module and the file according to Puppet's autoloading rules."
   (let* ((resource (downcase (if (string-prefix-p "::" identifier)
                                  (substring identifier 2)
                                identifier)))
@@ -816,7 +816,7 @@ and the file according to Puppet's autoloading rules."
                (pathlist (mapcar #'cdr (list pupfiles typfiles funfiles)))
                ;; list of directories where this module might be
                (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
-                                puppet-ts-module-path))
+                                puppet-ts-module-directories))
                ;; the regexp to find the resource definition in the file
                (resdef (concat "^\\(class\\|define\\|type\\|function\\)\\s-+"
                                resource
@@ -825,7 +825,7 @@ and the file according to Puppet's autoloading rules."
                (files '()))
           ;; Check the current module directory (if the buffer actually
           ;; visits a file) and all module subdirectories from
-          ;; `puppet-ts-module-path'.
+          ;; `puppet-ts-module-directories'.
           (dolist (dir (if buffer-file-name
                            (cons (puppet-ts-module-root buffer-file-name)
                                  moddirs)
@@ -834,7 +834,7 @@ and the file according to Puppet's autoloading rules."
             ;; might contain the resource; save the file name if the file
             ;; exists and we haven't seen it (we might try to check a file
             ;; twice if the current module is also below one of the dirs in
-            ;; `puppet-ts-module-path').
+            ;; `puppet-ts-module-directories').
             (dolist (path pathlist)
               (let ((file (expand-file-name path dir)))
                 (if (and (not (member file files))
@@ -981,9 +981,9 @@ used as variable name if it is active when the \"$\" character is
 entered.
 
 The mode supports the cross-referencing system documented in the
-Info node `Xref'.  The variable `puppet-ts-module-path' contains
-a list of directories that are searched to find installed Puppet
-modules.
+Info node `Xref'.  The variable `puppet-ts-module-directories'
+contains a list of directories that are searched to find
+installed Puppet modules.
 
 Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
 with point on an identifier (a class, defined type, data type or
