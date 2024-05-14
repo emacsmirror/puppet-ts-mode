@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-14 13:16:27 stm>
+;; Updated:          <2024-05-14 13:18:17 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -845,12 +845,12 @@ the module and the file according to Puppet's autoloading rules."
             (with-temp-buffer
               (insert-file-contents-literally file)
               (save-match-data
-                (when (re-search-forward resdef nil t)
-                  (push (xref-make
-                         (match-string-no-properties 0)
-                         (xref-make-file-location
-                          file (line-number-at-pos (match-beginning 1)) 0))
-                        xrefs)))))))
+                (if (re-search-forward resdef nil t)
+                    (push (xref-make
+                           (match-string-no-properties 0)
+                           (xref-make-file-location
+                            file (line-number-at-pos (match-beginning 1)) 0))
+                          xrefs)))))))
     xrefs))
 
 
