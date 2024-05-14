@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-14 12:59:15 stm>
+;; Updated:          <2024-05-14 13:16:27 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -839,7 +839,7 @@ the module and the file according to Puppet's autoloading rules."
               (let ((file (expand-file-name path dir)))
                 (if (and (not (member file files))
                          (file-readable-p file))
-                    (setq files (cons file files))))))
+                    (push file files)))))
           ;; Visit all found files to finally locate the resource definition
           (dolist (file files)
             (with-temp-buffer
