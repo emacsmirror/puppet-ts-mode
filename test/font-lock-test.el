@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-15 18:18:02 stm>
+;; Updated: <2024-05-15 20:45:52 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -204,6 +204,8 @@ bar"
 (ert-deftest puppet/keyword-as-parameter-name ()
   (should-not (puppet-test-face-at 16 "class { 'foo': unless => bar }")))
 
+;;; Variables
+
 (ert-deftest puppet/simple-variable ()
   (puppet-test-with-temp-buffer "$foo = 5"
     (should (eq (puppet-test-face-at 1) 'puppet-ts-variable-name))
@@ -240,6 +242,8 @@ bar"
     (should (eq (puppet-test-face-at 16) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 17))))
 
+;;; Classed/defined types/functions/type aliases
+
 (ert-deftest puppet/class ()
   (puppet-test-with-temp-buffer "class foo::bar { }"
     ;; The keyword
@@ -269,6 +273,24 @@ bar"
     (should (eq (puppet-test-face-at 17) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 21))))
 
+(ert-deftest puppet/function-name ()
+  (puppet-test-with-temp-buffer "function foo() >> Boolean {}"
+    (should (eq (puppet-test-face-at 10) 'puppet-ts-function-name))))
+
+(ert-deftest puppet/function-call ()
+  (puppet-test-with-temp-buffer "$x = foo(1)"
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-function-call))))
+
+(ert-deftest puppet/typealias ()
+  (puppet-test-with-temp-buffer "type Foo = String"
+    ;; The keyword
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
+    ;; The type alias
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 8) 'puppet-ts-resource-type))
+    ;; The data type
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))))
+
 (ert-deftest puppet/node ()
   (puppet-test-with-temp-buffer "node puppet.example.com { }"
     (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
@@ -293,15 +315,7 @@ bar"
     (should (eq (puppet-test-face-at 15) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 19))))
 
-(ert-deftest puppet/typealias ()
-  (puppet-test-with-temp-buffer "type Foo = String"
-    ;; The keyword
-    (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
-    ;; The type alias
-    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
-    (should (eq (puppet-test-face-at 8) 'puppet-ts-resource-type))
-    ;; The data type
-    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))))
+;;; Resources
 
 (ert-deftest puppet/resource ()
   (puppet-test-with-temp-buffer "foo::bar { 'title': }"
@@ -362,7 +376,7 @@ bar"
     (should-not (puppet-test-face-at 9))
     (should (eq (puppet-test-face-at 10) 'puppet-ts-string))))
 
-(ert-deftest puppet/builtin-function-in-parameter-name ()
+(ert-deftest puppet/builtin-parameter-name ()
   (puppet-test-with-temp-buffer "package { 'foo': ensure => installed }"
     (should (eq (puppet-test-face-at 18) 'puppet-ts-builtin))
     (should-not (puppet-test-face-at 24))))
