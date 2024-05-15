@@ -63,11 +63,11 @@ jobs:
     - name: Update PATH
       run: echo "$HOME/.cask/bin" >> $GITHUB_PATH
 
-    - name: Compile grammar
-      run: make grammar
-
     - name: Byte Compile
       run: make compile
+
+    - name: Compile grammar
+      run: make grammar
 
     - name: Run Tests
       run: make check
