@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-04-30 08:14:34 stm>
+;; Updated: <2024-05-15 17:57:42 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -70,11 +70,11 @@
 (ert-deftest puppet/variable-expansion-in-dq-string ()
   (puppet-test-with-temp-buffer "\"${::foo::bar} yeah\""
     (should (eq (puppet-test-face-at 1) 'puppet-ts-string))
-    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
-    (should (eq (puppet-test-face-at 3) 'puppet-ts-variable-name))
-    (should (eq (puppet-test-face-at 4) 'puppet-ts-variable-name))
-    (should (eq (puppet-test-face-at 6) 'puppet-ts-variable-name))
-    (should (eq (puppet-test-face-at 14) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 3) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 4) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-variable-use))
     (should (eq (puppet-test-face-at 16) 'puppet-ts-string))))
 
 
@@ -82,17 +82,20 @@
 
 (ert-deftest puppet/number-integer ()
   (puppet-test-with-temp-buffer "$x = 42"
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
     (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
     (should (eq (puppet-test-face-at 7) 'puppet-ts-number))))
 
 (ert-deftest puppet/number-float ()
   (puppet-test-with-temp-buffer "$x = 4.2"
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
     (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
     (should (eq (puppet-test-face-at 7) 'puppet-ts-number))
     (should (eq (puppet-test-face-at 8) 'puppet-ts-number))))
 
 (ert-deftest puppet/number-scientific ()
   (puppet-test-with-temp-buffer "$x = 4.2e12"
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
     (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
     (should (eq (puppet-test-face-at 7) 'puppet-ts-number))
     (should (eq (puppet-test-face-at 9) 'puppet-ts-number))
@@ -100,6 +103,7 @@
 
 (ert-deftest puppet/number-hex ()
   (puppet-test-with-temp-buffer "$x = 0x42"
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-variable-name))
     (should (eq (puppet-test-face-at 6) 'puppet-ts-number))
     (should (eq (puppet-test-face-at 7) 'puppet-ts-number))
     (should (eq (puppet-test-face-at 9) 'puppet-ts-number))))
@@ -230,10 +234,10 @@ bar"
 
 (ert-deftest puppet/variable-before-colon ()
   (puppet-test-with-temp-buffer "package { $::foo: }"
-    (should (eq (puppet-test-face-at 11) 'puppet-ts-variable-name))
-    (should (eq (puppet-test-face-at 12) 'puppet-ts-variable-name))
-    (should (eq (puppet-test-face-at 14) 'puppet-ts-variable-name))
-    (should (eq (puppet-test-face-at 16) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 11) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 14) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 17))))
 
 (ert-deftest puppet/class ()
@@ -262,7 +266,7 @@ bar"
     ;; The parenthesis
     (should-not (puppet-test-face-at 16))
     ;; The parameter
-    (should (eq (puppet-test-face-at 17) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 17) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 21))))
 
 (ert-deftest puppet/node ()
@@ -286,7 +290,7 @@ bar"
     ;; The parenthesis
     (should-not (puppet-test-face-at 14))
     ;; The parameter
-    (should (eq (puppet-test-face-at 15) 'puppet-ts-variable-name))
+    (should (eq (puppet-test-face-at 15) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 19))))
 
 (ert-deftest puppet/resource ()

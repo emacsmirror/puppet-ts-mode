@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-15 17:31:45 stm>
+;; Updated:          <2024-05-15 17:53:37 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -256,11 +256,12 @@ is added here because it is common and important.")
     :feature interpolation
     :language puppet
     :override t
-    ((interpolation) @puppet-ts-variable-name)
+    ((interpolation) @puppet-ts-variable-use)
 
     :feature variable
     :language puppet
-    ((variable ["$" (name)] @puppet-ts-variable-name))
+    ((statement :anchor (variable ["$" (name)] @puppet-ts-variable-name))
+     (variable ["$" (name)] @puppet-ts-variable-use))
 
     :feature constant
     :language puppet
