@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-14 13:18:17 stm>
+;; Updated:          <2024-05-14 15:05:09 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -1008,10 +1008,9 @@ using the function `puppet-ts-mode-install-grammar'.
   (setq-local parse-sexp-ignore-comments t)
 
   ;; Indentation
-  ;;(setq-local indent-line-function #'puppet-ts-indent-line)
   (setq indent-tabs-mode puppet-ts-indent-tabs-mode)
-  (setq-local electric-indent-chars
-              (append '(?\{ ?\} ?\( ?\) ?: ?,) electric-indent-chars))
+  (setq-local electric-indent-chars '(?\{ ?\} ?\( ?\) ?: ?, ?\n))
+  ;;(setq-local indent-line-function #'puppet-ts-indent-line)
 
   ;; Paragaphs
   (setq-local paragraph-ignore-fill-prefix t)
