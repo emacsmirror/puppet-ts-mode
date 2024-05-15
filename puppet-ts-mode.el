@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-15 18:14:45 stm>
+;; Updated:          <2024-05-15 19:11:53 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -743,15 +743,13 @@ it can be derived from FILE.  Otherwise NIL is returned."
   '("/etc/puppetlabs/code/environments/production/modules")
   "Directories to search for modules when resolving cross references.
 
-The list can contain multiple directories to allow more than
-a single search location (for example to have a local directory
-tree for development).  Each directory should be a top-level
-directory that has the module directories as subdirectories.  The
-list is searched in order and the search is terminated when the
-first match is found.
-
-Remote directories as defined by TRAMP are possible but slow when
-accessed."
+The variable can hold a list of directories to allow more than
+a single search location (for example if you use a personal
+directory where you do development).  Every directory should be
+a top-level directory where a module has its own subdirectory
+using the module name as subdirectory name (see the Puppet
+autoloading rules).  The list is searched in order and the search
+terminates when the first match is found."
   :group 'puppet-ts
   :type '(repeat directory))
 
@@ -977,17 +975,23 @@ out."
 (define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
   "Major mode for editing Puppet files, using the tree-sitter library.
 
+Syntax highlighting for all standard Puppet elements (comments,
+string, variables, keywords, resource types, metaparameters,
+functions, operators) is available.  You can customize the
+variable `treesit-font-lock-level' to control the level of
+fontification.
+
 Typing a \"$\" character inside a double quoted string will
 trigger the variable interpolation syntax.  The \"$\" character
 will be followed by a pair of braces so that the variable name to
-be interpolated can be entered immediately.  The region will be
-used as variable name if it is active when the \"$\" character is
-entered.
+be interpolated can be entered immediately.  If the region is
+active when the \"$\" character is entered, it will be used as
+the variable name.
 
 The mode supports the cross-referencing system documented in the
 Info node `Xref'.  The variable `puppet-ts-module-directories'
-contains a list of directories that are searched to find
-installed Puppet modules.
+can be customized to contain a list of directories that are
+searched to find other Puppet modules.
 
 Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
 with point on an identifier (a class, defined type, data type or
