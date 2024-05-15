@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-14 15:05:09 stm>
+;; Updated:          <2024-05-15 16:09:02 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -1017,13 +1017,6 @@ using the function `puppet-ts-mode-install-grammar'.
   (setq-local paragraph-start "\f\\|[ \t]*$\\|#$")
   (setq-local paragraph-separate "\\([ \t\f]*\\|#\\)$")
 
-  ;; Xref
-  (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
-
-  ;; Alignment
-  (setq align-mode-rules-list puppet-ts-mode-align-rules)
-  (setq align-mode-exclude-rules-list puppet-ts-mode-align-exclude-rules)
-
   ;; Treesitter
   (when (treesit-ready-p 'puppet)
     (treesit-parser-create 'puppet)
@@ -1036,6 +1029,13 @@ using the function `puppet-ts-mode-install-grammar'.
 
     ;; Indentation
     (setq-local treesit-simple-indent-rules puppet-ts-indent-rules)
+
+    ;; Alignment
+    (setq align-mode-rules-list puppet-ts-mode-align-rules)
+    (setq align-mode-exclude-rules-list puppet-ts-mode-align-exclude-rules)
+
+    ;; Xref
+    (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
 
     (treesit-major-mode-setup)))
 
