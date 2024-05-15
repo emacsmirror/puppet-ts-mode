@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-15 19:11:53 stm>
+;; Updated:          <2024-05-15 20:30:00 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -72,15 +72,15 @@
 
 (defvar puppet-ts--file-attribute-constants
   '("file" "directory" "link")
-  "Attributes for file resources formatted as constants.")
+  "Attributes for file resources that will be formatted as constants.")
 
 (defvar puppet-ts--package-attribute-constants
   '("present" "absent" "installed" "latest")
-  "Attributes for package resources formatted as constants.")
+  "Attributes for package resources that will be formatted as constants.")
 
 (defvar puppet-ts--service-attribute-constants
   '("running" "stopped")
-  "Attributes for service resources formatted as constants.")
+  "Attributes for service resources that will be formatted as constants.")
 
 ;; https://www.puppet.com/docs/puppet/latest/metaparameter.html
 (defvar puppet-ts--metaparameters
@@ -129,7 +129,7 @@ is added here because it is common and important.")
                                          puppet-ts--file-attribute-constants))
                       eos)
                 'no-group)
-  "Puppet constants for tree-sitter font-locking.")
+  "Regex to match Puppet attributes.")
 
 (defvar puppet-ts--metaparameters-regex
   (rx-to-string `(seq bos
@@ -144,14 +144,14 @@ is added here because it is common and important.")
                                          puppet-ts--statement-functions))
                       eos)
                 'no-group)
-  "Internal functions provided by Puppet.")
+  "Regex to match Puppet internal functions.")
 
 (defvar puppet-ts--statement-functions-regex
   (rx-to-string `(seq bos
                       ,(cons 'or puppet-ts--statement-functions)
                       eos)
                 'no-group)
-  "Statement functions provided by Puppet.")
+  "Regex to match Puppet statement functions.")
 
 
 ;;; Faces
@@ -525,7 +525,7 @@ The current block is the innermost block that point is in."
 ;;; Skeletons
 
 (defun puppet-ts-dissect-filename (file)
-  "Return list of path components for FILE.
+  "Return list of file name components for FILE.
 The first list element is the basename of FILE and the remaining
 elements are the names of each directory from FILE to the root of
 the filesystem."
@@ -538,12 +538,13 @@ the filesystem."
            collect (file-name-nondirectory path)))
 
 (defun puppet-ts-filename-parser (file)
-  "Return list of path components for the Puppet manifest FILE.
+  "Return list of file name components for the Puppet manifest FILE.
+
 The first element of the list will be the module name and the
-remaining elements are the relative path components below the
-‘manifests’ subdirectory.  The names of the path components are
-only derived from the file name by using the Puppet auto-loader
-rules.  FILE must be an absolute file name.
+remaining elements are the relative file name components below
+the ‘manifests’ subdirectory.  The names of the file name
+components are only derived from the file name by using the
+Puppet auto-loader rules.  FILE must be an absolute file name.
 
 The module name \"unidentified\" is returned if a module name
 can't be inferred from the file name.
@@ -562,11 +563,11 @@ development in a user's home directory)."
                         parts)))
         (cons
          ;; module name with illegal prefixes removed or "unidentified" if
-         ;; path is not compliant with the standard Puppet file hierarchy
+         ;; FILE is not compliant with the standard Puppet file hierarchy
          (replace-regexp-in-string
           "^.*[^a-z0-9_]" "" (or (cadr (member "manifests" parts))
                                  "unidentified"))
-         ;; remaining path components
+         ;; remaining file name components
          (cdr (member "manifests" (reverse compact)))))
     '("unidentified")))
 
@@ -580,7 +581,7 @@ development in a user's home directory)."
 
 (defun puppet-ts-file-type-name (file)
   "Return the Puppet type name for FILE.
-FILE must be an absolute path name and should conform to the
+FILE must be an absolute file name and should conform to the
 standard Puppet module layout.  The Puppet type name is returned
 if can be derived from FILE.  Otherwise NIL is returned.
 
@@ -596,7 +597,7 @@ appropriate type name is returned."
 
 (defun puppet-ts-file-provider-name (file)
   "Return the Puppet provider name for FILE.
-FILE must be an absolute path name and should conform to the
+FILE must be an absolute file name and should conform to the
 standard Puppet module layout.  The provider name is returned if
 it can be derived from FILE.  Otherwise NIL is returned."
   (let ((path (puppet-ts-dissect-filename file)))
@@ -739,7 +740,7 @@ it can be derived from FILE.  Otherwise NIL is returned."
 
 ;; Xref
 
-(defcustom puppet-ts-module-directories
+(defcustom puppet-ts-module-path
   '("/etc/puppetlabs/code/environments/production/modules")
   "Directories to search for modules when resolving cross references.
 
@@ -767,16 +768,16 @@ Return the directory name or nil if no directory is found."
               (file-readable-p (expand-file-name "lib" path))
               (file-readable-p (expand-file-name "types" path)))))))
 
-(defun puppet-ts-autoload-path (identifier &optional directory extension)
-  "Resolve IDENTIFIER into Puppet module and relative autoload path.
+(defun puppet-ts-autoload-name (identifier &optional directory extension)
+  "Resolve IDENTIFIER into Puppet module and relative autoload name.
 
 Use DIRECTORY as module subdirectory \(defaults to \"manifests\"
 and EXTENSION as file extension \(defaults to \".pp\") when
-building the path.
+building the name.
 
 Return a cons cell where the first part is the module name and
-the second part is a relative path name below that module where
-the identifier should be defined according to the Puppet autoload
+the second part is a relative file name below that module where
+the identifier would be defined according to the Puppet autoload
 rules."
   (let* ((components (split-string identifier "::"))
          (module (car components))
@@ -803,22 +804,22 @@ rules."
   "Find the definitions of a Puppet resource IDENTIFIER.
 
 First the location of the visited file is checked.  Then all
-directories from `puppet-ts-module-directories' are searched for
+directories from `puppet-ts-module-path' are searched for
 the module and the file according to Puppet's autoloading rules."
   (let* ((resource (downcase (if (string-prefix-p "::" identifier)
                                  (substring identifier 2)
                                identifier)))
-         (pupfiles (puppet-ts-autoload-path resource))
-         (typfiles (puppet-ts-autoload-path resource "types"))
-         (funfiles (puppet-ts-autoload-path resource "functions"))
+         (pupfiles (puppet-ts-autoload-name resource))
+         (typfiles (puppet-ts-autoload-name resource "types"))
+         (funfiles (puppet-ts-autoload-name resource "functions"))
          (xrefs '()))
     (if pupfiles
         (let* ((module (car pupfiles))
-               ;; merged list of relative path names to classes/defines/types
+               ;; merged list of relative file names to classes/defines/types
                (pathlist (mapcar #'cdr (list pupfiles typfiles funfiles)))
                ;; list of directories where this module might be
                (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
-                                puppet-ts-module-directories))
+                                puppet-ts-module-path))
                ;; the regexp to find the resource definition in the file
                (resdef (concat "^\\(class\\|define\\|type\\|function\\)\\s-+"
                                resource
@@ -827,16 +828,16 @@ the module and the file according to Puppet's autoloading rules."
                (files '()))
           ;; Check the current module directory (if the buffer actually
           ;; visits a file) and all module subdirectories from
-          ;; `puppet-ts-module-directories'.
+          ;; `puppet-ts-module-path'.
           (dolist (dir (if buffer-file-name
                            (cons (puppet-ts-module-root buffer-file-name)
                                  moddirs)
                          moddirs))
-            ;; Try all relative path names below the module directory that
+            ;; Try all relative file names below the module directory that
             ;; might contain the resource; save the file name if the file
             ;; exists and we haven't seen it (we might try to check a file
             ;; twice if the current module is also below one of the dirs in
-            ;; `puppet-ts-module-directories').
+            ;; `puppet-ts-module-path').
             (dolist (path pathlist)
               (let ((file (expand-file-name path dir)))
                 (if (and (not (member file files))
@@ -860,15 +861,23 @@ the module and the file according to Puppet's autoloading rules."
 
 (defconst puppet-ts-mode-treesit-language-source
   '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "main"))
-  "The language source entry for `treesit-language-source-alist'.")
+  "The language source entry for the correct Puppet language parser.
+
+The value refers to the specific version of the parser that the
+mode has been tested with.  Using this mode with either an older
+or newer version of the parser might not work as expected.")
 
 (defun puppet-ts-mode-install-grammar ()
-  "Install the language grammar for `puppet-ts-mode'."
+  "Install the language grammar for `puppet-ts-mode'.
+
+The function removes existing entries for the Puppet language in
+`treesit-language-source-alist' and adds the entry stored in
+`puppet-ts-mode-treesit-language-source'."
   (interactive)
-  ;; Remove the entry if it exists
+  ;; Remove existing entries
   (setq treesit-language-source-alist
         (assq-delete-all 'puppet treesit-language-source-alist))
-  ;; Add correct entry
+  ;; Add the correct entry
   (add-to-list 'treesit-language-source-alist
                puppet-ts-mode-treesit-language-source)
   ;; Install the grammar
@@ -975,23 +984,23 @@ out."
 (define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
   "Major mode for editing Puppet files, using the tree-sitter library.
 
-Syntax highlighting for all standard Puppet elements (comments,
+Syntax highlighting for standard Puppet elements (comments,
 string, variables, keywords, resource types, metaparameters,
 functions, operators) is available.  You can customize the
 variable `treesit-font-lock-level' to control the level of
 fontification.
 
 Typing a \"$\" character inside a double quoted string will
-trigger the variable interpolation syntax.  The \"$\" character
+insert the variable interpolation syntax.  The \"$\" character
 will be followed by a pair of braces so that the variable name to
 be interpolated can be entered immediately.  If the region is
 active when the \"$\" character is entered, it will be used as
 the variable name.
 
 The mode supports the cross-referencing system documented in the
-Info node `Xref'.  The variable `puppet-ts-module-directories'
-can be customized to contain a list of directories that are
-searched to find other Puppet modules.
+Info node `Xref'.  The variable `puppet-ts-module-path' can be
+customized to contain a list of directories that are searched to
+find other Puppet modules.
 
 Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
 with point on an identifier (a class, defined type, data type or
@@ -1002,9 +1011,9 @@ name of the source file can be infered from the identifier.
 A number of skeletons have been implemented to make insertion of
 often used code fragments simpler.
 
-The mode needs a tree-sitter grammar to be able to parse Puppet
-code.  The grammar matching the package version can be installed
-using the function `puppet-ts-mode-install-grammar'.
+The mode needs a tree-sitter parser for Puppet code.  The parser
+suitable for the package version can be installed using the
+function `puppet-ts-mode-install-grammar'.
 
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
