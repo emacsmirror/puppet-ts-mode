@@ -1,9 +1,9 @@
-# Emacs major mode for Puppet using tree-sitter
+# Emacs major mode for Puppet using Tree-sitter
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml/badge.svg)](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml)
 
-This is a major mode to edit Puppet manifests using a tree-sitter parser. It is a rewrite of the original [Puppet mode for Emacs](https://github.com/voxpupuli/puppet-mode)
+This is a major mode to edit Puppet manifests using a Tree-sitter parser. It is a rewrite of the original [Puppet mode for Emacs](https://github.com/voxpupuli/puppet-mode)
 
 **Note:** This is still work in progress; many details concerning font-lock or indentation might not yet work as expected. Most convenience functions of the old puppet-mode are not (yet) implemented.
 
@@ -13,7 +13,20 @@ The following features are planned for this mode.
 
 ### Syntax highlighting
 
-*mostly done...*
+Syntax highlighting for the following syntactic elements is implemented:
+
+- comments
+- strings
+- numbers
+- variables
+- constants (`true`, `false`, `default`, `undef`)
+- keywords (`if`, `unless` `case`, `and`, `or`, `in`, ...)
+- resource types including standard arguments
+- definitions (classes, defined types, type aliases, functions, nodes, plans)
+- builtin functions
+- custom functions
+- operators
+- syntax errors
 
 ### Indentation and alignment of parameter lists, expressions and statements
 
@@ -102,7 +115,7 @@ Key                  | Skeleton
 
 ## Installation
 
-Emacs 29.1 or above with tree-sitter support is required.
+Emacs 29.1 or above with Tree-sitter support is required.
 
 The following Elisp code should be used to install the Puppet language parser.  This requires some tools -- notably a compiler toolchain -- to be available on your machine.
 
@@ -115,6 +128,6 @@ Using the function provided by the package ensures that a version of the parser 
 
 ## License
 
-Puppet Treesitter Mode is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Puppet Tree-sitter Mode is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-Puppet Treesitter Mode is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+Puppet Tree-sitter Mode is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
