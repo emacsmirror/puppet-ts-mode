@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml/badge.svg)](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml)
 
-This is a major mode to edit Puppet manifests using a Tree-sitter parser. It is a rewrite of the original [Puppet mode for Emacs](https://github.com/voxpupuli/puppet-mode)
+This is a major mode to edit Puppet manifests using a Tree-sitter parser. It is a rewrite of the original [Puppet mode for Emacs](https://github.com/voxpupuli/puppet-mode).
 
 **Note:** This is still work in progress; many details concerning font-lock or indentation might not yet work as expected. Most convenience functions of the old puppet-mode are not (yet) implemented.
 
@@ -13,7 +13,7 @@ The following features are planned for this mode.
 
 ### Syntax highlighting
 
-Syntax highlighting for the following syntactic elements is implemented:
+Syntax highlighting for the following elements is fully implemented:
 
 - comments
 - strings
@@ -21,9 +21,9 @@ Syntax highlighting for the following syntactic elements is implemented:
 - variables
 - constants (`true`, `false`, `default`, `undef`)
 - keywords (`if`, `unless` `case`, `and`, `or`, `in`, ...)
-- resource types including standard arguments
+- resource types and metaparameters (`ensure`, `require`, `notify`, ...)
 - definitions (classes, defined types, type aliases, functions, nodes, plans)
-- builtin functions
+- built-in functions
 - custom functions
 - operators
 - syntax errors
