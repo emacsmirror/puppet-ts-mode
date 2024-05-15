@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-15 16:09:02 stm>
+;; Updated:          <2024-05-15 17:31:45 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -430,22 +430,24 @@ The signature of this function is defined by Tree-Sitter."
      ;; compound statements
      ((node-is "elsif") parent-bol 0)
      ((node-is "else") parent-bol 0)
-     ;; arrays
-     ((match "array_element" nil nil 1 1) parent-bol puppet-ts-indent-level)
-     ((match "array_element" nil nil 2 nil) prev-sibling 0)
-     ((parent-is "array") parent-bol puppet-ts-indent-level)
-     ;; structures and expressions
      ((parent-is "case") parent-bol puppet-ts-indent-level)
-     ((parent-is "hash") parent-bol puppet-ts-indent-level)
      ((parent-is "selector") parent-bol puppet-ts-indent-level)
+     ;; arrays
+     ((match "array_element" "array" nil 1 1) parent-bol puppet-ts-indent-level)
+     ((match "array_element" "array" nil 2 nil) prev-sibling 0)
+     ;; hashes
+     ((parent-is "hash") parent-bol puppet-ts-indent-level)
+     ;; resources & attributes
+     ((match "attribute" "attribute_list" nil 2 nil) first-sibling 0)
+     ((parent-is "resource_body") parent-bol puppet-ts-indent-level)
+     ((parent-is "resource_type") parent-bol puppet-ts-indent-level)
+     ((parent-is "resource_reference") parent-bol puppet-ts-indent-level)
+     ;; class parameters
+     ((parent-is "parameter_list") parent-bol puppet-ts-indent-level)
+     ;; function calls
      ((parent-is "function_call") parent-bol puppet-ts-indent-level)
-     ((parent-is "resource_type") resource-bol puppet-ts-indent-level)
-     ((parent-is "resource_body") resource-bol puppet-ts-indent-level)
-     ((parent-is "resource_reference") resource-bol puppet-ts-indent-level)
-     ((node-is "attribute") resource-bol puppet-ts-indent-level)
-     ((parent-is "attribute_list") resource-bol puppet-ts-indent-level)
-     ((parent-is "parameter_list") definition-bol puppet-ts-indent-level)
      ((parent-is "argument_list") function-bol puppet-ts-indent-level)
+     ;; default
      (catch-all parent-bol 0)))
   "Indentation rules for `puppet-ts-mode'.")
 

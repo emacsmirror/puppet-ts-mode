@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-04-28 16:54:55 stm>
-;; Updated: <2024-04-29 13:30:33 stm>
+;; Updated: <2024-05-15 17:36:29 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -220,45 +220,45 @@ class foo::bar (
 }"
 ))))
 
-;; (ert-deftest puppet/class-parameter-list ()
-;;   (puppet-test-indent "
-;; class foo::bar1 ($a, $b,
-;;                  $c, $d,
-;; ) {
-;;   $foo = $bar
-;; }
+(ert-deftest puppet/class-parameter-list ()
+  (puppet-test-indent "
+class foo::bar1 ($a, $b,
+  $c, $d,
+) {
+  $foo = $bar
+}
 
-;; class foo::bar2 ($a, $b,
-;;                  $c, $d)
-;; {
-;;   $foo = $bar
-;; }
+class foo::bar2 ($a, $b,
+  $c, $d)
+{
+  $foo = $bar
+}
 
-;; class foo::bar3 ($a, $b,
-;;                  $c, $d,
-;; )
-;; {
-;;   $foo = $bar
-;; }
+class foo::bar3 ($a, $b,
+  $c, $d,
+)
+{
+  $foo = $bar
+}
 
-;; class foo::bar4 ($a, $b)
-;; {
-;;   $foo = $bar
-;; }
+class foo::bar4 ($a, $b)
+{
+  $foo = $bar
+}
 
-;; class foo::bar5 ($a, $b) {
-;;   $foo = $bar
-;; }
-;; "))
+class foo::bar5 ($a, $b) {
+  $foo = $bar
+}
+"))
 
-;; (ert-deftest puppet/class-parameter-list-fail ()
-;;   ;;:expected-result :failed
-;;   (puppet-test-indent "
-;; class foo::bar ($a, $b,
-;;                 $c, $d) {
-;;   $foo = $bar
-;; }
-;; "))
+(ert-deftest puppet/class-parameter-list-fail ()
+  :expected-result :failed
+  (puppet-test-indent "
+class foo::bar ($a, $b,
+                $c, $d) {
+  $foo = $bar
+}
+"))
 
 (ert-deftest puppet/comments-change-indentation-level ()
   (puppet-test-with-temp-buffer
@@ -344,27 +344,27 @@ define foo::bar
 }"
                     ))))
 
-;; (ert-deftest puppet/extra-indent-after-colon ()
-;;   (puppet-test-with-temp-buffer
-;;       "
-;; class foo {
-;; # no extra indent after this:
-;; bar {
-;; 'extra indent after this':
-;; foo => 'bar';
-;; }
-;; }"
-;;     (indent-region (point-min) (point-max))
-;;     (should (string= (buffer-string)
-;;       "
-;; class foo {
-;;   # no extra indent after this:
-;;   bar {
-;;     'extra indent after this':
-;;       foo => 'bar';
-;;   }
-;; }"
-;; ))))
+(ert-deftest puppet/extra-indent-after-colon ()
+  (puppet-test-with-temp-buffer
+      "
+class foo {
+# no extra indent after this:
+bar {
+'extra indent after this':
+foo => 'bar';
+}
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+class foo {
+  # no extra indent after this:
+  bar {
+    'extra indent after this':
+      foo => 'bar';
+  }
+}"
+))))
 
 (ert-deftest puppet/if ()
   (puppet-test-with-temp-buffer
