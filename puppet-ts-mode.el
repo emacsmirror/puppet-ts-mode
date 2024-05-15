@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-15 17:53:37 stm>
+;; Updated:          <2024-05-15 18:14:45 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -281,6 +281,7 @@ is added here because it is common and important.")
      (function_definition "function" @puppet-ts-keyword)
      (node_definition "node" @puppet-ts-keyword)
      (plan_definition "plan" @puppet-ts-keyword)
+     (type_alias "type" @puppet-ts-keyword)
      ;; names of defined classes, defined types, functions, nodes, ...
      (classname (name) @puppet-ts-resource-type)
      ;; hostnames in a node definition

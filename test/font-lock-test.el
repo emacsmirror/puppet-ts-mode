@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-15 17:57:42 stm>
+;; Updated: <2024-05-15 18:18:02 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -292,6 +292,16 @@ bar"
     ;; The parameter
     (should (eq (puppet-test-face-at 15) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 19))))
+
+(ert-deftest puppet/typealias ()
+  (puppet-test-with-temp-buffer "type Foo = String"
+    ;; The keyword
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-keyword))
+    ;; The type alias
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 8) 'puppet-ts-resource-type))
+    ;; The data type
+    (should (eq (puppet-test-face-at 12) 'puppet-ts-resource-type))))
 
 (ert-deftest puppet/resource ()
   (puppet-test-with-temp-buffer "foo::bar { 'title': }"
