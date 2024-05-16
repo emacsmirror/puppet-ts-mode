@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 08:36:30 stm>
+;; Updated:          <2024-05-16 08:36:58 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -458,7 +458,9 @@ Return the node if it is found or nil otherwise."
        (if-let* ((attr (treesit-search-subtree node "attribute"))
                  (from (treesit-node-start attr)))
            (align from end)))
-      (_ (align beg end)))))
+      (_
+       ;; Default alignent for all other elements
+       (align beg end)))))
 
 
 ;;; Skeletons
