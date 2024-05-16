@@ -741,8 +741,8 @@ rules."
   "Find the definitions of a Puppet resource IDENTIFIER.
 
 First the location of the visited file is checked.  Then all
-directories from `puppet-ts-module-path' are searched for
-the module and the file according to Puppet's autoloading rules."
+directories from `puppet-ts-module-path' are searched for the
+module and file according to Puppet's autoloading rules."
   (let* ((resource (downcase (if (string-prefix-p "::" identifier)
                                  (substring identifier 2)
                                identifier)))
