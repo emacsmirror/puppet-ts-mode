@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 07:22:50 stm>
+;; Updated:          <2024-05-16 08:04:05 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -432,7 +432,7 @@ nodes we find.  Terminate the search if we know how to align the
 current node.  The constant `puppet-ts-align-node-types-regex'
 has the regex of the acceptable node types.
 
-Return the node or nil if nothing is found."
+Return the node if it is found or nil otherwise."
   (save-excursion
     (cl-loop for     node = (treesit-node-on location location)
              then    (treesit-node-parent node)
@@ -443,18 +443,20 @@ Return the node or nil if nothing is found."
              finally return node)))
 
 (defun puppet-ts-align-block ()
-  "Align the current parameter or attribute block.
-
-The current block is the innermost block that point is in."
+  "Align the innermost block of parameters, attributes or hashpairs."
   (interactive "*")
   (when-let* ((node (puppet-ts-find-alignment-node (point)))
               (beg (treesit-node-start node))
               (end (treesit-node-end node)))
     ;;(message "about to align %S" (treesit-node-type node))
     (pcase (treesit-node-type node)
-      ("parameter_list" (align beg end))
-      ("resource_type" (align beg end))
-      ("resource_reference" (align beg end)))))
+      ("resource_type"
+       ;; Restrict alignment to the attributes to
+       ;; avoid shifting a variable used as title
+       (if-let* ((attr (treesit-search-subtree node "attribute"))
+                 (from (treesit-node-start attr)))
+           (align from end)))
+      (_ (align beg end)))))
 
 
 ;;; Skeletons

@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-02 12:31:53 stm>
+;; Updated: <2024-05-16 07:58:39 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -150,7 +150,6 @@ class foo {
 }"))))
 
 (ert-deftest puppet/title-variable ()
-  :expected-result :failed
   (puppet-test-with-temp-buffer
       "
 file { $foo:
