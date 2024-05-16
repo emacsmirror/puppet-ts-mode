@@ -722,13 +722,12 @@ the identifier would be defined according to the Puppet autoload
 rules."
   (let* ((components (split-string identifier "::"))
          (module (car components))
-         (path (cons (or directory "manifests")
-                     (butlast (cdr components))))
+         (dirs (cons (or directory "manifests") (butlast (cdr components))))
          (file (if (cdr components)
                    (car (last components))
                  "init")))
     (cons module
-          (concat (mapconcat #'file-name-as-directory path "")
+          (concat (mapconcat #'file-name-as-directory dirs "")
                   file
                   (or extension ".pp")))))
 
