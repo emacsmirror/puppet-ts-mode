@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-04-28 16:54:55 stm>
-;; Updated: <2024-05-16 07:19:20 stm>
+;; Updated: <2024-05-16 08:19:42 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -247,15 +247,6 @@ class foo::bar4 ($a, $b)
 }
 
 class foo::bar5 ($a, $b) {
-  $foo = $bar
-}
-"))
-
-(ert-deftest puppet/class-parameter-list-fail ()
-  :expected-result :failed
-  (puppet-test-indent "
-class foo::bar ($a, $b,
-                $c, $d) {
   $foo = $bar
 }
 "))
