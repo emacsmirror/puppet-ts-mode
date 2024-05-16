@@ -871,6 +871,8 @@ out."
     (modify-syntax-entry ?\\ "\\" table)
     ;; the dollar sign is an expression prefix for variables
     (modify-syntax-entry ?$ "'" table)
+    ;; symbol constituent
+    (modify-syntax-entry ?: "_" table)
     ;; various operators and punctionation.
     (modify-syntax-entry ?<  "." table)
     (modify-syntax-entry ?>  "." table)
