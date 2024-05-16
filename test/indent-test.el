@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-04-28 16:54:55 stm>
-;; Updated: <2024-05-15 17:36:29 stm>
+;; Updated: <2024-05-16 07:19:20 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -54,10 +54,10 @@ class foo {
     1,
     2)
   $foo = bar(1,
-    2
+             2
   )
   $foo = bar(1,
-    2)
+             2)
 
   foo { 'foo':
     foo => bar(1,2),
@@ -69,10 +69,10 @@ class foo {
       1,
       2),
     foo => bar(1,
-      2,
+               2,
     ),
     foo => bar(1,
-      2),
+               2),
     foo => 0;
   }
 }
@@ -87,20 +87,20 @@ class foo {
   $foo = [
     $bar]
   $foo = [$bar,
-          $bar,
+    $bar,
   ]
   $foo = [$bar,
-          $bar]
+    $bar]
   foo { 'foo':
     bar => [
       $bar,
       $bar,
     ],
     bar => [$bar,
-            $bar,
+      $bar,
     ],
     bar => [$bar,
-            $bar],
+      $bar],
     bar => $bar;
   }
 }

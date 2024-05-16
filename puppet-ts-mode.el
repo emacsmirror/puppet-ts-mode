@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-15 20:41:45 stm>
+;; Updated:          <2024-05-16 07:18:56 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -434,12 +434,11 @@ The signature of this function is defined by Tree-Sitter."
      ;; compound statements
      ((node-is "elsif") parent-bol 0)
      ((node-is "else") parent-bol 0)
+     ;; additional statements
      ((parent-is "case") parent-bol puppet-ts-indent-level)
      ((parent-is "selector") parent-bol puppet-ts-indent-level)
-     ;; arrays
-     ((match "array_element" "array" nil 1 1) parent-bol puppet-ts-indent-level)
-     ((match "array_element" "array" nil 2 nil) prev-sibling 0)
-     ;; hashes
+     ;; arrays & hashes
+     ((parent-is "array") parent-bol puppet-ts-indent-level)
      ((parent-is "hash") parent-bol puppet-ts-indent-level)
      ;; resources & attributes
      ((match "attribute" "attribute_list" nil 2 nil) first-sibling 0)
