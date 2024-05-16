@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 13:49:07 stm>
+;; Updated:          <2024-05-16 15:05:49 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -840,21 +840,26 @@ A single \"$\" is inserted if point is not in a double quoted
 string.  With prefix argument SUPPRESS the braces are always left
 out."
   (interactive "P*")
-  (self-insert-command 1)
-  (unless suppress
-    (let ((node (puppet-ts-string-node (point))))
-      ;; Check if we are inside a string node and the string is terminated by
-      ;; a " character.
-      (if (and node (= (char-before (treesit-node-end node)) ?\"))
-          (if mark-active
-              (progn
-                ;; Surround the region
-                (goto-char (region-beginning))
+  (let ((node (puppet-ts-string-node (point))))
+    ;; Are we inside a string and is it terminated by a double quote?
+    (if (and node (= (char-before (treesit-node-end node)) ?\"))
+        (if mark-active
+            ;; region active: enclose in {...}
+            (let ((beg (region-beginning))
+                  (end (region-end)))
+              (goto-char beg)
+              (self-insert-command 1)
+              (if suppress
+                  (goto-char (1+ end))
                 (insert "{")
-                (goto-char (region-end))
-                (insert "}"))
+                (goto-char (+ end 2))
+                (insert "}")))
+          ;; region not active
+          (self-insert-command 1)
+          (unless suppress
             (insert "{}")
-            (forward-char -1))))))
+            (forward-char -1)))
+      (self-insert-command 1))))
 
 (defun puppet-ts-clear-string ()
   "Clear string at point."
