@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 07:18:56 stm>
+;; Updated:          <2024-05-16 07:22:50 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -356,72 +356,6 @@ is added here because it is common and important.")
   :type 'boolean
   :safe 'booleanp)
 
-(defsubst puppet-ts-find-ancestor-node (node regex)
-  "Find ancestor of NODE with a node type that matched REGEX."
-  (treesit-parent-until node
-                        (lambda (x)
-                          (string-match-p regex (treesit-node-type x)))
-                        t))
-
-(defun puppet-ts-ancestor-definition-bol (node parent _bol)
-  "Search ancestors of NODE or PARENT for a Puppet definition.
-
-The search starts with PARENT if NODE is NIL.  This happens if no
-node can start at the position, e.g. there is an empty line.
-Return the beginning of line position for the Puppet definition.
-
-The signature of this function is defined by Tree-Sitter."
-  (let ((ancestor (puppet-ts-find-ancestor-node
-                   (or node parent)     ; Start with parent if node is nil
-                   (regexp-opt '("class_definition" "define_definition"
-                                 "function_definition")))))
-    (if ancestor
-        (save-excursion
-          (goto-char (treesit-node-start ancestor))
-          (back-to-indentation)
-          (point)))))
-
-(defun puppet-ts-ancestor-resource-bol (node parent _bol)
-  "Search ancestors of NODE or PARENT for a Puppet resource.
-
-The search starts with PARENT if NODE is NIL.  This happens if no
-node can start at the position, e.g. there is an empty line.
-Return the beginning of line position for the Puppet resource.
-
-The signature of this function is defined by Tree-Sitter."
-  (let ((ancestor (puppet-ts-find-ancestor-node
-                   (or node parent)     ; Start with parent if node is nil
-                   (regexp-opt '("resource_type" "resource_reference")))))
-    (if ancestor
-        (save-excursion
-          (goto-char (treesit-node-start ancestor))
-          (back-to-indentation)
-          (point)))))
-
-(defun puppet-ts-ancestor-function-bol (node parent _bol)
-  "Search ancestors of NODE or PARENT for a Puppet function call.
-
-The search starts with PARENT if NODE is NIL.  This happens if no
-node can start at the position, e.g. there is an empty line.
-Return the beginning of line position for the Puppet resource.
-
-The signature of this function is defined by Tree-Sitter."
-  (let ((ancestor (puppet-ts-find-ancestor-node
-                   (or node parent)     ; Start with parent if node is nil
-                   (regexp-opt '("function_call")))))
-    (if ancestor
-        (save-excursion
-          (goto-char (treesit-node-start ancestor))
-          (back-to-indentation)
-          (point)))))
-
-;; Make the custom function usable as indent anchors by tree-sitter
-(setq treesit-simple-indent-presets
-      (append treesit-simple-indent-presets
-              (list (cons 'definition-bol #'puppet-ts-ancestor-definition-bol)
-                    (cons 'resource-bol #'puppet-ts-ancestor-resource-bol)
-                    (cons 'function-bol #'puppet-ts-ancestor-function-bol))))
-
 (defvar puppet-ts-indent-rules
   `((puppet
      ;; top-level statements start in column zero
@@ -445,11 +379,11 @@ The signature of this function is defined by Tree-Sitter."
      ((parent-is "resource_body") parent-bol puppet-ts-indent-level)
      ((parent-is "resource_type") parent-bol puppet-ts-indent-level)
      ((parent-is "resource_reference") parent-bol puppet-ts-indent-level)
-     ;; class parameters
+     ;; class/defined type parameters
      ((parent-is "parameter_list") parent-bol puppet-ts-indent-level)
      ;; function calls
+     ((match "argument" "argument_list" nil 2 nil) first-sibling 0)
      ((parent-is "function_call") parent-bol puppet-ts-indent-level)
-     ((parent-is "argument_list") function-bol puppet-ts-indent-level)
      ;; default
      (catch-all parent-bol 0)))
   "Indentation rules for `puppet-ts-mode'.")
