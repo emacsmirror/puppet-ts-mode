@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 10:30:42 stm>
+;; Updated:          <2024-05-16 12:26:28 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -702,9 +702,9 @@ Return the directory name or nil if no directory is found."
    file
    (lambda (path)
      (and (file-accessible-directory-p path)
-          (or (file-readable-p (expand-file-name "manifests" path))
-              (file-readable-p (expand-file-name "lib" path))
-              (file-readable-p (expand-file-name "types" path)))))))
+          (or (file-accessible-directory-p (expand-file-name "manifests" path))
+              (file-accessible-directory-p (expand-file-name "types" path))
+              (file-accessible-directory-p (expand-file-name "lib" path)))))))
 
 (defun puppet-ts-autoload-name (identifier &optional directory extension)
   "Resolve IDENTIFIER into Puppet module and relative autoload name.
