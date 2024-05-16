@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(message "Booting Emacs %s and run tests from %s"
+(message "Running Emacs %s with tests from %s"
          emacs-version (file-relative-name load-file-name))
 
 
