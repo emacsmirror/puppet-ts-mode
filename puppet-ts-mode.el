@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 08:04:05 stm>
+;; Updated:          <2024-05-16 08:17:07 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -421,7 +421,9 @@ is added here because it is common and important.")
   "Rules for excluding lines from alignment for Puppet.")
 
 (defconst puppet-ts-align-node-types-regex
-  (rx (or "hash" "parameter_list" "resource_type" "resource_reference"))
+  (rx bos
+      (or "hash" "parameter_list" "resource_type" "resource_reference")
+      eos)
   "List of parser items that can be aligned.")
 
 (defun puppet-ts-find-alignment-node (location)
