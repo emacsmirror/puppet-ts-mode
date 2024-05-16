@@ -265,10 +265,7 @@ is added here because it is common and important.")
 
     :feature constant
     :language puppet
-    (((true) @puppet-ts-constant)
-     ((false) @puppet-ts-constant)
-     ((default) @puppet-ts-constant)
-     ((undef) @puppet-ts-constant))
+    (([(true) (false) (default) (undef)] @puppet-ts-constant))
 
     :feature number
     :language puppet
