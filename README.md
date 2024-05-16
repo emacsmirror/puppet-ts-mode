@@ -3,13 +3,13 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml/badge.svg)](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml)
 
-This is a major mode to edit Puppet manifests using a Tree-sitter parser. It is a rewrite of the original [Puppet mode for Emacs](https://github.com/voxpupuli/puppet-mode).
+This is a major mode for [GNU Emacs](https://www.gnu.org/software/emacs/) 29.1 or later which adds support for the [Puppet](https://www.puppet.com) domain-specific language. It uses a Tree-sitter parser for Puppet to be able to parse the code and provide fontification, indentation, navigation and more.
 
-**Note:** This is still work in progress; many details concerning font-lock or indentation might not yet work as expected. Most convenience functions of the old puppet-mode are not (yet) implemented.
+It is a rewrite of the original [Puppet mode for Emacs](https://github.com/voxpupuli/puppet-mode).
 
 ## Features
 
-The mode provides the following enhancements to make writing Puppet manifests easier.
+The mode provides the following features and enhancements to make writing Puppet manifests easier.
 
 ### Syntax highlighting
 
@@ -31,6 +31,28 @@ Syntax highlighting for the following elements is fully implemented:
 ### Indentation and alignment
 
 The alignment of resource attributes, function parameter lists and hashes is fully implemented. If point is within such a block, the function `puppet-ts-align-block` (bound to <kbd>C-c C-a</kbd> by default) will align the attributes and parameters with respect to the `=>` symbols.
+
+**Example:** Consider the following badly written file resource:
+
+``` puppet
+file { '/var/www':
+  ensure    => directory,
+  owner =>     'root',
+  group   =>'www-data',
+  mode=>'0644',
+}
+```
+
+Type <kbd>C-c C-a</kbd> to align all the attributes and fat arrows when point is somewhere in this resource. The result will be like this:
+
+``` puppet
+file { '/var/www':
+  ensure => directory,
+  owner  => 'root',
+  group  => 'www-data',
+  mode   => '0644',
+}
+```
 
 ### Cross-reference navigation
 
