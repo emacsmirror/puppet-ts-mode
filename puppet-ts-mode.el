@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 12:26:28 stm>
+;; Updated:          <2024-05-16 13:49:07 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -384,6 +384,16 @@ is added here because it is common and important.")
      ;; default
      (catch-all parent-bol 0)))
   "Indentation rules for `puppet-ts-mode'.")
+
+
+;; Helper functions
+
+(defsubst puppet-ts-string-node (location)
+  "Return the string node arround LOCATION or nil if non exists."
+  (treesit-parent-until (treesit-node-at location)
+                        (lambda (x) (string= (treesit-node-type x) "string"))
+                        t))
+
 
 
 ;; Alignment
@@ -832,10 +842,7 @@ out."
   (interactive "P*")
   (self-insert-command 1)
   (unless suppress
-    (let ((node (treesit-parent-until
-                 (treesit-node-at (point))
-                 (lambda (x) (string= (treesit-node-type x) "string"))
-                 t)))
+    (let ((node (puppet-ts-string-node (point))))
       ;; Check if we are inside a string node and the string is terminated by
       ;; a " character.
       (if (and node (= (char-before (treesit-node-end node)) ?\"))
@@ -848,6 +855,14 @@ out."
                 (insert "}"))
             (insert "{}")
             (forward-char -1))))))
+
+(defun puppet-ts-clear-string ()
+  "Clear string at point."
+  (interactive "*")
+  (if-let* ((node (puppet-ts-string-node (point)))
+            (beg (treesit-node-start node))
+            (end (treesit-node-end node)))
+      (delete-region (1+ beg) (1- end))))
 
 
 ;; Major mode definition
@@ -893,7 +908,7 @@ out."
   (let ((map (make-sparse-keymap)))
     ;; Editing
     (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
-    ;; (define-key map (kbd "C-c C-;") #'puppet-clear-string)
+    (define-key map (kbd "C-c C-;") #'puppet-ts-clear-string)
     (define-key map (kbd "$") #'puppet-ts-interpolate)
     ;; Skeletons for types
     (define-key map (kbd "C-c C-t a") #'puppet-ts-type-anchor)
