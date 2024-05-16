@@ -9,7 +9,7 @@ This is a major mode to edit Puppet manifests using a Tree-sitter parser. It is 
 
 ## Features
 
-The following features are planned for this mode.
+The mode provides the following enhancements to make writing Puppet manifests easier.
 
 ### Syntax highlighting
 
@@ -28,9 +28,9 @@ Syntax highlighting for the following elements is fully implemented:
 - operators
 - syntax errors
 
-### Indentation and alignment of parameter lists, expressions and statements
+### Indentation and alignment
 
-*started...*
+The alignment of resource attributes, function parameter lists and hashes is fully implemented. If point is within such a block, the function `puppet-ts-align-block` (bound to <kbd>C-c C-a</kbd> by default) will align the attributes and parameters with respect to the `=>` symbols.
 
 ### Cross-reference navigation
 

@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 08:36:58 stm>
+;; Updated:          <2024-05-16 10:30:42 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -924,37 +924,41 @@ out."
 ;;;###autoload
 (define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
   "Major mode for editing Puppet files, using the tree-sitter library.
-
+\\<puppet-ts-mode-map>
 Syntax highlighting for standard Puppet elements (comments,
 string, variables, keywords, resource types, metaparameters,
 functions, operators) is available.  You can customize the
 variable `treesit-font-lock-level' to control the level of
 fontification.
 
+Attribute and parameter blocks can be aligned with respect to
+the \"=>\" symbols by positioning point inside such a block and
+calling the function `puppet-ts-align-block' (bound to \\[puppet-ts-align-block]).
+
 Typing a \"$\" character inside a double quoted string will
 insert the variable interpolation syntax.  The \"$\" character
-will be followed by a pair of braces so that the variable name to
-be interpolated can be entered immediately.  If the region is
-active when the \"$\" character is entered, it will be used as
-the variable name.
+will be followed by a pair of braces so that the variable name
+to be interpolated can be entered immediately.  If the region
+is active when the \"$\" character is entered, it will be used
+as the variable name.
 
-The mode supports the cross-referencing system documented in the
+The mode supports the cross-referencing system described in the
 Info node `Xref'.  The variable `puppet-ts-module-path' can be
-customized to contain a list of directories that are searched to
-find other Puppet modules.
+customized to contain a list of directories that are searched
+to find other Puppet modules.
 
 Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
-with point on an identifier (a class, defined type, data type or
-custom function) jumps to the definition of that identifier.
+with point on an identifier (a class, defined type, data type
+or custom function) jumps to the definition of that identifier.
 This is quick and does not need any sort of database, since the
 name of the source file can be infered from the identifier.
 
-A number of skeletons have been implemented to make insertion of
-often used code fragments simpler.
+A number of skeletons have been implemented to make insertion
+of often used code fragments simpler.
 
-The mode needs a tree-sitter parser for Puppet code.  The parser
-suitable for the package version can be installed using the
-function `puppet-ts-mode-install-grammar'.
+The mode needs the tree-sitter parser for Puppet code.  A parser
+suitable for the current package version can be installed using
+the function `puppet-ts-mode-install-grammar'.
 
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
