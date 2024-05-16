@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 08:17:07 stm>
+;; Updated:          <2024-05-16 08:36:30 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -522,7 +522,7 @@ development in a user's home directory)."
   "Return the Puppet type name for FILE.
 FILE must be an absolute file name and should conform to the
 standard Puppet module layout.  The Puppet type name is returned
-if can be derived from FILE.  Otherwise NIL is returned.
+if can be derived from FILE.  Otherwise nil is returned.
 
 If the function is called with the file name of a provider, the
 appropriate type name is returned."
@@ -538,7 +538,7 @@ appropriate type name is returned."
   "Return the Puppet provider name for FILE.
 FILE must be an absolute file name and should conform to the
 standard Puppet module layout.  The provider name is returned if
-it can be derived from FILE.  Otherwise NIL is returned."
+it can be derived from FILE.  Otherwise nil is returned."
   (let ((path (puppet-ts-dissect-filename file)))
     (if (and (equal (nth 2 path) "provider")
              (equal (nth 3 path) "puppet"))
