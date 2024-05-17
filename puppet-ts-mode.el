@@ -1,12 +1,12 @@
 ;;; puppet-ts-mode.el --- Major mode for Puppet using Tree-sitter -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024 Stefan Möding
+;; Copyright (c) 2024  Stefan Möding
 
 ;; Author:           Stefan Möding <stm@kill-9.net>
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-16 15:05:49 stm>
+;; Updated:          <2024-05-17 11:36:42 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -25,6 +25,27 @@
 
 ;; For a full copy of the GNU General Public License
 ;; see <http://www.gnu.org/licenses/>.
+
+;; This file incorporates work covered by the following copyright and
+;; permission notice:
+
+;;   Copyright (C) 2013-2014, 2016  Sebastian Wiesner <swiesner@lunaryorn.com>
+;;   Copyright (C) 2013, 2014  Bozhidar Batsov <bozhidar@batsov.com>
+;;   Copyright (C) 2011  Puppet Labs Inc
+
+;; and
+
+;;   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+;;   use this file except in compliance with the License.  You may obtain a copy
+;;   of the License at
+;;
+;;       http://www.apache.org/licenses/LICENSE-2.0
+;;
+;;   Unless required by applicable law or agreed to in writing, software
+;;   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+;;   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+;;   License for the specific language governing permissions and limitations
+;;   under the License.
 
 ;;; Commentary:
 
