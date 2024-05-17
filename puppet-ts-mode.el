@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-17 11:36:42 stm>
+;; Updated:          <2024-05-17 14:00:46 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -49,10 +49,35 @@
 
 ;;; Commentary:
 
-;; This package provides Puppet syntax highlighting, indentation and
-;; navigation using Tree-sitter.  To use the `puppet-ts-mode' major mode you
-;; will need to install the appropriate grammar.  This can be done by using
-;; the following Elisp snippet:
+;; This package uses a Tree-sitter parser to provide syntax highlighting,
+;; indentation, alignment, xref navigation and code checking for the Puppet
+;; domain-specific language.
+;;
+;; Syntax highlighting: Fontification is supported using custom faces for
+;; Puppet syntax elements like comments, strings, variables, constants,
+;; keywords, resource types and their metaparameters.  Even syntax errors can
+;; be show using a warning face, when `treesit-font-lock-level' is set to 4.
+;;
+;; Indentation: Automatic indentation according to the Puppet coding
+;; standards is provided.
+;;
+;; Alignment: Provide alignment rules for common Puppet expressions and align
+;; the current block with `puppet-ts-align-block' (bound to "C-c C-a").
+;;
+;; Cross-reference navigation: When point is on an identifier for a class,
+;; defined type, data type or custom function, the definition of that element
+;; can easily be opened with `xref-find-definitions' (bound to "M-.").  The
+;; list of directories that will be searched to locate the definition can be
+;; customized in `puppet-ts-module-path'.
+;;
+;; Code checking: Validate the syntax of the current buffer with
+;; `puppet-ts-validate' (bound to "C-c C-v").  Lint the current buffer for
+;; semantic errors with `puppet-ts-lint' (bound to "C-c C-l").  Apply the
+;; current buffer in noop-mode with `puppet-ts-apply' (bound to "C-c C-c").
+;;
+;; The package uses a Tree-sitter library to parse Puppet code and you need
+;; to install the appropriate parser.  This can be done by using this Elisp
+;; snippet:
 ;;
 ;;    (require 'puppet-ts-mode)
 ;;    (puppet-ts-mode-install-grammar)
@@ -60,14 +85,8 @@
 ;; Using the function provided by the package ensures that a version of the
 ;; parser matching the package will be installed.  These commands should also
 ;; be used to update the parser to the corrent version when the package is
-;; updated.
+;; updated.  Note that a compiler toolchain is required for this to work.
 ;;
-;; Note that a compiler toolchain is required for this to work.  You may also
-;; want to consult the Emacs manual: (info "(elisp) Parsing Program Source")
-;;
-;; Caution: Currently this is work in progress; many details concerning
-;; font-lock or indentation might not yet work as expected.  Most convenience
-;; functions of the old puppet-mode are not (yet) implemented.
 
 ;;; Code:
 
