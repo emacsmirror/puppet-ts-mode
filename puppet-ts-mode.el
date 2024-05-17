@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-17 14:00:46 stm>
+;; Updated:          <2024-05-17 14:34:33 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages, puppet, tree-sitter
 ;; Package-Requires: ((emacs "29.1"))
@@ -1092,6 +1092,14 @@ or custom function) jumps to the definition of that identifier.
 This is quick and does not need any sort of database, since the
 name of the source file can be infered from the identifier.
 
+By convention a Puppet manifest only has a single definition of
+a class, defined type or function.  So the navigation function
+`beginning-of-defun' and `end-of-defun' would normally only jump
+to the beginning or the end of the buffer.  This does not provide
+any benefit and so the mode uses the associated keybindings to go
+to the preceding (\\[treesit-beginning-of-defun]) or the following (\\[treesit-end-of-defun]) resource
+declaration.
+
 The manifest in a buffer can be applied in noop-mode (\\[puppet-ts-apply])
 and validated (\\[puppet-ts-validate]).  The \"puppet\" executable is required
 for this to work.
@@ -1129,6 +1137,9 @@ tools (C compiler, ...) are required for this.
   ;; Treesitter
   (when (treesit-ready-p 'puppet)
     (treesit-parser-create 'puppet)
+
+    ;; Navigation
+    (setq treesit-defun-type-regexp "resource_\\(type\\|reference\\)")
 
     ;; Font-Lock
     (setq-local treesit-font-lock-feature-list puppet-ts-mode-feature-list)

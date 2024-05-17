@@ -54,6 +54,10 @@ file { '/var/www':
 }
 ```
 
+### Navigation
+
+The keybindings <kbd>C-M-a</kbd> and <kbd>C-M-e</kbd> jump to preceding or following resource declaration respectively. This seems to be more useful than jumping to the beginning or end of a definition since a Puppet manifest normally only has a single definition.
+
 ### Cross-reference navigation
 
 Navigation from a referenced class, defined type, data type or function to the file where this corresponding type is defined (aka `xref`) is fully implemented.
@@ -128,12 +132,6 @@ Key                  | Skeleton
 <kbd>C-c C-k u</kbd> | keyword `unless`
 <kbd>C-c C-k s</kbd> | keyword `case`
 <kbd>C-c C-k ?</kbd> | keyword `selector`
-
-### Tag navigation
-
-(aka `imenu`)
-
-*not started...*
 
 ## Installation
 
