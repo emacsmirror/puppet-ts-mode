@@ -415,6 +415,82 @@ is added here because it is common and important.")
                         (lambda (x) (string= (treesit-node-type x) "string"))
                         t))
 
+
+;;; Checking
+
+(defcustom puppet-ts-validate-command "puppet parser validate --color=false"
+  "Command to validate the syntax of a Puppet manifest."
+  :type 'string
+  :group 'puppet-ts)
+
+(defcustom puppet-ts-lint-command
+  (concat
+   "puppet-lint --with-context "
+   "--log-format \"%{path}:%{line}: %{kind}: %{message} (%{check})\"")
+  "Command to lint a Puppet manifest."
+  :type 'string
+  :group 'puppet-ts)
+
+(defcustom puppet-ts-apply-command "puppet apply --verbose --noop"
+  "Command to apply a Puppet manifest."
+  :type 'string
+  :group 'puppet-ts)
+
+(defvar-local puppet-ts-last-validate-command nil
+  "The last command used for validation.")
+
+(defvar-local puppet-ts-last-lint-command nil
+  "The last command used for linting.")
+
+(defvar-local puppet-ts-last-apply-command nil
+  "The last command used to apply a manifest.")
+
+(defun puppet-ts-run-check-command (command buffer-name-template)
+  "Run COMMAND to check the current buffer.
+BUFFER-NAME-TEMPLATE is used to create the buffer name."
+  (save-some-buffers (not compilation-ask-about-save) nil)
+  (compilation-start command nil (lambda (_)
+                                   (format buffer-name-template command))))
+
+(defun puppet-ts-read-command (prompt previous-command default-command)
+  "Read a command from minibuffer with PROMPT.
+PREVIOUS-COMMAND or DEFAULT-COMMAND are used if set."
+  (let* ((buffer-file-name (or (buffer-file-name) ""))
+         (filename (or (file-remote-p buffer-file-name 'localname)
+                       buffer-file-name)))
+    (read-string prompt (or previous-command
+                            (concat default-command " "
+                                    (shell-quote-argument filename))))))
+
+(defun puppet-ts-validate (command)
+  "Validate the syntax of the current buffer with COMMAND.
+
+When called interactively, prompt for COMMAND."
+  (interactive (list (puppet-ts-read-command "Validate command: "
+                                             puppet-ts-last-validate-command
+                                             puppet-ts-validate-command)))
+  (setq puppet-ts-last-validate-command command)
+  (puppet-ts-run-check-command command "*Puppet Validate: %s*"))
+
+(defun puppet-ts-lint (command)
+  "Lint the current buffer with COMMAND.
+
+When called interactively, prompt for COMMAND."
+  (interactive (list (puppet-ts-read-command "Lint command: "
+                                             puppet-ts-last-lint-command
+                                             puppet-ts-lint-command)))
+  (setq puppet-ts-last-lint-command command)
+  (puppet-ts-run-check-command command "*Puppet Lint: %s*"))
+
+(defun puppet-ts-apply (command)
+  "Apply the current manifest with COMMAND.
+
+When called interactively, prompt for COMMAND."
+  (interactive (list (puppet-ts-read-command "Apply command: "
+                                             puppet-ts-last-apply-command
+                                             puppet-ts-apply-command)))
+  (setq puppet-ts-last-apply-command command)
+  (puppet-ts-run-check-command command "*Puppet Apply: %s*"))
 
 
 ;; Alignment
@@ -936,6 +1012,11 @@ out."
     (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
     (define-key map (kbd "C-c C-;") #'puppet-ts-clear-string)
     (define-key map (kbd "$") #'puppet-ts-interpolate)
+    ;; Apply manifests
+    (define-key map (kbd "C-c C-c") #'puppet-ts-apply)
+    ;; Linting and validation
+    (define-key map (kbd "C-c C-v") #'puppet-ts-validate)
+    (define-key map (kbd "C-c C-l") #'puppet-ts-lint)
     ;; Skeletons for types
     (define-key map (kbd "C-c C-t a") #'puppet-ts-type-anchor)
     (define-key map (kbd "C-c C-t c") #'puppet-ts-type-class)
@@ -992,12 +1073,20 @@ or custom function) jumps to the definition of that identifier.
 This is quick and does not need any sort of database, since the
 name of the source file can be infered from the identifier.
 
-A number of skeletons have been implemented to make insertion
-of often used code fragments simpler.
+The manifest in a buffer can be applied in noop-mode (\\[puppet-ts-apply])
+and validated (\\[puppet-ts-validate]).  The \"puppet\" executable is required
+for this to work.
+
+A manifest can also be linted (\\[puppet-ts-lint]) if the \"puppet-lint\"
+utility is available.
+
+A number of skeletons have been implemented to make insertion of
+often used code fragments simpler.
 
 The mode needs the tree-sitter parser for Puppet code.  A parser
 suitable for the current package version can be installed using
-the function `puppet-ts-mode-install-grammar'.
+the function `puppet-ts-mode-install-grammar'.  Some development
+tools (C compiler, ...) are required for this.
 
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
