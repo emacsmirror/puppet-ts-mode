@@ -1070,14 +1070,14 @@ as the variable name.
 
 The mode supports the cross-referencing system described in the
 Info node `Xref'.  The variable `puppet-ts-module-path' can be
-customized to contain a list of directories that are searched
-to find other Puppet modules.
+customized to contain a list of directories that are used to find
+other Puppet modules.
 
-Calling the function `xref-find-definitions' (bound to \\[xref-find-definitions])
-with point on an identifier (a class, defined type, data type
-or custom function) jumps to the definition of that identifier.
-This is quick and does not need any sort of database, since the
-name of the source file can be infered from the identifier.
+Calling the function `xref-find-definitions' (\\[xref-find-definitions]) with point on
+an identifier (a class, defined type, custom function or data
+type) jumps to the definition of that identifier.  This is quick
+and does not need any sort of additional database, since the name
+of the related source file can be infered from the identifier.
 
 By convention a Puppet manifest only has a single definition of
 a class, defined type or function.  So the navigation function
@@ -1085,7 +1085,8 @@ a class, defined type or function.  So the navigation function
 to the beginning or the end of the buffer.  This does not provide
 any benefit and so the mode uses the associated keybindings to go
 to the preceding (\\[treesit-beginning-of-defun]) or the following (\\[treesit-end-of-defun]) resource
-declaration.
+declaration.  Putting the region around this declaration by
+calling the function `mark-defun' (\\[mark-defun]) comes for free.
 
 The manifest in a buffer can be applied in noop-mode (\\[puppet-ts-apply])
 and validated (\\[puppet-ts-validate]).  The \"puppet\" executable is required
