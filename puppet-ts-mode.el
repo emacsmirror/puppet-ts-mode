@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-22 10:52:51 stm>
+;; Updated:          <2024-05-22 19:47:30 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -662,77 +662,38 @@ it can be derived from FILE.  Otherwise nil is returned."
 (define-skeleton puppet-ts-keyword-class
   "Insert \"class\" skeleton."
   nil
-  "class " (puppet-ts-file-class-name (buffer-file-name)) " (" > \n
+  > "class " (puppet-ts-file-class-name (buffer-file-name)) " (" \n
   ") {" > \n
   > _ "}" > \n)
 
 (define-skeleton puppet-ts-keyword-define
-  "Insert \"class\" skeleton."
+  "Insert \"define\" skeleton."
   nil
-  "define " (puppet-ts-file-class-name (buffer-file-name)) " (" > \n
+  > "define " (puppet-ts-file-class-name (buffer-file-name)) " (" \n
   ") {" > \n
   > _ "}" > \n)
 
 (define-skeleton puppet-ts-keyword-node
   "Insert \"node\" skeleton."
   nil
-  "node " > - " {" \n
+  > "node " - " {" \n
   > _ "}" > \n)
-
-(define-skeleton puppet-ts-keyword-if
-  "Insert \"if\" statement."
-  nil
-  "if " > - " {" \n
-  > _ "}" > \n)
-
-(define-skeleton puppet-ts-keyword-elsif
-  "Insert \"elsif\" statement."
-  nil
-  "elsif " > - " {" \n
-  > _ "}" > \n)
-
-(define-skeleton puppet-ts-keyword-else
-  "Insert \"else\" statement."
-  nil
-  "else {" > \n
-  > _ "}" > \n)
-
-(define-skeleton puppet-ts-keyword-unless
-  "Insert \"unless\" statement."
-  nil
-  "unless " > - " {" \n
-  > _ "}" > \n)
-
-(define-skeleton puppet-ts-keyword-case
-  "Insert \"case\" statement."
-  nil
-  "case " > - " {" \n
-  "default: {" > \n
-  "}" > \n
-  "}" > \n)
-
-(define-skeleton puppet-ts-keyword-selector
-  "Insert \"?\" selector."
-  nil
-  "? {" > \n
-  "default => " > - "," \n
-  "}" > \n)
 
 (define-skeleton puppet-ts-type-anchor
   "Insert the \"anchor\" resource type."
   nil
-  "anchor { " > - ": }" \n)
+  > "anchor { " - ": }" \n)
 
 (define-skeleton puppet-ts-type-class
   "Insert the \"class\" resource type."
   nil
-  "class { " > - ":" \n
+  > "class { " - ":" \n
   "}" > \n)
 
 (define-skeleton puppet-ts-type-exec
   "Insert the \"exec\" resource type."
   nil
-  "exec { " > - ":" \n
+  > "exec { " - ":" \n
   "path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin', ]," > \n
   "user => 'root'," > \n
   "cwd  => '/'," > \n
@@ -741,7 +702,7 @@ it can be derived from FILE.  Otherwise nil is returned."
 (define-skeleton puppet-ts-type-file
   "Insert the \"file\" resource type."
   nil
-  "file { " > - ":" \n
+  > "file { " - ":" \n
   "ensure => file," > \n
   "owner  => 'root'," > \n
   "group  => 'root'," > \n
@@ -751,33 +712,33 @@ it can be derived from FILE.  Otherwise nil is returned."
 (define-skeleton puppet-ts-type-group
   "Insert the \"group\" resource type."
   nil
-  "group { " > - ":" \n
+  > "group { " - ":" \n
   "ensure => present," > \n
   "}" > \n)
 
 (define-skeleton puppet-ts-type-host
   "Insert the \"host\" resource type."
   nil
-  "host { " > - ":" \n
+  > "host { " - ":" \n
   "ensure => present," > \n
   "}" > \n)
 
 (define-skeleton puppet-ts-type-notify
   "Insert the \"notify\" resource type."
   nil
-  "notify { " > - ": }" \n)
+  > "notify { " - ": }" \n)
 
 (define-skeleton puppet-ts-type-package
   "Insert the \"package\" resource type."
   nil
-  "package { " > - ":" \n
+  > "package { " - ":" \n
   "ensure => present," > \n
   "}" > \n)
 
 (define-skeleton puppet-ts-type-service
   "Insert the \"service\" resource type."
   nil
-  "service { " > - ":" \n
+  > "service { " - ":" \n
   "ensure => running," > \n
   "enable => true," > \n
   "}" > \n)
@@ -785,7 +746,7 @@ it can be derived from FILE.  Otherwise nil is returned."
 (define-skeleton puppet-ts-type-user
   "Insert the \"user\" resource type."
   nil
-  "user { " > - ":" \n
+  > "user { " - ":" \n
   "ensure   => present," > \n
   "shell    => '/bin/bash'," > \n
   "password => '*'," > \n
@@ -1041,12 +1002,6 @@ out."
     (define-key map (kbd "C-c C-k c") #'puppet-ts-keyword-class)
     (define-key map (kbd "C-c C-k d") #'puppet-ts-keyword-define)
     (define-key map (kbd "C-c C-k n") #'puppet-ts-keyword-node)
-    (define-key map (kbd "C-c C-k i") #'puppet-ts-keyword-if)
-    (define-key map (kbd "C-c C-k e") #'puppet-ts-keyword-elsif)
-    (define-key map (kbd "C-c C-k o") #'puppet-ts-keyword-else)
-    (define-key map (kbd "C-c C-k u") #'puppet-ts-keyword-unless)
-    (define-key map (kbd "C-c C-k s") #'puppet-ts-keyword-case)
-    (define-key map (kbd "C-c C-k ?") #'puppet-ts-keyword-selector)
     map)
   "Keymap for Puppet Mode buffers.")
 

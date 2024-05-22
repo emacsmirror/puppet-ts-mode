@@ -126,12 +126,6 @@ Key                  | Skeleton
 <kbd>C-c C-k c</kbd> | keyword `class`
 <kbd>C-c C-k d</kbd> | keyword `define`
 <kbd>C-c C-k n</kbd> | keyword `node`
-<kbd>C-c C-k i</kbd> | keyword `if`
-<kbd>C-c C-k e</kbd> | keyword `elsif`
-<kbd>C-c C-k o</kbd> | keyword `else`
-<kbd>C-c C-k u</kbd> | keyword `unless`
-<kbd>C-c C-k s</kbd> | keyword `case`
-<kbd>C-c C-k ?</kbd> | keyword `selector`
 
 ## Installation
 
