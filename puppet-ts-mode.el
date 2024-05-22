@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-22 08:40:50 stm>
+;; Updated:          <2024-05-22 10:52:51 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1136,7 +1136,8 @@ particular syntax error.
     (treesit-parser-create 'puppet)
 
     ;; Navigation
-    (setq treesit-defun-type-regexp "resource_\\(type\\|reference\\)")
+    (setq treesit-defun-type-regexp (rx (or "resource_reference"
+                                            "resource_type")))
 
     ;; Font-Lock
     (setq-local treesit-font-lock-feature-list puppet-ts-mode-feature-list)
