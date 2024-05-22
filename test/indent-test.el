@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-04-28 16:54:55 stm>
-;; Updated: <2024-05-16 08:19:42 stm>
+;; Updated: <2024-05-22 21:27:44 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -42,7 +42,7 @@
 
 ;;; Indentation
 
-(ert-deftest puppet/argument-list ()
+(ert-deftest indent/argument-list ()
   (puppet-test-indent "
 class foo {
   $foo = bar(1,2)
@@ -78,7 +78,7 @@ class foo {
 }
 "))
 
-(ert-deftest puppet/array ()
+(ert-deftest indent/array ()
   (puppet-test-indent "
 class foo {
   $foo = [
@@ -106,7 +106,7 @@ class foo {
 }
 "))
 
-(ert-deftest puppet/class ()
+(ert-deftest indent/class ()
   (puppet-test-with-temp-buffer
       "class test (
 $foo = $title,
@@ -122,7 +122,7 @@ $bar = 'hello'
 }"
 ))))
 
-(ert-deftest puppet/class-inherits ()
+(ert-deftest indent/class-inherits ()
   (puppet-test-with-temp-buffer
       "class test (
 $foo = $title,
@@ -138,7 +138,7 @@ $bar = 'hello'
 }"
 ))))
 
-(ert-deftest puppet/class-no-parameters ()
+(ert-deftest indent/class-no-parameters ()
   (puppet-test-with-temp-buffer
       "class test () {
 $bar = 'hello'
@@ -150,7 +150,7 @@ $bar = 'hello'
 }"
 ))))
 
-(ert-deftest puppet/class-no-parameters-2 ()
+(ert-deftest indent/class-no-parameters-2 ()
   (puppet-test-with-temp-buffer
       "class foobar {
 class { 'test':
@@ -176,7 +176,7 @@ fgh => 'fgh',
 "
 ))))
 
-(ert-deftest puppet/class-no-parameters-inherits ()
+(ert-deftest indent/class-no-parameters-inherits ()
   (puppet-test-with-temp-buffer
       "class test () inherits ::something::someting:dark::side {
 $bar = 'hello'
@@ -188,7 +188,7 @@ $bar = 'hello'
 }"
 ))))
 
-(ert-deftest puppet/class-paramaters-no-inherits ()
+(ert-deftest indent/class-paramaters-no-inherits ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -204,7 +204,7 @@ class foo (
 }"
 ))))
 
-(ert-deftest puppet/class-paramaters-inherits ()
+(ert-deftest indent/class-paramaters-inherits ()
   (puppet-test-with-temp-buffer
       "
 class foo::bar (
@@ -220,7 +220,7 @@ class foo::bar (
 }"
 ))))
 
-(ert-deftest puppet/class-parameter-list ()
+(ert-deftest indent/class-parameter-list ()
   (puppet-test-indent "
 class foo::bar1 ($a, $b,
   $c, $d,
@@ -251,7 +251,7 @@ class foo::bar5 ($a, $b) {
 }
 "))
 
-(ert-deftest puppet/comments-change-indentation-level ()
+(ert-deftest indent/comments-change-indentation-level ()
   (puppet-test-with-temp-buffer
       "
 if $foo {
@@ -279,7 +279,7 @@ if $foo {
 "
 ))))
 
-(ert-deftest puppet/function ()
+(ert-deftest indent/function ()
   (puppet-test-with-temp-buffer
       "
 function foo::bar (
@@ -297,7 +297,7 @@ function foo::bar (
 }"
 ))))
 
-(ert-deftest puppet/define ()
+(ert-deftest indent/define ()
   (puppet-test-with-temp-buffer
       "
 define foo::bar (
@@ -315,7 +315,7 @@ define foo::bar (
 }"
 ))))
 
-(ert-deftest puppet/define-lonely-opening-paren ()
+(ert-deftest indent/define-lonely-opening-paren ()
   (puppet-test-with-temp-buffer
    "
 define foo::bar
@@ -335,7 +335,7 @@ define foo::bar
 }"
                     ))))
 
-(ert-deftest puppet/extra-indent-after-colon ()
+(ert-deftest indent/extra-indent-after-colon ()
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -357,7 +357,7 @@ class foo {
 }"
 ))))
 
-(ert-deftest puppet/if ()
+(ert-deftest indent/if ()
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -377,7 +377,7 @@ class foo {
 "
 ))))
 
-(ert-deftest puppet/if-elsif-else ()
+(ert-deftest indent/if-elsif-else ()
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -409,7 +409,7 @@ class foo {
 "
 ))))
 
-(ert-deftest puppet/if-statement-with-no-newline-after-closing-braces ()
+(ert-deftest indent/if-statement-with-no-newline-after-closing-braces ()
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -437,7 +437,7 @@ class foo {
 "
 ))))
 
-(ert-deftest puppet/nested-hash ()
+(ert-deftest indent/nested-hash ()
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -467,7 +467,7 @@ class foo {
 "
 ))))
 
-(ert-deftest puppet/nested-hash-inside-array ()
+(ert-deftest indent/nested-hash-inside-array ()
   (puppet-test-with-temp-buffer
       "
 $shadow_config_settings = [
@@ -493,7 +493,7 @@ $shadow_config_settings = [
 "
 ))))
 
-(ert-deftest puppet/nested-hash-inside-array-inside-hash ()
+(ert-deftest indent/nested-hash-inside-array-inside-hash ()
   (puppet-test-with-temp-buffer
       "
 class openvpn::config {
@@ -535,7 +535,7 @@ class openvpn::config {
 "
 ))))
 
-(ert-deftest puppet/arrow-after-block ()
+(ert-deftest indent/arrow-after-block ()
   (puppet-test-with-temp-buffer
    "
 class foo {

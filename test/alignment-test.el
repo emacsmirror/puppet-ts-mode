@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-16 08:17:37 stm>
+;; Updated: <2024-05-22 21:26:21 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -41,7 +41,7 @@
 
 
 
-(ert-deftest puppet/one-block ()
+(ert-deftest align/one-block ()
   (puppet-test-with-temp-buffer
       "
 package { 'foo':
@@ -58,7 +58,7 @@ package { 'foo':
   install_options => ['--foo', '--bar']
 }"))))
 
-(ert-deftest puppet/stays-within-one-block ()
+(ert-deftest align/stays-within-one-block ()
   (puppet-test-with-temp-buffer
       "
 package { 'foo':
@@ -83,7 +83,7 @@ package { 'bar':
   install_options => [],
 }"))))
 
-(ert-deftest puppet/skip-nested-blocks ()
+(ert-deftest align/skip-nested-blocks ()
   (puppet-test-with-temp-buffer
       "
 package { 'foo':
@@ -108,7 +108,7 @@ package { 'foo':
   }
 }"))))
 
-(ert-deftest puppet/ignores-commented-out-lines ()
+(ert-deftest align/ignores-commented-out-lines ()
   (puppet-test-with-temp-buffer
       "
 package { 'foo':
@@ -123,7 +123,7 @@ package { 'foo':
   # require => Package['bar'],
 }"))))
 
-(ert-deftest puppet/skip-previous-nested-block ()
+(ert-deftest align/skip-previous-nested-block ()
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -148,7 +148,7 @@ class foo {
   }
 }"))))
 
-(ert-deftest puppet/title-variable ()
+(ert-deftest align/title-variable ()
   (puppet-test-with-temp-buffer
       "
 file { $foo:
@@ -163,7 +163,7 @@ file { $foo:
   foobar => $foobar,
 }"))))
 
-(ert-deftest puppet/point-in-string ()
+(ert-deftest align/point-in-string ()
   (puppet-test-with-temp-buffer
       "
 class foo {
@@ -190,7 +190,7 @@ class foo {
 
 ;;; Alignment tests for parameter list
 
-(ert-deftest puppet/no-block ()
+(ert-deftest align/no-block ()
   (puppet-test-with-temp-buffer
       "
 class foo (String    $foo) {
@@ -201,7 +201,7 @@ class foo (String    $foo) {
 class foo (String $foo) {
 }"))))
 
-(ert-deftest puppet/block-1-param ()
+(ert-deftest align/block-1-param ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -216,7 +216,7 @@ class foo (
 ) {
 }"))))
 
-(ert-deftest puppet/block-2-param ()
+(ert-deftest align/block-2-param ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -233,7 +233,7 @@ class foo (
 ) {
 }"))))
 
-(ert-deftest puppet/block-3-param ()
+(ert-deftest align/block-3-param ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -252,7 +252,7 @@ class foo (
 ) {
 }"))))
 
-(ert-deftest puppet/block-nested ()
+(ert-deftest align/block-nested ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -271,7 +271,7 @@ class foo (
 ) {
 }"))))
 
-(ert-deftest puppet/block-1-default ()
+(ert-deftest align/block-1-default ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -288,7 +288,7 @@ class foo (
 ) {
 }"))))
 
-(ert-deftest puppet/block-2-default ()
+(ert-deftest align/block-2-default ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -305,7 +305,7 @@ class foo (
 ) {
 }"))))
 
-(ert-deftest puppet/block-3-default ()
+(ert-deftest align/block-3-default ()
   (puppet-test-with-temp-buffer
       "
 class foo (
@@ -324,7 +324,7 @@ class foo (
 ) {
 }"))))
 
-(ert-deftest puppet/block-3-mixed ()
+(ert-deftest align/block-3-mixed ()
   (puppet-test-with-temp-buffer
       "
 class foo (

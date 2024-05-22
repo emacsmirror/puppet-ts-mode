@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-16 07:32:12 stm>
+;; Updated: <2024-05-22 21:27:59 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -42,27 +42,27 @@
 
 ;;; Regular Expressions
 
-(ert-deftest puppet/regular-expression-literal-match-op ()
+(ert-deftest syntax/regular-expression-literal-match-op ()
   (puppet-test-with-temp-buffer "$foo =~ / class $foo/"
     (should (eq (puppet-test-syntax-at 9) 'punctuation))
     (should (eq (puppet-test-syntax-at 21) 'punctuation))))
 
-(ert-deftest puppet/regular-expression-literal-no-match-op ()
+(ert-deftest syntax/regular-expression-literal-no-match-op ()
   (puppet-test-with-temp-buffer "$foo !~ / class $foo/"
     (should (eq (puppet-test-syntax-at 9) 'punctuation))
     (should (eq (puppet-test-syntax-at 21) 'punctuation))))
 
-(ert-deftest puppet/regular-expression-literal-node ()
+(ert-deftest syntax/regular-expression-literal-node ()
   (puppet-test-with-temp-buffer "node / class $foo/ {}"
     (should (eq (puppet-test-syntax-at 6) 'punctuation))
     (should (eq (puppet-test-syntax-at 6) 'punctuation))))
 
-(ert-deftest puppet/regular-expression-literal-selector ()
+(ert-deftest syntax/regular-expression-literal-selector ()
   (puppet-test-with-temp-buffer "/ class $foo/=>"
     (should (eq (puppet-test-syntax-at 1) 'punctuation))
     (should (eq (puppet-test-syntax-at 13) 'punctuation))))
 
-(ert-deftest puppet/regular-expression-case ()
+(ert-deftest syntax/regular-expression-case ()
   (puppet-test-with-temp-buffer "/ class $foo/:"
     (should (eq (puppet-test-syntax-at 1) 'punctuation))
     (should (eq (puppet-test-syntax-at 13) 'punctuation))))
