@@ -41,19 +41,21 @@
 ;;
 ;; Syntax highlighting: Fontification is supported using custom faces for
 ;; Puppet syntax elements like comments, strings, variables, constants,
-;; keywords, resource types and their metaparameters.  Even syntax errors can
-;; be show using a warning face, when `treesit-font-lock-level' is set to 4.
+;; keywords, resource types and their metaparameters.  Syntax errors can be
+;; shown using a warning face by setting `treesit-font-lock-level' to 4.
 ;;
 ;; Indentation: Automatic indentation according to the Puppet coding
 ;; standards is provided.
 ;;
-;; Alignment: Provide alignment rules for common Puppet expressions and align
-;; the current block with `puppet-ts-align-block' (bound to "C-c C-a").
+;; Alignment: Alignment rules for common Puppet expressions are included.
+;; The function `puppet-ts-align-block' (bound to "C-c C-a") aligns the
+;; current block with respect to "=>" for attributes or hashes or "=" for
+;; parameter lists.
 ;;
 ;; Cross-reference navigation: When point is on an identifier for a class,
 ;; defined type, data type or custom function, the definition of that element
 ;; can easily be opened with `xref-find-definitions' (bound to "M-.").  The
-;; list of directories that will be searched to locate the definition can be
+;; list of directories that will be searched to locate the definition is
 ;; customized in `puppet-ts-module-path'.
 ;;
 ;; Code checking: Validate the syntax of the current buffer with
@@ -1050,7 +1052,7 @@ out."
 
 ;;;###autoload
 (define-derived-mode puppet-ts-mode prog-mode "Puppet"
-  "Major mode for editing Puppet files, using the tree-sitter library.
+  "Major mode for editing Puppet files, using the Tree-sitter library.
 \\<puppet-ts-mode-map>
 Syntax highlighting for standard Puppet elements (comments,
 string, variables, keywords, resource types, metaparameters,
@@ -1058,9 +1060,9 @@ functions, operators) is available.  You can customize the
 variable `treesit-font-lock-level' to control the level of
 fontification.
 
-Attribute and parameter blocks can be aligned with respect to
-the \"=>\" symbols by positioning point inside such a block and
-calling the function `puppet-ts-align-block' (bound to \\[puppet-ts-align-block]).
+Attribute and parameter blocks can be aligned with respect to the
+\"=>\" and \"=\" symbols by positioning point inside such a block
+and calling `puppet-ts-align-block' (bound to \\[puppet-ts-align-block]).
 
 Typing a \"$\" character inside a double quoted string will
 insert the variable interpolation syntax.  The \"$\" character
@@ -1099,10 +1101,16 @@ utility is available.
 A number of skeletons have been implemented to make insertion of
 often used code fragments simpler.
 
-The mode needs the tree-sitter parser for Puppet code.  A parser
+The mode needs the Tree-sitter parser for Puppet code.  A parser
 suitable for the current package version can be installed using
 the function `puppet-ts-mode-install-grammar'.  Some development
 tools (C compiler, ...) are required for this.
+
+Indentation and fontification depend on the concrete syntax tree
+returned by the Tree-sitter parser.  So errors like a missing
+closing parenthesis or bracket can lead to wrong indentation or
+missing fontification.  This is easily resolved by fixing the
+particular syntax error.
 
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
