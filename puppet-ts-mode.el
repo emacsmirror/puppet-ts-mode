@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-22 08:39:54 stm>
+;; Updated:          <2024-05-22 08:40:50 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1049,7 +1049,7 @@ out."
   "Keymap for Puppet Mode buffers.")
 
 ;;;###autoload
-(define-derived-mode puppet-ts-mode prog-mode "Puppet[ts]"
+(define-derived-mode puppet-ts-mode prog-mode "Puppet"
   "Major mode for editing Puppet files, using the tree-sitter library.
 \\<puppet-ts-mode-map>
 Syntax highlighting for standard Puppet elements (comments,
