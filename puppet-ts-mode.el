@@ -6,9 +6,9 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-21 15:21:10 stm>
+;; Updated:          <2024-05-22 08:39:54 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
-;; Keywords:         languages, puppet, tree-sitter
+;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -63,15 +63,16 @@
 ;;
 ;; The package uses a Tree-sitter library to parse Puppet code and you need
 ;; to install the appropriate parser.  This can be done by using this Elisp
-;; snippet:
+;; code:
 ;;
 ;;    (require 'puppet-ts-mode)
 ;;    (puppet-ts-mode-install-grammar)
 ;;
-;; Using the function provided by the package ensures that a version of the
-;; parser matching the package will be installed.  These commands should also
-;; be used to update the parser to the corrent version when the package is
-;; updated.  Note that a compiler toolchain is required for this to work.
+;; Note that a compiler toolchain is required for this to work.  Using the
+;; function provided by the package ensures that a version of the parser
+;; matching the package will be installed.  These commands should also be
+;; used to update the parser to the corrent version when the package is
+;; updated.
 ;;
 
 ;;; Code:
