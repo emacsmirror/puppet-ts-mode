@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-24 17:03:32 stm>
+;; Updated:          <2024-05-24 17:53:10 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -49,7 +49,7 @@
 ;;
 ;; Alignment: Alignment rules for common Puppet expressions are included.
 ;; The function `puppet-ts-align-block' (bound to "C-c C-a") aligns the
-;; current block with respect to "=>" for attributes or hashes or "=" for
+;; current block with respect to "=>" for attributes and hashes or "=" for
 ;; parameter lists.
 ;;
 ;; Cross-reference navigation: When point is on an identifier for a class,
@@ -1021,10 +1021,10 @@ and calling `puppet-ts-align-block' (bound to \\[puppet-ts-align-block]).
 
 Typing a \"$\" character inside a double quoted string will
 insert the variable interpolation syntax.  The \"$\" character
-will be followed by a pair of braces so that the variable name
-to be interpolated can be entered immediately.  If the region
-is active when the \"$\" character is entered, it will be used
-as the variable name.
+will be followed by a pair of braces so that the variable name to
+be interpolated can be entered immediately.  If the region is
+active when the \"$\" character is entered, it will be used as
+the variable name.
 
 The mode supports the cross-referencing system described in the
 Info node `Xref'.  The variable `puppet-ts-module-path' can be
