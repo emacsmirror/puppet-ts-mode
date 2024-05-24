@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-22 19:47:30 stm>
+;; Updated:          <2024-05-24 17:03:32 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -979,29 +979,29 @@ out."
 (defvar puppet-ts-mode-map
   (let ((map (make-sparse-keymap)))
     ;; Editing
-    (define-key map (kbd "C-c C-a") #'puppet-ts-align-block)
-    (define-key map (kbd "C-c C-;") #'puppet-ts-clear-string)
-    (define-key map (kbd "$") #'puppet-ts-interpolate)
+    (keymap-set map "C-c C-a" #'puppet-ts-align-block)
+    (keymap-set map "C-c C-;" #'puppet-ts-clear-string)
+    (keymap-set map "$" #'puppet-ts-interpolate)
     ;; Apply manifests
-    (define-key map (kbd "C-c C-c") #'puppet-ts-apply)
+    (keymap-set map "C-c C-c" #'puppet-ts-apply)
     ;; Linting and validation
-    (define-key map (kbd "C-c C-v") #'puppet-ts-validate)
-    (define-key map (kbd "C-c C-l") #'puppet-ts-lint)
+    (keymap-set map "C-c C-v" #'puppet-ts-validate)
+    (keymap-set map "C-c C-l" #'puppet-ts-lint)
     ;; Skeletons for types
-    (define-key map (kbd "C-c C-t a") #'puppet-ts-type-anchor)
-    (define-key map (kbd "C-c C-t c") #'puppet-ts-type-class)
-    (define-key map (kbd "C-c C-t e") #'puppet-ts-type-exec)
-    (define-key map (kbd "C-c C-t f") #'puppet-ts-type-file)
-    (define-key map (kbd "C-c C-t g") #'puppet-ts-type-group)
-    (define-key map (kbd "C-c C-t h") #'puppet-ts-type-host)
-    (define-key map (kbd "C-c C-t n") #'puppet-ts-type-notify)
-    (define-key map (kbd "C-c C-t p") #'puppet-ts-type-package)
-    (define-key map (kbd "C-c C-t s") #'puppet-ts-type-service)
-    (define-key map (kbd "C-c C-t u") #'puppet-ts-type-user)
+    (keymap-set map "C-c C-t a" #'puppet-ts-type-anchor)
+    (keymap-set map "C-c C-t c" #'puppet-ts-type-class)
+    (keymap-set map "C-c C-t e" #'puppet-ts-type-exec)
+    (keymap-set map "C-c C-t f" #'puppet-ts-type-file)
+    (keymap-set map "C-c C-t g" #'puppet-ts-type-group)
+    (keymap-set map "C-c C-t h" #'puppet-ts-type-host)
+    (keymap-set map "C-c C-t n" #'puppet-ts-type-notify)
+    (keymap-set map "C-c C-t p" #'puppet-ts-type-package)
+    (keymap-set map "C-c C-t s" #'puppet-ts-type-service)
+    (keymap-set map "C-c C-t u" #'puppet-ts-type-user)
     ;; Skeletons for keywords
-    (define-key map (kbd "C-c C-k c") #'puppet-ts-keyword-class)
-    (define-key map (kbd "C-c C-k d") #'puppet-ts-keyword-define)
-    (define-key map (kbd "C-c C-k n") #'puppet-ts-keyword-node)
+    (keymap-set map "C-c C-k c" #'puppet-ts-keyword-class)
+    (keymap-set map "C-c C-k d" #'puppet-ts-keyword-define)
+    (keymap-set map "C-c C-k n" #'puppet-ts-keyword-node)
     map)
   "Keymap for Puppet Mode buffers.")
 
