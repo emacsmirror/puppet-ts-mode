@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-24 22:13:06 stm>
+;; Updated:          <2024-05-25 09:21:18 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -503,9 +503,9 @@ When called interactively, prompt for COMMAND."
 
 ;; Alignment
 
-(add-to-list 'align-sq-string-modes 'puppet-mode)
-(add-to-list 'align-dq-string-modes 'puppet-mode)
-(add-to-list 'align-open-comment-modes 'puppet-mode)
+(add-to-list 'align-sq-string-modes 'puppet-ts-mode)
+(add-to-list 'align-dq-string-modes 'puppet-ts-mode)
+(add-to-list 'align-open-comment-modes 'puppet-ts-mode)
 
 (defconst puppet-ts-mode-align-rules
   '((puppet-resource-arrow
