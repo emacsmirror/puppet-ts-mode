@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-25 09:21:18 stm>
+;; Updated:          <2024-05-25 09:22:55 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -82,6 +82,7 @@
 ;;; Requirements
 
 (require 'treesit)
+(require 'thingatpt)
 (require 'align)
 (require 'xref)
 
