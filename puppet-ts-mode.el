@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-24 17:53:10 stm>
+;; Updated:          <2024-05-24 22:13:06 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -70,11 +70,10 @@
 ;;    (require 'puppet-ts-mode)
 ;;    (puppet-ts-mode-install-grammar)
 ;;
-;; Note that a compiler toolchain is required for this to work.  Using the
-;; function provided by the package ensures that a version of the parser
-;; matching the package will be installed.  These commands should also be
-;; used to update the parser to the corrent version when the package is
-;; updated.
+;; Note that a C compiler is required for this step.  Using the function
+;; provided by the package ensures that a version of the parser matching the
+;; package will be installed.  These commands should also be used to update
+;; the parser to the correct version when the package is updated.
 ;;
 
 ;;; Code:
@@ -1079,9 +1078,8 @@ particular syntax error.
   ;; Indentation
   (setq indent-tabs-mode puppet-ts-indent-tabs-mode)
   (setq-local electric-indent-chars '(?\{ ?\} ?\( ?\) ?: ?, ?\n))
-  ;;(setq-local indent-line-function #'puppet-ts-indent-line)
 
-  ;; Paragaphs
+  ;; Paragraphs
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local paragraph-start "\f\\|[ \t]*$\\|#$")
   (setq-local paragraph-separate "\\([ \t\f]*\\|#\\)$")
