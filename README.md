@@ -1,5 +1,6 @@
 # Emacs major mode for Puppet using Tree-sitter
 
+[![MELPA](https://melpa.org/packages/puppet-ts-mode-badge.svg)](https://melpa.org/#/puppet-ts-mode)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml/badge.svg)](https://github.com/smoeding/puppet-ts-mode/actions/workflows/CI.yaml)
 
