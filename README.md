@@ -21,7 +21,7 @@ Syntax highlighting for the following elements is fully implemented:
 - numbers
 - variables
 - constants (`true`, `false`, `default`, `undef`)
-- keywords (`if`, `unless` `case`, `and`, `or`, `in`, ...)
+- keywords (`if`, `unless`, `case`, `and`, `or`, `in`, ...)
 - resource types and metaparameters (`ensure`, `require`, `notify`, ...)
 - definitions (classes, defined types, type aliases, functions, nodes, plans)
 - built-in functions
