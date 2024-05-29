@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-22 21:27:21 stm>
+;; Updated: <2024-05-29 21:46:47 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -76,6 +76,16 @@
     (should (eq (puppet-test-face-at 6) 'puppet-ts-variable-use))
     (should (eq (puppet-test-face-at 14) 'puppet-ts-variable-use))
     (should (eq (puppet-test-face-at 16) 'puppet-ts-string))))
+
+
+;;; Regexp
+
+(ert-deftest fontify/regexp ()
+  (puppet-test-with-temp-buffer "type Foo = Pattern[/^.*$/]"
+    (should (eq (puppet-test-face-at 20) 'puppet-ts-regexp))
+    (should (eq (puppet-test-face-at 21) 'puppet-ts-regexp))
+    (should (eq (puppet-test-face-at 24) 'puppet-ts-regexp))
+    (should (eq (puppet-test-face-at 25) 'puppet-ts-regexp))))
 
 
 ;;; Numbers
@@ -314,6 +324,23 @@ bar"
     ;; The parameter
     (should (eq (puppet-test-face-at 15) 'puppet-ts-variable-use))
     (should-not (puppet-test-face-at 19))))
+
+(ert-deftest fontify/class-parameters ()
+  (puppet-test-with-temp-buffer "class foo (
+  String               $string,
+  Stdlib::Absolutepath $path,
+) {
+}"
+    ;; Builtin data type
+    (should (eq (puppet-test-face-at 15) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 36) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 37) 'puppet-ts-variable-use))
+    ;; Custom data type
+    (should (eq (puppet-test-face-at 47) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 53) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 55) 'puppet-ts-resource-type))
+    (should (eq (puppet-test-face-at 68) 'puppet-ts-variable-use))
+    (should (eq (puppet-test-face-at 69) 'puppet-ts-variable-use))))
 
 ;;; Resources
 

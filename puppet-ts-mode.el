@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-25 09:30:30 stm>
+;; Updated:          <2024-05-29 18:28:13 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -196,6 +196,11 @@ is added here because it is common and important.")
   "Face for strings in Puppet."
   :group 'puppet-ts)
 
+(defface puppet-ts-regexp
+  '((t :inherit font-lock-regexp-face))
+  "Face for regular expressions."
+  :group 'puppet-ts)
+
 (defface puppet-ts-keyword
   '((t :inherit font-lock-keyword-face))
   "Face for keywords in Puppet."
@@ -268,8 +273,8 @@ is added here because it is common and important.")
   ;; operators, brackets, punctuation, all functions, properties,
   ;; variables, etc.
   '((comment definition)
-    (keyword string resource-type)
-    (constant number variable string-interpolation builtin function)
+    (keyword string regexp resource-type)
+    (constant number variable string-interpolation  builtin function)
     (operator error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
@@ -282,6 +287,10 @@ is added here because it is common and important.")
     :feature string
     :language puppet
     ((string) @puppet-ts-string)
+
+    :feature regexp
+    :language puppet
+    ((regex) @puppet-ts-regexp)
 
     :feature string-interpolation
     :language puppet
