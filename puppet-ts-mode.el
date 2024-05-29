@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-29 18:28:13 stm>
+;; Updated:          <2024-05-29 22:06:51 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -781,9 +781,10 @@ terminates when the first match is found."
 (defun puppet-ts-module-root (file)
   "Return the Puppet module root directory for FILE.
 
-Walk up the directory tree until a directory is found, that
-either contains a \"manifests\", \"lib\" or \"types\" subdir.
-Return the directory name or nil if no directory is found."
+Walk up the directory tree for FILE until a directory is found,
+that contains either a \"manifests\", \"types\" or \"lib\"
+subdirectory.  Return that directory name or nil if no directory
+is found."
   (locate-dominating-file
    file
    (lambda (path)
