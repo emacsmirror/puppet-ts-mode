@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-30 08:28:01 stm>
+;; Updated:          <2024-05-30 08:29:29 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -845,9 +845,11 @@ module and file according to Puppet's autoloading rules."
                (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
                                 puppet-ts-module-path))
                ;; the regexp to find the resource definition in the file
-               (resdef (concat "^\\(class\\|define\\|type\\|function\\)\\s-+"
-                               resource
-                               "\\((\\|{\\|\\s-\\|$\\)"))
+               (resdef (rx bol
+                           (or "class" "define" "function" "type")
+                           (1+ whitespace)
+                           (literal resource)
+                           word-boundary))
                ;; files to visit when searching for the resource
                (files '()))
           ;; Check the current module directory (if the buffer actually
