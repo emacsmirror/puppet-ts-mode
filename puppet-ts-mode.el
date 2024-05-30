@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-29 22:06:51 stm>
+;; Updated:          <2024-05-30 08:28:01 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -871,13 +871,12 @@ module and file according to Puppet's autoloading rules."
           (dolist (file files)
             (with-temp-buffer
               (insert-file-contents-literally file)
-              (save-match-data
-                (if (re-search-forward resdef nil t)
-                    (push (xref-make
-                           (match-string-no-properties 0)
-                           (xref-make-file-location
-                            file (line-number-at-pos (match-beginning 1)) 0))
-                          xrefs)))))))
+              (if (re-search-forward resdef nil t)
+                  (push (xref-make
+                         (match-string-no-properties 0)
+                         (xref-make-file-location
+                          file (line-number-at-pos (match-beginning 1)) 0))
+                        xrefs))))))
     xrefs))
 
 
