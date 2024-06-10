@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-10 08:56:28 stm>
+;; Updated:          <2024-06-10 10:29:35 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -897,7 +897,7 @@ module and file according to Puppet's autoloading rules."
 ;; Language grammar
 
 (defconst puppet-ts-mode-treesit-language-source
-  '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "v1.0.0"))
+  '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "v1.1.0"))
   "The language source entry for the associated Puppet language parser.
 
 The value refers to the specific version of the parser that the
