@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-05-29 21:46:47 stm>
+;; Updated: <2024-06-10 09:34:32 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -51,9 +51,30 @@
 (ert-deftest fontify/escape-in-dq-string ()
   (puppet-test-with-temp-buffer "\"foo\\n\""
     (should (eq (puppet-test-face-at 1) 'puppet-ts-string))
-    (should (eq (puppet-test-face-at 5) 'puppet-ts-string))
-    (should (eq (puppet-test-face-at 6) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 5) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-escape))
     (should (eq (puppet-test-face-at 7) 'puppet-ts-string))))
+
+
+;;; Heredocs
+
+(ert-deftest fontify/heredoc ()
+  (puppet-test-with-temp-buffer "$foo = @(FOO)
+foo
+FOO"
+    (should (eq (puppet-test-face-at 15) 'puppet-ts-string))))
+
+(ert-deftest fontify/heredoc-with-escape ()
+  (puppet-test-with-temp-buffer "$foo = @(FOO)
+\\tfoo\\n
+FOO"
+    (should (eq (puppet-test-face-at 15) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 16) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 17) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 19) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 20) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 21) 'puppet-ts-escape))))
 
 ;; Interpolation is not (yet) detected in a single quoted string
 

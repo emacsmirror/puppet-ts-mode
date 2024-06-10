@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-05-30 08:29:29 stm>
+;; Updated:          <2024-06-10 08:56:28 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -201,6 +201,11 @@ is added here because it is common and important.")
   "Face for regular expressions."
   :group 'puppet-ts)
 
+(defface puppet-ts-escape
+  '((t :inherit font-lock-escape-face))
+  "Face for escape sequences."
+  :group 'puppet-ts)
+
 (defface puppet-ts-keyword
   '((t :inherit font-lock-keyword-face))
   "Face for keywords in Puppet."
@@ -274,7 +279,7 @@ is added here because it is common and important.")
   ;; variables, etc.
   '((comment definition)
     (keyword string regexp resource-type)
-    (constant number variable string-interpolation  builtin function)
+    (constant number variable string-interpolation escape-sequence builtin function)
     (operator error))
   "`treesit-font-lock-feature-list' for `puppet-ts-mode'.")
 
@@ -286,7 +291,8 @@ is added here because it is common and important.")
 
     :feature string
     :language puppet
-    ((string) @puppet-ts-string)
+    (((string) @puppet-ts-string)
+     ((heredoc) @puppet-ts-string))
 
     :feature regexp
     :language puppet
@@ -296,6 +302,12 @@ is added here because it is common and important.")
     :language puppet
     :override t
     ((interpolation) @puppet-ts-variable-use)
+
+    :feature escape-sequence
+    :language puppet
+    :override t
+    ((string (escape_sequence) @puppet-ts-escape)
+     (heredoc (escape_sequence) @puppet-ts-escape))
 
     :feature variable
     :language puppet
