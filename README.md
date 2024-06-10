@@ -17,7 +17,7 @@ The mode provides the following features and enhancements to make writing Puppet
 Syntax highlighting for the following elements is fully implemented:
 
 - comments
-- strings
+- strings (including interpolated variables and escape sequences)
 - numbers
 - variables
 - constants (`true`, `false`, `default`, `undef`)
@@ -139,7 +139,7 @@ The following Elisp code should be used to install the Puppet language parser.  
 (puppet-ts-mode-install-grammar)
 ```
 
-Using the function provided by the package ensures that a version of the parser matching the package will be installed. These commands should also be used to update the parser to the corrent version when the package is updated.
+Using the function provided by the package ensures that a version of the parser matching the package will be installed. These commands should also be used to update the parser to the correct version when the package is updated.
 
 ## License
 
