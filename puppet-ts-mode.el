@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-10 10:29:35 stm>
+;; Updated:          <2024-06-11 20:00:10 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -98,7 +98,8 @@
 (defgroup puppet-ts nil
   "Write Puppet manifests in Emacs."
   :prefix "puppet-ts-"
-  :group 'languages)
+  :group 'languages
+  :link '(url-link :tag "Repository" "https://github.com/smoeding/puppet-ts-mode"))
 
 (defvar puppet-ts--file-attribute-constants
   '("file" "directory" "link")
