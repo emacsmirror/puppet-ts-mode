@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-13 15:54:14 stm>
+;; Updated:          <2024-06-13 16:00:55 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -674,7 +674,7 @@ The first element of the list will be the module name and the
 remaining elements are the relative file name components below
 the ‘manifests’ subdirectory.  The names of the file name
 components are only derived from the file name by using the
-Puppet auto-loader rules.  FILE must be an absolute file name.
+Puppet autoloader rules.  FILE must be an absolute file name.
 
 The module name \"unidentified\" is returned if a module name
 can't be inferred from the file name.
@@ -1117,9 +1117,11 @@ other Puppet modules.
 
 Calling the function `xref-find-definitions' (\\[xref-find-definitions]) with point on
 an identifier (a class, defined type, custom function or data
-type) jumps to the definition of that identifier.  This is quick
-and does not need any sort of additional database, since the name
-of the related source file can be infered from the identifier.
+type) jumps to the file and location where that identifier is
+defined.  This works without any sort of database or file that
+otherwise might hold stale references.  Instead the Puppet
+autoloader rules are used to infer the file name from the
+identifier.
 
 By convention a Puppet manifest only has a single definition of
 a class, defined type or function.  So the navigation function
