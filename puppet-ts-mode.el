@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-11 20:00:10 stm>
+;; Updated:          <2024-06-13 11:23:09 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -40,28 +40,31 @@
 ;; domain-specific language.
 ;;
 ;; Syntax highlighting: Fontification is supported using custom faces for
-;; Puppet syntax elements like comments, strings, variables, constants,
-;; keywords, resource types and their metaparameters.  Syntax errors can be
-;; shown using a warning face by setting `treesit-font-lock-level' to 4.
+;;   Puppet syntax elements like comments, strings, variables, constants,
+;;   keywords, resource types and their metaparameters.  Syntax errors can be
+;;   shown using a warning face by setting `treesit-font-lock-level' to 4.
 ;;
 ;; Indentation: Automatic indentation according to the Puppet coding
-;; standards is provided.
+;;   standards is provided.
 ;;
 ;; Alignment: Alignment rules for common Puppet expressions are included.
-;; The function `puppet-ts-align-block' (bound to "C-c C-a") aligns the
-;; current block with respect to "=>" for attributes and hashes or "=" for
-;; parameter lists.
+;;   The function `puppet-ts-align-block' (bound to "C-c C-a") aligns the
+;;   current block with respect to "=>" for attributes and hashes or "=" for
+;;   parameter lists.
+;;
+;; Imenu: Navigation to the resource types used in a file is implemented by
+;;   the imenu facility.
 ;;
 ;; Cross-reference navigation: When point is on an identifier for a class,
-;; defined type, data type or custom function, the definition of that element
-;; can easily be opened with `xref-find-definitions' (bound to "M-.").  The
-;; list of directories that will be searched to locate the definition is
-;; customized in `puppet-ts-module-path'.
+;;   defined type, data type or custom function, the definition of that
+;;   element can easily be opened with `xref-find-definitions' (bound to
+;;   "M-.").  The list of directories that will be searched to locate the
+;;   definition is customized in `puppet-ts-module-path'.
 ;;
 ;; Code checking: Validate the syntax of the current buffer with
-;; `puppet-ts-validate' (bound to "C-c C-v").  Lint the current buffer for
-;; semantic errors with `puppet-ts-lint' (bound to "C-c C-l").  Apply the
-;; current buffer in noop-mode with `puppet-ts-apply' (bound to "C-c C-c").
+;;   `puppet-ts-validate' (bound to "C-c C-v").  Lint the current buffer for
+;;   semantic errors with `puppet-ts-lint' (bound to "C-c C-l").  Apply the
+;;   current buffer in noop-mode with `puppet-ts-apply' (bound to "C-c C-c").
 ;;
 ;; The package uses a Tree-sitter library to parse Puppet code and you need
 ;; to install the appropriate parser.  This can be done by using this Elisp
@@ -438,13 +441,48 @@ is added here because it is common and important.")
   "Indentation rules for `puppet-ts-mode'.")
 
 
-;; Helper functions
+;; Helper macros & functions
+
+(defmacro puppet-ts-node-type-predicate (type)
+  "Return a lambda function to test if a node has type `TYPE'."
+  `(lambda (node) (string-equal (treesit-node-type node) ,type)))
 
 (defsubst puppet-ts-string-node (location)
   "Return the string node arround LOCATION or nil if non exists."
   (treesit-parent-until (treesit-node-at location)
-                        (lambda (x) (string= (treesit-node-type x) "string"))
+                        (puppet-ts-node-type-predicate "string")
                         t))
+
+(defsubst puppet-ts--parent-resource-type (node)
+  "Return the resource type that `NODE' belongs to."
+  (treesit-parent-until node
+                        (puppet-ts-node-type-predicate "resource_type")
+                        t))
+
+(defun puppet-ts-resource-type (node)
+  "Return the resource type that `NODE' belongs to."
+  (if-let* ((resource (puppet-ts--parent-resource-type node))
+            (name (treesit-search-subtree resource "\\`name\\'")))
+      (treesit-node-text name t)))
+
+(defun puppet-ts-resource-title (node)
+  "Return the title of the resource type that `NODE' belongs to."
+  (if-let* ((resource (puppet-ts--parent-resource-type node))
+            (body (treesit-search-subtree resource "\\`resource_body\\'"))
+            (title (treesit-search-subtree body "\\`resource_title\\'")))
+      (treesit-node-text title t)))
+
+
+;; Imenu
+
+(defun puppet-ts--resource-imenu-name (node)
+  "Return the imenu title for `NODE'."
+  (concat (puppet-ts-resource-type node) " " (puppet-ts-resource-title node)))
+
+(defvar puppet-ts-simple-imenu-settings
+  '((nil "resource_type" nil puppet-ts--resource-imenu-name))
+  "The simple Imenu settings for `puppet-ts-mode'.
+It should be a list of (CATEGORY REGEXP PRED NAME-FN).")
 
 
 ;;; Checking
@@ -1050,6 +1088,9 @@ be interpolated can be entered immediately.  If the region is
 active when the \"$\" character is entered, it will be used as
 the variable name.
 
+With `imenu' (bound to \\[imenu]) you can find the major resource types
+used the current manifest.
+
 The mode supports the cross-referencing system described in the
 Info node `Xref'.  The variable `puppet-ts-module-path' can be
 customized to contain a list of directories that are used to find
@@ -1125,6 +1166,9 @@ particular syntax error.
 
     ;; Indentation
     (setq-local treesit-simple-indent-rules puppet-ts-indent-rules)
+
+    ;; Imenu
+    (setq-local treesit-simple-imenu-settings puppet-ts-simple-imenu-settings)
 
     ;; Alignment
     (setq align-mode-rules-list puppet-ts-mode-align-rules)

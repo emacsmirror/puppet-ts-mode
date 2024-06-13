@@ -59,6 +59,10 @@ file { '/var/www':
 
 The keybindings <kbd>C-M-a</kbd> and <kbd>C-M-e</kbd> jump to preceding or following resource declaration respectively. This seems to be more useful than jumping to the beginning or end of a definition since a Puppet manifest normally only has a single definition.
 
+### Imenu
+
+Navigation to the resource types used in a manifest is implemented using Imenu.
+
 ### Cross-reference navigation
 
 Navigation from a referenced class, defined type, data type or function to the file where this corresponding type is defined (aka `xref`) is fully implemented.
