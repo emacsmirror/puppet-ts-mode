@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-13 11:23:09 stm>
+;; Updated:          <2024-06-13 15:54:14 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -52,8 +52,8 @@
 ;;   current block with respect to "=>" for attributes and hashes or "=" for
 ;;   parameter lists.
 ;;
-;; Imenu: Navigation to the resource types used in a file is implemented by
-;;   the imenu facility.
+;; Imenu: Navigation to the resource types and variable assignments used in
+;;   a file is implemented using the imenu facility.
 ;;
 ;; Cross-reference navigation: When point is on an identifier for a class,
 ;;   defined type, data type or custom function, the definition of that
@@ -477,10 +477,26 @@ is added here because it is common and important.")
 
 (defun puppet-ts--resource-imenu-name (node)
   "Return the imenu title for `NODE'."
-  (concat (puppet-ts-resource-type node) " " (puppet-ts-resource-title node)))
+  (pcase (treesit-node-type node)
+    ("resource_type"
+     (concat (puppet-ts-resource-type node)
+             " "
+             (puppet-ts-resource-title node)))
+    ("statement"
+     (let ((lhs (treesit-node-child node 0 t)))
+       (if (and lhs (string-equal (treesit-node-type lhs) "variable"))
+           (treesit-node-text lhs t))))))
+
+(defun puppet-ts--variable-assignment-p (node)
+  "Return t if `NODE' is an assignment to a variable."
+  (if (string-equal (treesit-node-type node) "statement")
+      (let ((lhs (treesit-node-child node 0 t)))
+        (and lhs (string-equal (treesit-node-type lhs) "variable")))))
 
 (defvar puppet-ts-simple-imenu-settings
-  '((nil "resource_type" nil puppet-ts--resource-imenu-name))
+  '((nil "resource_type" nil puppet-ts--resource-imenu-name)
+    ("Variables" "statement"
+     puppet-ts--variable-assignment-p puppet-ts--resource-imenu-name))
   "The simple Imenu settings for `puppet-ts-mode'.
 It should be a list of (CATEGORY REGEXP PRED NAME-FN).")
 
@@ -1088,8 +1104,11 @@ be interpolated can be entered immediately.  If the region is
 active when the \"$\" character is entered, it will be used as
 the variable name.
 
-With `imenu' (bound to \\[imenu]) you can find the major resource types
-used the current manifest.
+With `imenu' (bound to \\[imenu]) you can find the resource types
+and variables used the current manifest.  For variables the
+location of the initial assignment is used.  Puppet variables are
+immutable so this is normally the only place in the file where
+the variable is set.
 
 The mode supports the cross-referencing system described in the
 Info node `Xref'.  The variable `puppet-ts-module-path' can be

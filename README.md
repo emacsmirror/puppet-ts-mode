@@ -61,7 +61,7 @@ The keybindings <kbd>C-M-a</kbd> and <kbd>C-M-e</kbd> jump to preceding or follo
 
 ### Imenu
 
-Navigation to the resource types used in a manifest is implemented using Imenu.
+Navigation to the resource types and variable assignments used in a manifest is implemented using Imenu.
 
 ### Cross-reference navigation
 
