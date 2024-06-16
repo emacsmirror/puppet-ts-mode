@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-13 16:00:55 stm>
+;; Updated:          <2024-06-16 17:59:33 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -443,9 +443,13 @@ is added here because it is common and important.")
 
 ;; Helper macros & functions
 
-(defmacro puppet-ts-node-type-predicate (type)
-  "Return a lambda function to test if a node has type `TYPE'."
-  `(lambda (node) (string-equal (treesit-node-type node) ,type)))
+(defmacro puppet-ts-node-type-predicate (&rest type)
+  "Return a lambda function to test if a node has type `TYPE'.
+
+The macro can take more than one argument in which case the node
+type must match one of the given type names."
+  `(lambda (node)
+     (string-match-p (rx bos (or ,@type) eos) (treesit-node-type node))))
 
 (defsubst puppet-ts-string-node (location)
   "Return the string node arround LOCATION or nil if non exists."
