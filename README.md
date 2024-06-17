@@ -44,7 +44,7 @@ file { '/var/www':
 }
 ```
 
-Type <kbd>C-c C-a</kbd> to align all the attributes and fat arrows when point is somewhere in this resource. The result will be like this:
+Type <kbd>C-c C-a</kbd> when point is somewhere in this resource to neatly align all the attributes and fat arrows. The result will be like this:
 
 ``` puppet
 file { '/var/www':
