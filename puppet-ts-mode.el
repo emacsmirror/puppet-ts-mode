@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-16 17:59:33 stm>
+;; Updated:          <2024-06-17 19:40:48 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1026,7 +1026,7 @@ out."
     ;; our strings
     (modify-syntax-entry ?\' "\"'"  table)
     (modify-syntax-entry ?\" "\"\"" table)
-    ;; C-style comments
+    ;; C-style comments (no longer documented since Puppet 7.x)
     (modify-syntax-entry ?/ ". 14b" table)
     (modify-syntax-entry ?* ". 23b" table)
     ;; line comments
