@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-17 19:40:48 stm>
+;; Updated:          <2024-06-18 17:32:04 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -295,7 +295,8 @@ is added here because it is common and important.")
 
     :feature string
     :language puppet
-    (((string) @puppet-ts-string)
+    (((double_quoted_string) @puppet-ts-string)
+     ((single_quoted_string) @puppet-ts-string)
      ((heredoc) @puppet-ts-string))
 
     :feature regexp
@@ -310,7 +311,7 @@ is added here because it is common and important.")
     :feature escape-sequence
     :language puppet
     :override t
-    ((string (escape_sequence) @puppet-ts-escape)
+    ((double_quoted_string (escape_sequence) @puppet-ts-escape)
      (heredoc (escape_sequence) @puppet-ts-escape))
 
     :feature variable
@@ -450,12 +451,6 @@ The macro can take more than one argument in which case the node
 type must match one of the given type names."
   `(lambda (node)
      (string-match-p (rx bos (or ,@type) eos) (treesit-node-type node))))
-
-(defsubst puppet-ts-string-node (location)
-  "Return the string node arround LOCATION or nil if non exists."
-  (treesit-parent-until (treesit-node-at location)
-                        (puppet-ts-node-type-predicate "string")
-                        t))
 
 (defsubst puppet-ts--parent-resource-type (node)
   "Return the resource type that `NODE' belongs to."
@@ -956,7 +951,7 @@ module and file according to Puppet's autoloading rules."
 ;; Language grammar
 
 (defconst puppet-ts-mode-treesit-language-source
-  '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "v1.1.0"))
+  '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "v2.0.0"))
   "The language source entry for the associated Puppet language parser.
 
 The value refers to the specific version of the parser that the
@@ -989,31 +984,36 @@ A single \"$\" is inserted if point is not in a double quoted
 string.  With prefix argument SUPPRESS the braces are always left
 out."
   (interactive "P*")
-  (let ((node (puppet-ts-string-node (point))))
-    ;; Are we inside a string and is it terminated by a double quote?
-    (if (and node (= (char-before (treesit-node-end node)) ?\"))
-        (if mark-active
-            ;; region active: enclose in {...}
-            (let ((beg (region-beginning))
-                  (end (region-end)))
-              (goto-char beg)
-              (self-insert-command 1)
-              (if suppress
-                  (goto-char (1+ end))
-                (insert "{")
-                (goto-char (+ end 2))
-                (insert "}")))
-          ;; region not active
-          (self-insert-command 1)
-          (unless suppress
-            (insert "{}")
-            (forward-char -1)))
-      (self-insert-command 1))))
+  (if (treesit-parent-until (treesit-node-at (point))
+                            (puppet-ts-node-type-predicate "double_quoted_string")
+                            t)
+      ;; We are inside a double quoted string
+      (if mark-active
+          ;; region active: enclose in {...}
+          (let ((beg (region-beginning))
+                (end (region-end)))
+            (goto-char beg)
+            (self-insert-command 1)
+            (if suppress
+                (goto-char (1+ end))
+              (insert "{")
+              (goto-char (+ end 2))
+              (insert "}")))
+        ;; region not active
+        (self-insert-command 1)
+        (unless suppress
+          (insert "{}")
+          (forward-char -1)))
+    (self-insert-command 1)))
 
 (defun puppet-ts-clear-string ()
   "Clear string at point."
   (interactive "*")
-  (if-let* ((node (puppet-ts-string-node (point)))
+  (if-let* ((node (treesit-parent-until
+                   (treesit-node-at (point))
+                   (puppet-ts-node-type-predicate "single_quoted_string"
+                                                  "double_quoted_string")
+                   t))
             (beg (treesit-node-start node))
             (end (treesit-node-end node)))
       (delete-region (1+ beg) (1- end))))
