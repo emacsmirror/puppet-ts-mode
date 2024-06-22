@@ -20,6 +20,7 @@ jobs:
           - 29.1
           - 29.2
           - 29.3
+          - 29.4
           - snapshot
 
     name: Emacs ${{ matrix.emacs_version }}
