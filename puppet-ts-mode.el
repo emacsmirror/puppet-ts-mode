@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-18 17:32:04 stm>
+;; Updated:          <2024-06-26 08:45:14 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -312,6 +312,7 @@ is added here because it is common and important.")
     :language puppet
     :override t
     ((double_quoted_string (escape_sequence) @puppet-ts-escape)
+     (single_quoted_string (escape_sequence) @puppet-ts-escape)
      (heredoc (escape_sequence) @puppet-ts-escape))
 
     :feature variable
@@ -951,7 +952,7 @@ module and file according to Puppet's autoloading rules."
 ;; Language grammar
 
 (defconst puppet-ts-mode-treesit-language-source
-  '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "v2.0.0"))
+  '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "v2.1.0"))
   "The language source entry for the associated Puppet language parser.
 
 The value refers to the specific version of the parser that the

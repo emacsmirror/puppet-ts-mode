@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-06-10 09:34:32 stm>
+;; Updated: <2024-06-18 18:49:44 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -50,6 +50,14 @@
 
 (ert-deftest fontify/escape-in-dq-string ()
   (puppet-test-with-temp-buffer "\"foo\\n\""
+    (should (eq (puppet-test-face-at 1) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 2) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 5) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 6) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 7) 'puppet-ts-string))))
+
+(ert-deftest fontify/escape-in-sq-string ()
+  (puppet-test-with-temp-buffer "'foo\\''"
     (should (eq (puppet-test-face-at 1) 'puppet-ts-string))
     (should (eq (puppet-test-face-at 2) 'puppet-ts-string))
     (should (eq (puppet-test-face-at 5) 'puppet-ts-escape))
