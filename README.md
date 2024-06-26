@@ -136,6 +136,8 @@ Key                  | Skeleton
 
 Emacs 29.1 or above with Tree-sitter support is required.
 
+Also the appropriate [parser](https://github.com/smoeding/tree-sitter-puppet) for the Puppet language needs to be installed. Note that there are different parsers available and only the referenced parser will work with this code.
+
 The following Elisp code should be used to install the Puppet language parser.  This requires some tools -- notably a compiler toolchain -- to be available on your machine.
 
 ```elisp
