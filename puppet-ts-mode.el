@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-06-26 08:45:14 stm>
+;; Updated:          <2024-11-12 14:46:49 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -36,8 +36,8 @@
 ;;; Commentary:
 
 ;; This package uses a Tree-sitter parser to provide syntax highlighting,
-;; indentation, alignment, xref navigation and code checking for the Puppet
-;; domain-specific language.
+;; indentation, alignment, completion, xref navigation and code checking
+;; for the Puppet domain-specific language.
 ;;
 ;; Syntax highlighting: Fontification is supported using custom faces for
 ;;   Puppet syntax elements like comments, strings, variables, constants,
@@ -51,6 +51,10 @@
 ;;   The function `puppet-ts-align-block' (bound to "C-c C-a") aligns the
 ;;   current block with respect to "=>" for attributes and hashes or "=" for
 ;;   parameter lists.
+;;
+;; Completion: The mode updates the `completion-at-point' component to
+;;   complete variable names and resource types.  Tree-sitter is used to
+;;   extract the local variable names from the current buffer.
 ;;
 ;; Imenu: Navigation to the resource types and variable assignments used in
 ;;   a file is implemented using the imenu facility.
@@ -88,6 +92,7 @@
 (require 'thingatpt)
 (require 'align)
 (require 'xref)
+(require 'seq)
 
 (eval-when-compile
   (require 'cl-lib)
@@ -949,6 +954,65 @@ module and file according to Puppet's autoloading rules."
     xrefs))
 
 
+;; Completion
+
+(defcustom puppet-ts-completion-variables
+  '("$facts" "$trusted")
+  "A list of variable names used for completion."
+  :group 'puppet-ts
+  :type '(repeat string))
+
+(defcustom puppet-ts-completion-resource-types
+  '("class" "exec" "file" "group" "notify" "package" "service" "tidy" "user")
+  "A list of resource types used for completion."
+  :group 'puppet-ts
+  :type '(repeat string))
+
+(defun puppet-ts--manifest-variables ()
+  "Return a list of the Puppet variable names used in the manifest.
+
+The list can contain duplicates and it is not ordered in any way."
+  (flatten-tree (treesit-induce-sparse-tree
+                 (treesit-buffer-root-node 'puppet)
+                 (lambda (node) (string= (treesit-node-type node) "variable"))
+                 (lambda (node) (treesit-node-text node)))))
+
+(defun puppet-ts-completion-at-point ()
+  "Completion function for `puppet-ts-mode'.
+
+The function completes Puppet variable names at point.  It
+suggests all local variables used in the current manifest and
+additional variable names which can be customized with
+`puppet-ts-builtin-variables'.
+
+The function is added to the `completion-at-point-functions' hook
+when `puppet-ts-mode' is enabled."
+  (interactive "*")
+  (let* ((bounds (bounds-of-thing-at-point 'symbol))
+         (beg (or (car bounds) (point)))
+         (end (or (cdr bounds) (point))))
+    (cond ((char-equal (char-before beg) ?$)
+           ;; The bounds may be nil if no symbol is found at point. In this
+           ;; case `char-before' looks at the character before point.
+           (let ((curr (buffer-substring-no-properties (1- beg) end))
+                 (vars (puppet-ts--manifest-variables)))
+             ;; Remove the name we are trying to complete if it is found
+             ;; only once; it will be the variable name at point and it
+             ;; doesn't make sense to offer that as a candidate.
+             (if (eql (seq-count (lambda (elt) (string= elt curr)) vars) 1)
+                 (setq vars (delete curr vars)))
+             ;; Add supported global Puppet variables
+             (list (1- beg)
+                   end
+                   (completion-table-dynamic
+                    (lambda (_)
+                      (append vars puppet-ts-completion-variables))))))
+          ((consp bounds)
+           ;; The symbol at point does not start with a "$" so we complete
+           ;; using the list of resource types.
+           (list beg end puppet-ts-completion-resource-types)))))
+
+
 ;; Language grammar
 
 (defconst puppet-ts-mode-treesit-language-source
@@ -1098,6 +1162,15 @@ functions, operators) is available.  You can customize the
 variable `treesit-font-lock-level' to control the level of
 fontification.
 
+The function `completion-at-point' (bound to \\[completion-at-point])
+can be used for completion.  It completes variable names if the
+symbol at point starts with the \"$\" character.  The suggestions
+include variables already used in the current buffer and all
+variable names customized in `puppet-ts-completion-variables'.
+If the symbol at point does not start with the \"$\" character,
+the completion will use the resource type names customized in
+`puppet-ts-completion-resource-types'.
+
 Attribute and parameter blocks can be aligned with respect to the
 \"=>\" and \"=\" symbols by positioning point inside such a block
 and calling `puppet-ts-align-block' (bound to \\[puppet-ts-align-block]).
@@ -1202,6 +1275,10 @@ particular syntax error.
 
     ;; Xref
     (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
+
+    ;; Completion
+    (add-hook 'completion-at-point-functions
+              'puppet-ts-completion-at-point -10 'local)
 
     (treesit-major-mode-setup)))
 
