@@ -1,5 +1,5 @@
 (source gnu)
-(source melpa)
+(source melpa-stable)
 
 (package-file "puppet-ts-mode.el")
 
