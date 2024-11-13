@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-12 14:46:49 stm>
+;; Updated:          <2024-11-13 18:24:58 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -883,7 +883,7 @@ rules."
                    (car (last components))
                  "init")))
     (cons module
-          (concat (mapconcat #'file-name-as-directory dirs "")
+          (concat (mapconcat #'file-name-as-directory dirs)
                   file
                   (or extension ".pp")))))
 
