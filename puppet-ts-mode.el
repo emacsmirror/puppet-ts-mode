@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-13 18:24:58 stm>
+;; Updated:          <2024-11-14 07:35:13 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1006,7 +1006,8 @@ when `puppet-ts-mode' is enabled."
                    end
                    (completion-table-dynamic
                     (lambda (_)
-                      (append vars puppet-ts-completion-variables))))))
+                      (seq-uniq
+                       (append vars puppet-ts-completion-variables)))))))
           ((consp bounds)
            ;; The symbol at point does not start with a "$" so we complete
            ;; using the list of resource types.
