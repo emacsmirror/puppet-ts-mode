@@ -59,6 +59,8 @@ file { '/var/www':
 
 Completion of local variable names is implemented using the `completion-at-point` function (normally bound to <kbd>C-M-i</kbd>). Tree-sitter is used to extract all local variable names from the current manifest. Additional variables like the global `$facts` variable can be customized in `puppet-ts-completion-variables`.
 
+Completion of variable names also works for interpolated variables in a string.
+
 ### Navigation
 
 The keybindings <kbd>C-M-a</kbd> and <kbd>C-M-e</kbd> jump to preceding or following resource declaration respectively. This seems to be more useful than jumping to the beginning or end of a definition since a Puppet manifest normally only has a single definition.

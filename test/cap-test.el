@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-11-12 13:05:03 stm>
-;; Updated: <2024-11-12 15:29:29 stm>
+;; Updated: <2024-11-15 17:54:42 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -51,7 +51,23 @@ class foo (
    (goto-char (point-min))
    (end-of-line 6)
    (completion-at-point)
-   (should (looking-back "^ *$version$"))))
+   (should (looking-back "  $version" (pos-bol)))))
+
+(ert-deftest completion/interpolated-variable ()
+  (puppet-test-with-temp-buffer
+   "
+class foo (
+  String $ensure  = 'present',
+  String $version = '42',
+) {
+  \"${v}\"
+}"
+   (goto-char (point-min))
+   (end-of-line 6)
+   (backward-char 2)
+   (completion-at-point)
+   (should (and (looking-back "  \"${version" (pos-bol))
+                (looking-at "}\"")))))
 
 (ert-deftest completion/unique-prefix-variable ()
   (puppet-test-with-temp-buffer
@@ -65,7 +81,7 @@ class foo (
    (goto-char (point-min))
    (end-of-line 6)
    (completion-at-point)
-   (should (looking-back "^ *$ensure$"))))
+   (should (looking-back "  $ensure" (pos-bol)))))
 
 (ert-deftest completion/facts-variable ()
   (puppet-test-with-temp-buffer
@@ -79,7 +95,7 @@ class foo (
    (goto-char (point-min))
    (end-of-line 6)
    (completion-at-point)
-   (should (looking-back "^ *$facts$"))))
+   (should (looking-back "  $facts" (pos-bol)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; cap-test.el ends here

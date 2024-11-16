@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-14 07:35:13 stm>
+;; Updated:          <2024-11-16 12:16:20 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -957,8 +957,10 @@ module and file according to Puppet's autoloading rules."
 ;; Completion
 
 (defcustom puppet-ts-completion-variables
-  '("$facts" "$trusted")
-  "A list of variable names used for completion."
+  '("facts" "trusted")
+  "A list of variable names used for completion.
+
+Do not use the \"$\" prefix when customizing variable names here."
   :group 'puppet-ts
   :type '(repeat string))
 
@@ -975,7 +977,7 @@ The list can contain duplicates and it is not ordered in any way."
   (flatten-tree (treesit-induce-sparse-tree
                  (treesit-buffer-root-node 'puppet)
                  (lambda (node) (string= (treesit-node-type node) "variable"))
-                 (lambda (node) (treesit-node-text node)))))
+                 (lambda (node) (substring (treesit-node-text node t) 1)))))
 
 (defun puppet-ts-completion-at-point ()
   "Completion function for `puppet-ts-mode'.
@@ -983,7 +985,7 @@ The list can contain duplicates and it is not ordered in any way."
 The function completes Puppet variable names at point.  It
 suggests all local variables used in the current manifest and
 additional variable names which can be customized with
-`puppet-ts-builtin-variables'.
+`puppet-ts-completion-variables'.
 
 The function is added to the `completion-at-point-functions' hook
 when `puppet-ts-mode' is enabled."
@@ -991,18 +993,18 @@ when `puppet-ts-mode' is enabled."
   (let* ((bounds (bounds-of-thing-at-point 'symbol))
          (beg (or (car bounds) (point)))
          (end (or (cdr bounds) (point))))
-    (cond ((char-equal (char-before beg) ?$)
-           ;; The bounds may be nil if no symbol is found at point. In this
-           ;; case `char-before' looks at the character before point.
-           (let ((curr (buffer-substring-no-properties (1- beg) end))
+    (cond ((save-excursion
+             (goto-char beg)
+             (looking-back "${?" (pos-bol)))
+           (let ((curr (buffer-substring-no-properties beg end))
                  (vars (puppet-ts--manifest-variables)))
              ;; Remove the name we are trying to complete if it is found
              ;; only once; it will be the variable name at point and it
-             ;; doesn't make sense to offer that as a candidate.
+             ;; really doesn't make sense to offer that as a candidate.
              (if (eql (seq-count (lambda (elt) (string= elt curr)) vars) 1)
                  (setq vars (delete curr vars)))
-             ;; Add supported global Puppet variables
-             (list (1- beg)
+             ;; Also add supported global Puppet variables to the result
+             (list beg
                    end
                    (completion-table-dynamic
                     (lambda (_)
@@ -1168,6 +1170,9 @@ can be used for completion.  It completes variable names if the
 symbol at point starts with the \"$\" character.  The suggestions
 include variables already used in the current buffer and all
 variable names customized in `puppet-ts-completion-variables'.
+Completion of variable names also works for interpolated
+variables in a string when the symbol at point starts with
+a \"${\" prefix.
 If the symbol at point does not start with the \"$\" character,
 the completion will use the resource type names customized in
 `puppet-ts-completion-resource-types'.
