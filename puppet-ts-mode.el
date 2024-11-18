@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-18 18:00:03 stm>
+;; Updated:          <2024-11-18 18:06:55 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -617,7 +617,8 @@ When called interactively, prompt for COMMAND."
 
 (defconst puppet-ts-align-node-types-regex
   (rx bos
-      (or "hash" "parameter_list" "resource_type" "resource_reference")
+      (or "hash" "parameter_list" "resource_type" "resource_reference"
+          "resource_collector")
       eos)
   "List of parser items that can be aligned.")
 
