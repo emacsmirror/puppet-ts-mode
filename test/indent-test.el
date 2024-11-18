@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-04-28 16:54:55 stm>
-;; Updated: <2024-05-22 21:27:44 stm>
+;; Updated: <2024-11-18 18:03:32 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -333,7 +333,21 @@ define foo::bar
 ) {
   $bar = 'hello'
 }"
-                    ))))
+))))
+
+(ert-deftest indent/resource-collector ()
+  (puppet-test-with-temp-buffer
+      "
+Foo <<| tag == 'foo'|>> {
+foo => true,
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+Foo <<| tag == 'foo'|>> {
+  foo => true,
+}"
+))))
 
 (ert-deftest indent/extra-indent-after-colon ()
   (puppet-test-with-temp-buffer

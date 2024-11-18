@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-16 12:16:20 stm>
+;; Updated:          <2024-11-18 18:00:03 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -438,6 +438,7 @@ is added here because it is common and important.")
      ((parent-is "resource_body") parent-bol puppet-ts-indent-level)
      ((parent-is "resource_type") parent-bol puppet-ts-indent-level)
      ((parent-is "resource_reference") parent-bol puppet-ts-indent-level)
+     ((parent-is "resource_collector") parent-bol puppet-ts-indent-level)
      ;; class/defined type parameters
      ((parent-is "parameter_list") parent-bol puppet-ts-indent-level)
      ;; function calls
