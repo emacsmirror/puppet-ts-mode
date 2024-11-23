@@ -40,7 +40,7 @@ file { '/var/www':
   ensure    => directory,
   owner =>     'root',
   group   =>'www-data',
-  mode=>'0644',
+  mode=>'0755',
 }
 ```
 
@@ -51,7 +51,7 @@ file { '/var/www':
   ensure => directory,
   owner  => 'root',
   group  => 'www-data',
-  mode   => '0644',
+  mode   => '0755',
 }
 ```
 
