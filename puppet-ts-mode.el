@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-18 18:06:55 stm>
+;; Updated:          <2024-11-26 16:17:52 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -976,10 +976,18 @@ Do not use the \"$\" prefix when customizing variable names here."
   "Return a list of the Puppet variable names used in the manifest.
 
 The list can contain duplicates and it is not ordered in any way."
-  (flatten-tree (treesit-induce-sparse-tree
-                 (treesit-buffer-root-node 'puppet)
-                 (lambda (node) (string= (treesit-node-type node) "variable"))
-                 (lambda (node) (substring (treesit-node-text node t) 1)))))
+  (flatten-tree
+   (treesit-induce-sparse-tree
+    (treesit-buffer-root-node 'puppet)
+    (lambda (node)
+      (and (string= (treesit-node-type node) "variable")
+           ;; Filter random things that don't look like a variable when the
+           ;; manifests contains a syntax error.  Tree-sitter tries to parse
+           ;; almost anything as the next token before signaling an error.
+           ;; We don't want to offer that as a completion candidate.
+           (string-match-p "$[a-z_][a-zA-Z0-9_]*" (treesit-node-text node t))))
+    (lambda (node)
+      (substring (treesit-node-text node t) 1)))))
 
 (defun puppet-ts-completion-at-point ()
   "Completion function for `puppet-ts-mode'.
