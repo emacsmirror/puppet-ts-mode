@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-26 16:17:52 stm>
+;; Updated:          <2024-11-27 11:28:28 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -50,7 +50,9 @@
 ;; Alignment: Alignment rules for common Puppet expressions are included.
 ;;   The function `puppet-ts-align-block' (bound to "C-c C-a") aligns the
 ;;   current block with respect to "=>" for attributes and hashes or "=" for
-;;   parameter lists.
+;;   parameter lists.  The fat arrow and equal sign are electric and they
+;;   perform automatic alignment.  Electricity is controlled by
+;;   `puppet-ts-greater-is-electric' and `puppet-ts-equal-is-electric'.
 ;;
 ;; Completion: The mode updates the `completion-at-point' component to
 ;;   complete variable names and resource types.  Tree-sitter is used to
@@ -158,6 +160,22 @@ is added here because it is common and important.")
     "debug" "info" "notice" "warning" "err" "crit" ; Logging statements
     "fail")                                        ; Failure statements
   "Statement functions provided by Puppet.")
+
+(defcustom puppet-ts-greater-is-electric t
+  "Non-nil (and non-null) means a fat arrow should be electric.
+
+Inserting the fat arrow \"=>\" in a hash or an attribute list
+will perform automatic alignment if electric."
+  :type 'boolean
+  :group 'puppet-ts)
+
+(defcustom puppet-ts-equal-is-electric t
+  "Non-nil (and non-null) means an equal sign should be electric.
+
+Inserting an equal sign \"=\" in a parameter list will perform
+automatic alignment if electric."
+  :type 'boolean
+  :group 'puppet-ts)
 
 ;; Regular expressions
 
@@ -592,7 +610,7 @@ When called interactively, prompt for COMMAND."
 
 (defconst puppet-ts-mode-align-rules
   '((puppet-resource-arrow
-     (regexp . "\\(\\s-*\\)=>\\(\\s-*\\)")
+     (regexp . "\\(\\s-*\\)[=+]>\\(\\s-*\\)")
      (group  . (1 2))
      (modes  . '(puppet-ts-mode))
      (separate . entire))
@@ -643,20 +661,77 @@ Return the node if it is found or nil otherwise."
 (defun puppet-ts-align-block ()
   "Align the innermost block of parameters, attributes or hashpairs."
   (interactive "*")
-  (when-let* ((node (puppet-ts-find-alignment-node (point)))
-              (beg (treesit-node-start node))
-              (end (treesit-node-end node)))
-    ;;(message "about to align %S" (treesit-node-type node))
-    (pcase (treesit-node-type node)
-      ("resource_type"
-       ;; Restrict alignment to the attributes to
-       ;; avoid shifting a variable used as title
-       (if-let* ((attr (treesit-search-subtree node "attribute"))
-                 (from (treesit-node-start attr)))
-           (align from end)))
-      (_
-       ;; Default alignent for all other elements
-       (align beg end)))))
+  (save-excursion
+    ;; Skip back over a preceding "}" to perform alignment even when point
+    ;; is just behind the closing bracket.
+    (if (eq (preceding-char) ?})
+        (backward-char))
+    (when-let* ((node (puppet-ts-find-alignment-node (point)))
+                (beg (treesit-node-start node))
+                (end (treesit-node-end node)))
+      ;;(message "about to align %S" (treesit-node-type node))
+      (pcase (treesit-node-type node)
+        ("resource_type"
+         ;; Restrict alignment to the attributes to
+         ;; avoid shifting a variable used as title
+         (if-let* ((attr (treesit-search-subtree node "attribute"))
+                   (from (treesit-node-start attr)))
+             (align from end)))
+        (_
+         ;; Default alignent for all other elements
+         (align beg end))))))
+
+(defun puppet-ts-electric-greater (arg)
+  "Insert a greater symbol while considering the prefix ARG.
+
+The function checks if the preceding character is an equal sign
+to make the fat arrow \"=>\" special.  Inserting a fat arrow in
+a hash or an attribute list performs automatic alignment.  This
+can be disabled by customizing `puppet-ts-greater-is-electric'."
+  (interactive "*P")
+  (self-insert-command (prefix-numeric-value arg))
+  (if (and puppet-ts-greater-is-electric
+           (memq (char-before (1- (point))) '(?= ?+)))
+      (if-let* ((node (treesit-parent-until
+                       (treesit-node-at (point))
+                       (puppet-ts-node-type-predicate "comment"
+                                                      "single_quoted_string"
+                                                      "double_quoted_string"
+                                                      "attribute_list"
+                                                      "hash")
+                       t))
+                (type (treesit-node-type node)))
+          ;; Align only when not inside a comment or string
+          (when (or (string= type "attribute_list")
+                    (string= type "hash"))
+            (puppet-ts-align-block)
+            ;; Move point to the start of the value
+            (cond ((looking-at-p " ")
+                   (forward-char))
+                  ((eolp)
+                   (insert " ")))))))
+
+(defun puppet-ts-electric-equal (arg)
+  "Insert an equal symbol while considering the prefix ARG."
+  (interactive "*P")
+  (self-insert-command (prefix-numeric-value arg))
+  (if puppet-ts-equal-is-electric
+      (if-let* ((node (treesit-parent-until
+                       (treesit-node-at (point))
+                       (puppet-ts-node-type-predicate "comment"
+                                                      "single_quoted_string"
+                                                      "double_quoted_string"
+                                                      "parameter_list")
+                       t))
+                (type (treesit-node-type node)))
+          ;; Align only when not inside a comment or string
+          (when (string= type "parameter_list")
+            (puppet-ts-align-block)
+            ;; Move point to the start of the value
+            (cond ((looking-at-p " ")
+                   (forward-char))
+                  ((eolp)
+                   (insert " ")))))))
 
 
 ;;; Skeletons
@@ -1142,6 +1217,8 @@ out."
     (keymap-set map "C-c C-a" #'puppet-ts-align-block)
     (keymap-set map "C-c C-;" #'puppet-ts-clear-string)
     (keymap-set map "$" #'puppet-ts-interpolate)
+    (keymap-set map ">" #'puppet-ts-electric-greater)
+    (keymap-set map "=" #'puppet-ts-electric-equal)
     ;; Apply manifests
     (keymap-set map "C-c C-c" #'puppet-ts-apply)
     ;; Linting and validation
@@ -1190,6 +1267,15 @@ the completion will use the resource type names customized in
 Attribute and parameter blocks can be aligned with respect to the
 \"=>\" and \"=\" symbols by positioning point inside such a block
 and calling `puppet-ts-align-block' (bound to \\[puppet-ts-align-block]).
+
+The greater sign is electric when used to insert a fat arrow
+\"=>\" in a hash or attribute list and it will performs automatic
+alignment of the structure.  You can disable this by customizing
+`puppet-ts-greater-is-electric'.
+
+The equal sign is electric when used in a parameter list and it
+will perform automatic alignment of the structure.  You can
+disable this by customizing `puppet-ts-equal-is-electric'.
 
 Typing a \"$\" character inside a double quoted string will
 insert the variable interpolation syntax.  The \"$\" character
