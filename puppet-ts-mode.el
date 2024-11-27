@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-27 11:28:28 stm>
+;; Updated:          <2024-11-27 12:53:06 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -470,7 +470,7 @@ automatic alignment if electric."
 ;; Helper macros & functions
 
 (defmacro puppet-ts-node-type-predicate (&rest type)
-  "Return a lambda function to test if a node has type `TYPE'.
+  "Return a lambda function to test if a node has type TYPE.
 
 The macro can take more than one argument in which case the node
 type must match one of the given type names."
@@ -478,19 +478,19 @@ type must match one of the given type names."
      (string-match-p (rx bos (or ,@type) eos) (treesit-node-type node))))
 
 (defsubst puppet-ts--parent-resource-type (node)
-  "Return the resource type that `NODE' belongs to."
+  "Return the resource type that NODE belongs to."
   (treesit-parent-until node
                         (puppet-ts-node-type-predicate "resource_type")
                         t))
 
 (defun puppet-ts-resource-type (node)
-  "Return the resource type that `NODE' belongs to."
+  "Return the resource type that NODE belongs to."
   (if-let* ((resource (puppet-ts--parent-resource-type node))
             (name (treesit-search-subtree resource "\\`name\\'")))
       (treesit-node-text name t)))
 
 (defun puppet-ts-resource-title (node)
-  "Return the title of the resource type that `NODE' belongs to."
+  "Return the title of the resource type that NODE belongs to."
   (if-let* ((resource (puppet-ts--parent-resource-type node))
             (body (treesit-search-subtree resource "\\`resource_body\\'"))
             (title (treesit-search-subtree body "\\`resource_title\\'")))
@@ -500,7 +500,7 @@ type must match one of the given type names."
 ;; Imenu
 
 (defun puppet-ts--resource-imenu-name (node)
-  "Return the imenu title for `NODE'."
+  "Return the imenu title for NODE."
   (pcase (treesit-node-type node)
     ("resource_type"
      (concat (puppet-ts-resource-type node)
@@ -512,7 +512,7 @@ type must match one of the given type names."
            (treesit-node-text lhs t))))))
 
 (defun puppet-ts--variable-assignment-p (node)
-  "Return t if `NODE' is an assignment to a variable."
+  "Return t if NODE is an assignment to a variable."
   (if (string-equal (treesit-node-type node) "statement")
       (let ((lhs (treesit-node-child node 0 t)))
         (and lhs (string-equal (treesit-node-type lhs) "variable")))))
