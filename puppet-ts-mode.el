@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-29 11:39:22 stm>
+;; Updated:          <2024-11-29 16:39:52 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1325,7 +1325,10 @@ often used code fragments simpler.
 The mode needs the Tree-sitter parser for Puppet code.  A parser
 suitable for the current package version can be installed using
 the function `puppet-ts-mode-install-grammar'.  Development tools
-like a C compiler are required for this.
+like a C compiler are required for this.  The constant
+`puppet-ts-mode-treesit-language-source' contains the location
+and version of the parser that should be used for the present
+release of the mode.
 
 Indentation, alignment and fontification depend on the concrete
 syntax tree returned by the Tree-sitter parser.  Syntax errors
