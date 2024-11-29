@@ -1324,14 +1324,14 @@ often used code fragments simpler.
 
 The mode needs the Tree-sitter parser for Puppet code.  A parser
 suitable for the current package version can be installed using
-the function `puppet-ts-mode-install-grammar'.  Some development
-tools (C compiler, ...) are required for this.
+the function `puppet-ts-mode-install-grammar'.  Development tools
+like a C compiler are required for this.
 
-Indentation and fontification depend on the concrete syntax tree
-returned by the Tree-sitter parser.  So errors like a missing
-closing parenthesis or bracket can lead to wrong indentation or
-missing fontification.  This is easily resolved by fixing the
-particular syntax error.
+Indentation, alignment and fontification depend on the concrete
+syntax tree returned by the Tree-sitter parser.  Syntax errors
+like a missing closing parenthesis or bracket can lead to wrong
+indentation or missing fontification.  This is easily resolved by
+fixing the particular syntax error.
 
 \\{puppet-ts-mode-map}"
   :syntax-table puppet-ts-mode-syntax-table
