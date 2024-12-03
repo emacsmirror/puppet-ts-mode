@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-11-27 11:29:54 stm>
+;; Updated: <2024-12-03 10:12:27 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -73,6 +73,23 @@ Foo <<| tag == |>> {
   ensure          => latest,
   require         => Package['bar'],
   install_options => ['--foo', '--bar']
+}"))))
+
+(ert-deftest align/selector ()
+  (puppet-test-with-temp-buffer
+      "
+$rootgroup = $facts['os']['family'] ? {
+  'RedHat'                 => 'wheel',
+  /(Debian|Ubuntu)/  => 'wheel',
+  default =>    'root',
+}"
+      (search-forward "wheel")
+      (puppet-ts-align-block)
+      (should (string= (buffer-string) "
+$rootgroup = $facts['os']['family'] ? {
+  'RedHat'          => 'wheel',
+  /(Debian|Ubuntu)/ => 'wheel',
+  default           => 'root',
 }"))))
 
 (ert-deftest align/resource-collector-add ()

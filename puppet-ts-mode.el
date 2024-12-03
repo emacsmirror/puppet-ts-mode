@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-11-29 16:39:52 stm>
+;; Updated:          <2024-12-03 10:09:39 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -636,7 +636,7 @@ When called interactively, prompt for COMMAND."
 (defconst puppet-ts-align-node-types-regex
   (rx bos
       (or "hash" "parameter_list" "resource_type" "resource_reference"
-          "resource_collector")
+          "resource_collector" "selector")
       eos)
   "List of parser items that can be aligned.")
 
@@ -681,6 +681,10 @@ Return the node if it is found or nil otherwise."
          ;; Default alignent for all other elements
          (align beg end))))))
 
+(defconst puppet-ts-inhibit-electric-alignment
+  (rx (or "comment" "single_quoted_string" "double_quoted_string"))
+  "Node types where electric alignment should not be performed.")
+
 (defun puppet-ts-electric-greater (arg)
   "Insert a greater symbol while considering the prefix ARG.
 
@@ -698,12 +702,12 @@ can be disabled by customizing `puppet-ts-greater-is-electric'."
                                                       "single_quoted_string"
                                                       "double_quoted_string"
                                                       "attribute_list"
-                                                      "hash")
+                                                      "hash"
+                                                      "selector")
                        t))
                 (type (treesit-node-type node)))
-          ;; Align only when not inside a comment or string
-          (when (or (string= type "attribute_list")
-                    (string= type "hash"))
+          (unless (string-match-p puppet-ts-inhibit-electric-alignment type)
+            ;; Align only when not inside a comment or string
             (puppet-ts-align-block)
             ;; Move point to the start of the value
             (cond ((looking-at-p " ")
@@ -724,8 +728,8 @@ can be disabled by customizing `puppet-ts-greater-is-electric'."
                                                       "parameter_list")
                        t))
                 (type (treesit-node-type node)))
-          ;; Align only when not inside a comment or string
-          (when (string= type "parameter_list")
+          (unless (string-match-p puppet-ts-inhibit-electric-alignment type)
+            ;; Align only when not inside a comment or string
             (puppet-ts-align-block)
             ;; Move point to the start of the value
             (cond ((looking-at-p " ")
