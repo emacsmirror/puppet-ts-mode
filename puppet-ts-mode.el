@@ -1273,7 +1273,7 @@ Attribute and parameter blocks can be aligned with respect to the
 and calling `puppet-ts-align-block' (bound to \\[puppet-ts-align-block]).
 
 The greater sign is electric when used to insert a fat arrow
-\"=>\" in a hash or attribute list and it will performs automatic
+\"=>\" in a hash or attribute list and it will perform automatic
 alignment of the structure.  You can disable this by customizing
 `puppet-ts-greater-is-electric'.
 
