@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-12-11 21:12:38 stm>
+;; Updated:          <2024-12-11 21:27:05 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -162,7 +162,6 @@ is added here because it is common and important.")
 
 (defcustom puppet-ts-greater-is-electric t
   "Non-nil (and non-null) means a fat arrow should be electric.
-
 Inserting the fat arrow \"=>\" in a hash or an attribute list
 will perform automatic alignment if electric."
   :type 'boolean
@@ -170,7 +169,6 @@ will perform automatic alignment if electric."
 
 (defcustom puppet-ts-equal-is-electric t
   "Non-nil (and non-null) means an equal sign should be electric.
-
 Inserting an equal sign \"=\" in a parameter list will perform
 automatic alignment if electric."
   :type 'boolean
@@ -470,7 +468,6 @@ automatic alignment if electric."
 
 (defmacro puppet-ts-node-type-predicate (&rest type)
   "Return a lambda function to test if a node has type TYPE.
-
 The macro can take more than one argument in which case the node
 type must match one of the given type names."
   `(lambda (node)
@@ -572,7 +569,6 @@ PREVIOUS-COMMAND or DEFAULT-COMMAND are used if set."
 
 (defun puppet-ts-validate (command)
   "Validate the syntax of the current buffer with COMMAND.
-
 When called interactively, prompt for COMMAND."
   (interactive (list (puppet-ts-read-command "Validate command: "
                                              puppet-ts-last-validate-command
@@ -582,7 +578,6 @@ When called interactively, prompt for COMMAND."
 
 (defun puppet-ts-lint (command)
   "Lint the current buffer with COMMAND.
-
 When called interactively, prompt for COMMAND."
   (interactive (list (puppet-ts-read-command "Lint command: "
                                              puppet-ts-last-lint-command
@@ -592,7 +587,6 @@ When called interactively, prompt for COMMAND."
 
 (defun puppet-ts-apply (command)
   "Apply the current manifest with COMMAND.
-
 When called interactively, prompt for COMMAND."
   (interactive (list (puppet-ts-read-command "Apply command: "
                                              puppet-ts-last-apply-command
@@ -641,7 +635,6 @@ When called interactively, prompt for COMMAND."
 
 (defun puppet-ts-find-alignment-node (location)
   "Identify the innermost node of a block that can be aligned.
-
 Walk the parse tree upwards starting from LOCATION and check the
 nodes we find.  Terminate the search if we know how to align the
 current node.  The constant `puppet-ts-align-node-types-regex'
@@ -687,7 +680,6 @@ Return the node if it is found or nil otherwise."
 
 (defun puppet-ts-electric-greater (arg)
   "Insert a greater symbol while considering the prefix ARG.
-
 The function checks if the preceding character is an equal sign
 to make the fat arrow \"=>\" special.  Inserting a fat arrow in
 a hash or an attribute list performs automatic alignment.  This
@@ -755,7 +747,6 @@ the filesystem."
 
 (defun puppet-ts-filename-parser (file)
   "Return list of file name components for the Puppet manifest FILE.
-
 The first element of the list will be the module name and the
 remaining elements are the relative file name components below
 the ‘manifests’ subdirectory.  The names of the file name
@@ -920,7 +911,6 @@ it can be derived from FILE.  Otherwise nil is returned."
 (defcustom puppet-ts-module-path
   '("/etc/puppetlabs/code/environments/production/modules")
   "Directories to search for modules when resolving cross references.
-
 The variable can hold a list of directories to allow more than
 a single search location (for example if you use a personal
 directory where you do development).  Every directory should be
@@ -933,7 +923,6 @@ terminates when the first match is found."
 
 (defun puppet-ts-module-root (file)
   "Return the Puppet module root directory for FILE.
-
 Walk up the directory tree for FILE until a directory is found,
 that contains either a \"manifests\", \"types\" or \"lib\"
 subdirectory.  Return that directory name or nil if no directory
@@ -948,7 +937,6 @@ is found."
 
 (defun puppet-ts-autoload-name (identifier &optional directory extension)
   "Resolve IDENTIFIER into Puppet module and relative autoload name.
-
 Use DIRECTORY as module subdirectory \(defaults to \"manifests\"
 and EXTENSION as file extension \(defaults to \".pp\") when
 building the name.
@@ -979,7 +967,6 @@ rules."
 
 (cl-defmethod xref-backend-definitions ((_backend (eql puppet)) identifier)
   "Find the definitions of a Puppet resource IDENTIFIER.
-
 First the location of the visited file is checked.  Then all
 directories from `puppet-ts-module-path' are searched for the
 module and file according to Puppet's autoloading rules."
@@ -1040,7 +1027,6 @@ module and file according to Puppet's autoloading rules."
 (defcustom puppet-ts-completion-variables
   '("facts" "trusted")
   "A list of variable names used for completion.
-
 Do not use the \"$\" prefix when customizing variable names here."
   :group 'puppet-ts
   :type '(repeat string))
@@ -1053,7 +1039,6 @@ Do not use the \"$\" prefix when customizing variable names here."
 
 (defun puppet-ts--manifest-variables ()
   "Return a list of the Puppet variable names used in the manifest.
-
 The list can contain duplicates and it is not ordered in any way."
   (flatten-tree
    (treesit-induce-sparse-tree
@@ -1070,7 +1055,6 @@ The list can contain duplicates and it is not ordered in any way."
 
 (defun puppet-ts-completion-at-point ()
   "Completion function for `puppet-ts-mode'.
-
 The function completes Puppet variable names at point.  It
 suggests all local variables used in the current manifest and
 additional variable names which can be customized with
@@ -1110,14 +1094,12 @@ when `puppet-ts-mode' is enabled."
 (defconst puppet-ts-mode-treesit-language-source
   '(puppet . ("https://github.com/smoeding/tree-sitter-puppet" "v2.2.0"))
   "The language source entry for the associated Puppet language parser.
-
 The value refers to the specific version of the parser that the
 mode has been tested with.  Using this mode with either an older
 or newer version of the parser might not work as expected.")
 
 (defun puppet-ts-mode-install-grammar ()
   "Install the language grammar for `puppet-ts-mode'.
-
 The function removes existing entries for the Puppet language in
 `treesit-language-source-alist' and adds the entry stored in
 `puppet-ts-mode-treesit-language-source'."
@@ -1136,7 +1118,6 @@ The function removes existing entries for the Puppet language in
 
 (defun puppet-ts-interpolate (suppress)
   "Insert \"${}\" when point is in a double quoted string.
-
 A single \"$\" is inserted if point is not in a double quoted
 string.  With prefix argument SUPPRESS the braces are always left
 out."
