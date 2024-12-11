@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-12-03 10:09:39 stm>
+;; Updated:          <2024-12-11 21:09:57 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -670,16 +670,17 @@ Return the node if it is found or nil otherwise."
                 (beg (treesit-node-start node))
                 (end (treesit-node-end node)))
       ;;(message "about to align %S" (treesit-node-type node))
-      (pcase (treesit-node-type node)
-        ("resource_type"
-         ;; Restrict alignment to the attributes to
-         ;; avoid shifting a variable used as title
-         (if-let* ((attr (treesit-search-subtree node "attribute"))
-                   (from (treesit-node-start attr)))
-             (align from end)))
-        (_
-         ;; Default alignent for all other elements
-         (align beg end))))))
+      (cond ((string-match-p "\\`resource_\\(?:collector\\|type\\)\\'"
+                             (treesit-node-type node))
+             ;; Restrict alignment to the attributes to avoid including
+             ;; a variable used as title.  So we start where the first
+             ;; attribute subtree begins.
+             (if-let* ((attr (treesit-search-subtree node "attribute"))
+                       (from (treesit-node-start attr)))
+                 (align from end)))
+            (t
+             ;; Default alignent for all other elements
+             (align beg end))))))
 
 (defconst puppet-ts-inhibit-electric-alignment
   (rx (or "comment" "single_quoted_string" "double_quoted_string"))

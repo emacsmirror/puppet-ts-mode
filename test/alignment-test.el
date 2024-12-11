@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-12-03 10:12:27 stm>
+;; Updated: <2024-12-11 20:54:25 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -61,18 +61,16 @@ package { 'foo':
 (ert-deftest align/resource-collector ()
   (puppet-test-with-temp-buffer
       "
-Foo <<| tag == |>> {
-  ensure => latest,
+Foo <<| tag == $tag |>> {
+  ensure => $ensure,
   require    => Package['bar'],
-  install_options =>   ['--foo', '--bar']
 }"
       (search-forward "bar")
       (puppet-ts-align-block)
       (should (string= (buffer-string) "
-Foo <<| tag == |>> {
-  ensure          => latest,
-  require         => Package['bar'],
-  install_options => ['--foo', '--bar']
+Foo <<| tag == $tag |>> {
+  ensure  => $ensure,
+  require => Package['bar'],
 }"))))
 
 (ert-deftest align/selector ()
