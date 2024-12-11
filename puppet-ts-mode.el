@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-12-11 21:12:16 stm>
+;; Updated:          <2024-12-11 21:12:38 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -682,7 +682,7 @@ Return the node if it is found or nil otherwise."
              (align beg end))))))
 
 (defconst puppet-ts-inhibit-electric-alignment
-  (rx (or "comment" "single_quoted_string" "double_quoted_string"))
+  (rx bos (or "comment" "single_quoted_string" "double_quoted_string") eos)
   "Node types where electric alignment should not be performed.")
 
 (defun puppet-ts-electric-greater (arg)
