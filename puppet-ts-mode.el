@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-12-11 21:09:57 stm>
+;; Updated:          <2024-12-11 21:12:16 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -99,7 +99,6 @@
 (eval-when-compile
   (require 'cl-lib)
   (require 'skeleton)
-  (require 'pcase)
   (require 'rx))
 
 
@@ -501,15 +500,15 @@ type must match one of the given type names."
 
 (defun puppet-ts--resource-imenu-name (node)
   "Return the imenu title for NODE."
-  (pcase (treesit-node-type node)
-    ("resource_type"
-     (concat (puppet-ts-resource-type node)
-             " "
-             (puppet-ts-resource-title node)))
-    ("statement"
-     (let ((lhs (treesit-node-child node 0 t)))
-       (if (and lhs (string-equal (treesit-node-type lhs) "variable"))
-           (treesit-node-text lhs t))))))
+  (let ((type (treesit-node-type node)))
+    (cond ((string-equal type "resource_type")
+           (concat (puppet-ts-resource-type node)
+                   " "
+                   (puppet-ts-resource-title node)))
+          ((string-equal type "statement")
+           (let ((lhs (treesit-node-child node 0 t)))
+             (if (and lhs (string-equal (treesit-node-type lhs) "variable"))
+                 (treesit-node-text lhs t)))))))
 
 (defun puppet-ts--variable-assignment-p (node)
   "Return t if NODE is an assignment to a variable."
