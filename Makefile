@@ -3,7 +3,7 @@
 CASK    := cask
 EMACS   := emacs
 
-SRCS    := $(filter-out %-autoloads.el, $(shell cask files))
+SRCS    := $(filter-out %-autoloads.el %-mode-pkg.el, $(shell cask files))
 OBJS    := $(SRCS:.el=.elc)
 CHECKS  := $(wildcard test/*-test.el)
 PKGDIR  := $(shell $(CASK) package-directory)
