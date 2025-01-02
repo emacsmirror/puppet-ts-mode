@@ -1,12 +1,12 @@
 ;;; puppet-ts-mode.el --- Major mode for Puppet using Tree-sitter -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024  Stefan Möding
+;; Copyright (c) 2024, 2025  Stefan Möding
 
 ;; Author:           Stefan Möding <stm@kill-9.net>
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2024-12-11 21:27:05 stm>
+;; Updated:          <2025-01-02 12:57:54 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -55,8 +55,9 @@
 ;;   `puppet-ts-greater-is-electric' and `puppet-ts-equal-is-electric'.
 ;;
 ;; Completion: The mode updates the `completion-at-point' component to
-;;   complete variable names and resource types.  Tree-sitter is used to
-;;   extract the local variable names from the current buffer.
+;;   complete variable names, resource types and resource parameters.
+;;   Tree-sitter is used to extract the local variable names from the
+;;   current buffer.
 ;;
 ;; Imenu: Navigation to the resource types and variable assignments used in
 ;;   a file is implemented using the imenu facility.
@@ -491,6 +492,14 @@ type must match one of the given type names."
             (body (treesit-search-subtree resource "\\`resource_body\\'"))
             (title (treesit-search-subtree body "\\`resource_title\\'")))
       (treesit-node-text title t)))
+
+(defun puppet-ts-hierarchy (node)
+  "Return a list of the node hierarchy for NODE."
+  (cl-loop for     n = node
+           then    (treesit-node-parent n)
+           until   (treesit-node-eq n (treesit-buffer-root-node))
+           if      (treesit-node-check n 'named)
+           collect (treesit-node-type n)))
 
 
 ;; Imenu
@@ -1026,7 +1035,7 @@ module and file according to Puppet's autoloading rules."
 
 (defcustom puppet-ts-completion-variables
   '("facts" "trusted")
-  "A list of variable names used for completion.
+  "A list of non-local variable names used for completion.
 Do not use the \"$\" prefix when customizing variable names here."
   :group 'puppet-ts
   :type '(repeat string))
@@ -1036,6 +1045,104 @@ Do not use the \"$\" prefix when customizing variable names here."
   "A list of resource types used for completion."
   :group 'puppet-ts
   :type '(repeat string))
+
+(defcustom puppet-ts-metaparameters
+  '("alias" "audit" "before" "loglevel" "noop" "notify" "require" "schedule"
+    "stage" "subscribe" "tag")
+  "A list of the Puppet metaparemeters used for completion."
+  :group 'puppet-ts
+  :type '(repeat string))
+
+(defcustom puppet-ts-resource-type-parameters
+  '(("exec" . ("command" "creates" "cwd" "environment" "group" "logoutput"
+               "onlyif" "path" "refresh" "refreshonly" "returns" "timeout"
+               "tries" "try_sleep" "umask" "unless" "user"))
+    ("file" . ("path" "ensure" "backup" "checksum" "checksum_value"
+               "content" "ctime" "force" "group" "ignore" "links"
+               "max_files" "mode" "mtime" "owner" "purge" "recurse"
+               "recurselimit" "replace" "selinux_ignore_defaults" "selrange"
+               "selrole" "seltype" "seluser" "show_diff" "source"
+               "source_permissions" "sourceselect" "staging_location"
+               "target" "type" "validate_cmd" "validate_replacement"))
+    ("group" . ("name" "ensure" "allowdupe" "attribute_membership"
+                "attributes" "auth_membership" "forcelocal" "gid"
+                "ia_load_module" "members" "system"))
+    ("notify" . ("name" "message" "withpath"))
+    ("package" . ("name" "command" "ensure" "adminfile" "allow_virtual"
+                  "allowcdrom" "category" "configfiles" "description"
+                  "enable_only" "flavor" "install_only" "install_options"
+                  "instance" "mark" "package_settings" "platform"
+                  "reinstall_on_refresh" "responsefile" "root" "source"
+                  "status" "uninstall_options" "vendor"))
+    ("resources" . ("name" "purge" "unless_system_user" "unless_uid"))
+    ("schedule" . ("name" "period" "periodmatch" "range" "repeat" "weekday"))
+    ("service" . ("name" "ensure" "binary" "control" "enable" "flags"
+                  "hasrestart" "hasstatus" "logonaccount" "logonpassword"
+                  "manifest" "path" "pattern" "restart" "start" "status"
+                  "stop" "timeout"))
+    ("stage" . ("name"))
+    ("tidy" . ("path" "age" "backup" "matches" "max_files" "recurse"
+               "rmdirs" "size" "type"))
+    ("user" . ("name" "ensure" "allowdupe" "attribute_membership"
+               "attributes" "auth_membership" "auths" "comment" "expiry"
+               "forcelocal" "gid" "groups" "home" "ia_load_module"
+               "iterations" "key_membership" "keys" "loginclass"
+               "managehome" "membership" "password" "password_max_age"
+               "password_min_age" "password_warn_days" "profile_membership"
+               "profiles" "project" "purge_ssh_keys" "role_membership"
+               "roles" "salt" "shell" "system" "uid"))
+    ("augeas" . ("returns" "changes" "context" "force" "incl" "lens"
+                 "load_path" "name" "onlyif" "root" "show_diff"
+                 "type_check"))
+    ("cron" . ("command" "ensure" "environment" "hour" "minute" "month"
+               "special" "target" "user" "weekday" "name"))
+    ("host" . ("comment" "ensure" "host_aliases" "ip" "target" "name"))
+    ("mailaliase . "("ensure" "file" "recipient" "target" "name"))
+    ("mount" . ("atboot" "blockdevice" "device" "dump" "ensure" "fstype"
+                "options" "pass" "target" "name" "remounts"))
+    ("scheduled_task" . ("arguments" "command" "compatibility" "description"
+                         "enabled" "ensure" "trigger" "user" "working_dir"
+                         "name" "password"))
+    ("selboolean" . ("value" "name" "persistent"))
+    ("selmodule" . ("value" "name" "persistent"))
+    ("ssh_authorized_key" . ("ensure" "key" "options" "target" "type" "user"
+                             "drop_privileges" "name"))
+    ("sshkey" . ("ensure" "key" "options" "target" "type" "user"
+                 "drop_privileges" "name"))
+    ("yumrepo" . ("assumeyes" "bandwidth" "baseurl" "cost"
+                  "deltarpm_metadata_percentage" "deltarpm_percentage"
+                  "descr" "enabled" "enablegroups" "ensure" "exclude"
+                  "failovermethod" "gpgcakey" "gpgcheck" "gpgkey"
+                  "http_caching" "include" "includepkgs" "keepalive"
+                  "metadata_expire" "metalink" "minrate" "mirrorlist"
+                  "mirrorlist_expire" "module_hotfixes" "password"
+                  "payload_gpgcheck" "priority" "protect" "proxy"
+                  "proxy_password" "proxy_username" "repo_gpgcheck"
+                  "retries" "s3_enabled" "skip_if_unavailable" "sslcacert"
+                  "sslclientcert" "sslclientkey" "sslverify" "throttle"
+                  "timeout" "username" "name" "target"))
+    ("zfs" . ("aclinherit" "aclmode" "acltype" "atime" "canmount" "checksum"
+              "compression" "copies" "dedup" "defaultuserquota" "devices"
+              "ensure" "exec" "logbias" "mountpoint" "nbmand" "overlay"
+              "primarycache" "quota" "readonly" "recordsize" "refquota"
+              "refreservation" "relatime" "reservation" "secondarycache"
+              "setuid" "shareiscsi" "sharenfs" "sharesmb" "snapdir" "sync"
+              "version" "volsize" "vscan" "xattr" "zoned" "name"))
+    ("zone" . ("autoboot" "dataset" "ensure" "inherit" "ip" "iptype" "path"
+               "pool" "shares" "clone" "create_args" "id" "install_args"
+               "name" "realhostname" "sysidcfg"))
+    ("zpool" . ("ashift" "autoexpand" "cache" "disk" "ensure" "failmode"
+                "log" "mirror" "raidz" "spare" "pool" "raid_parity"))
+    ;; Additional widely used resource types
+    ("concat" . ("backup" "ensure" "ensure_newline" "format" "force" "group"
+                 "mode" "order" "owner" "path" "replace"
+                 "selinux_ignore_defaults" "selrange" "selrole" "seltype"
+                 "seluser" "show_diff" "validate_cmd" "warn"
+                 "create_empty_file"))
+    ("concat::fragment" . ("content" "order" "source" "target")))
+  "An alist of common Puppet resource types and their parameters."
+  :group 'puppet-ts
+  :type '(alist :key-type "string" :value-type (repeat string)))
 
 (defun puppet-ts--manifest-variables ()
   "Return a list of the Puppet variable names used in the manifest.
@@ -1055,38 +1162,57 @@ The list can contain duplicates and it is not ordered in any way."
 
 (defun puppet-ts-completion-at-point ()
   "Completion function for `puppet-ts-mode'.
-The function completes Puppet variable names at point.  It
-suggests all local variables used in the current manifest and
-additional variable names which can be customized with
-`puppet-ts-completion-variables'.
+The function completes various Puppet items depending on context.
+
+It can complete variable names at point if the symbol before
+point looks like a Puppet variable.  It suggests all variables
+used in the current manifest and additional variable names that
+are customized with `puppet-ts-completion-variables'.
+
+The function also completes resource type names and their
+parameters if point is positioned accordingly.  See the
+customization variables `puppet-ts-completion-resource-types' and
+`puppet-ts-resource-type-parameters'.
 
 The function is added to the `completion-at-point-functions' hook
 when `puppet-ts-mode' is enabled."
   (interactive "*")
   (let* ((bounds (bounds-of-thing-at-point 'symbol))
          (beg (or (car bounds) (point)))
-         (end (or (cdr bounds) (point))))
-    (cond ((save-excursion
-             (goto-char beg)
-             (looking-back "${?" (pos-bol)))
-           (let ((curr (buffer-substring-no-properties beg end))
-                 (vars (puppet-ts--manifest-variables)))
-             ;; Remove the name we are trying to complete if it is found
-             ;; only once; it will be the variable name at point and it
-             ;; really doesn't make sense to offer that as a candidate.
-             (if (eql (seq-count (lambda (elt) (string= elt curr)) vars) 1)
-                 (setq vars (delete curr vars)))
-             ;; Also add supported global Puppet variables to the result
-             (list beg
-                   end
-                   (completion-table-dynamic
-                    (lambda (_)
-                      (seq-uniq
-                       (append vars puppet-ts-completion-variables)))))))
-          ((consp bounds)
-           ;; The symbol at point does not start with a "$" so we complete
-           ;; using the list of resource types.
-           (list beg end puppet-ts-completion-resource-types)))))
+         (end (or (cdr bounds) (point)))
+         (node (treesit-node-on beg end))
+         (types (puppet-ts-hierarchy node)))
+    (cond
+     ;; Complete variable names if the symbol before point starts with "$".
+     ((save-excursion
+        (goto-char beg)
+        (looking-back "${?" (pos-bol)))
+      (let ((curr (buffer-substring-no-properties beg end))
+            (vars (puppet-ts--manifest-variables)))
+        ;; Remove the name we are trying to complete if it is found
+        ;; only once; it will be the variable name at point and it
+        ;; really doesn't make sense to offer that as a candidate.
+        (if (eql (seq-count (lambda (elt) (string= elt curr)) vars) 1)
+            (setq vars (delete curr vars)))
+        ;; Also add supported global Puppet variables to the result
+        (list beg end (completion-table-dynamic
+                       (lambda (_)
+                         (seq-uniq
+                          (append vars puppet-ts-completion-variables)))))))
+     ;; Complete resource type parameters including metaparameters if point
+     ;; is withing a resource type.
+     ((and (member "resource_type" types)
+           (string-match-p (rx (or "name" "resource_body" "resource_type"))
+                           (car types)))
+      (let* ((resparam (assoc (puppet-ts-resource-type node)
+                              puppet-ts-resource-type-parameters))
+             (allparam (append puppet-ts-metaparameters (cdr resparam))))
+        (list beg end (completion-table-dynamic
+                       (lambda (_)
+                         (seq-sort #'string< (seq-uniq allparam)))))))
+     ;; Complete resource types.
+     ((string= (car types) "name")
+      (list beg end puppet-ts-completion-resource-types)))))
 
 
 ;; Language grammar
@@ -1238,16 +1364,19 @@ variable `treesit-font-lock-level' to control the level of
 fontification.
 
 The function `completion-at-point' (bound to \\[completion-at-point])
-can be used for completion.  It completes variable names if the
-symbol at point starts with the \"$\" character.  The suggestions
-include variables already used in the current buffer and all
-variable names customized in `puppet-ts-completion-variables'.
-Completion of variable names also works for interpolated
-variables in a string when the symbol at point starts with
-a \"${\" prefix.
-If the symbol at point does not start with the \"$\" character,
-the completion will use the resource type names customized in
-`puppet-ts-completion-resource-types'.
+can be used for completion.  See the variable `tab-always-indent'
+on how to enable completion using the TAB key.
+It completes variable names if the symbol at point starts with
+the \"$\" character.  The suggestions include variables already
+used in the current buffer and all variable names customized in
+`puppet-ts-completion-variables'.  Completion of variable names
+also works for interpolated variables in a string when the symbol
+at point starts with a \"${\" prefix.
+Depending on context the function will also complete resource
+type names and their parameter names.  The resource types can be
+customized in the list `puppet-ts-completion-resource-types'.
+The alist `puppet-ts-resource-type-parameters' is used to
+customize the parameters for a resource type.
 
 Attribute and parameter blocks can be aligned with respect to the
 \"=>\" and \"=\" symbols by positioning point inside such a block
@@ -1368,7 +1497,7 @@ fixing the particular syntax error.
 
     ;; Completion
     (add-hook 'completion-at-point-functions
-              'puppet-ts-completion-at-point -10 'local)
+              #'puppet-ts-completion-at-point nil 'local)
 
     (treesit-major-mode-setup)))
 
