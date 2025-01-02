@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-01-02 12:57:54 stm>
+;; Updated:          <2025-01-02 13:19:06 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1142,7 +1142,7 @@ Do not use the \"$\" prefix when customizing variable names here."
     ("concat::fragment" . ("content" "order" "source" "target")))
   "An alist of common Puppet resource types and their parameters."
   :group 'puppet-ts
-  :type '(alist :key-type "string" :value-type (repeat string)))
+  :type '(alist :key-type string :value-type (repeat string)))
 
 (defun puppet-ts--manifest-variables ()
   "Return a list of the Puppet variable names used in the manifest.
