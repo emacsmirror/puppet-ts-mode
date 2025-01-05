@@ -57,9 +57,13 @@ file { '/var/www':
 
 ### Completion
 
-Completion of local variable names is implemented using the `completion-at-point` function (normally bound to <kbd>C-M-i</kbd>). Tree-sitter is used to extract all local variable names from the current manifest. Additional variables like the global `$facts` variable can be customized in `puppet-ts-completion-variables`.
+Context-aware completion is implemented using the `completion-at-point` function (normally bound to <kbd>C-M-i</kbd>).
+
+The function completes variable names using the local variable from the current manifest if the symbol before point looks like a variable that is, it starts with a `$` . Additional variables like the global `$facts` variable can be customized in `puppet-ts-completion-variables`.
 
 Completion of variable names also works for interpolated variables in a string.
+
+The function also completes resource parameters if point is within the resource declaration where a parameter is expected. Completion candidates are all the parameters that are valid for the current resource. That includes all metaparameters.
 
 ### Navigation
 

@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-01-02 13:19:06 stm>
+;; Updated:          <2025-01-05 12:14:20 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1358,14 +1358,14 @@ out."
   "Major mode for editing Puppet files, using the Tree-sitter library.
 \\<puppet-ts-mode-map>
 Syntax highlighting for standard Puppet elements (comments,
-string, variables, keywords, resource types, metaparameters,
+strings, variables, keywords, resource types, metaparameters,
 functions, operators) is available.  You can customize the
 variable `treesit-font-lock-level' to control the level of
 fontification.
 
-The function `completion-at-point' (bound to \\[completion-at-point])
-can be used for completion.  See the variable `tab-always-indent'
-on how to enable completion using the TAB key.
+The function `completion-at-point' can be used for completion.
+See the variable `tab-always-indent' on how to enable completion
+using the TAB key.
 It completes variable names if the symbol at point starts with
 the \"$\" character.  The suggestions include variables already
 used in the current buffer and all variable names customized in
@@ -1374,9 +1374,10 @@ also works for interpolated variables in a string when the symbol
 at point starts with a \"${\" prefix.
 Depending on context the function will also complete resource
 type names and their parameter names.  The resource types can be
-customized in the list `puppet-ts-completion-resource-types'.
+customized with the list `puppet-ts-completion-resource-types'.
 The alist `puppet-ts-resource-type-parameters' is used to
-customize the parameters for a resource type.
+customize the completion candidates for a resource type
+parameter.
 
 Attribute and parameter blocks can be aligned with respect to the
 \"=>\" and \"=\" symbols by positioning point inside such a block
