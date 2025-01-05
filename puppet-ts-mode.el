@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-01-05 12:14:20 stm>
+;; Updated:          <2025-01-05 12:17:33 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1452,22 +1452,23 @@ indentation or missing fontification.  This is easily resolved by
 fixing the particular syntax error.
 
 \\{puppet-ts-mode-map}"
-  :syntax-table puppet-ts-mode-syntax-table
+  (setq-local require-final-newline mode-require-final-newline)
+
 
   ;; Comments
-  (setq-local comment-start "#")
-  (setq-local comment-end "")
-  (setq-local comment-start-skip "#+[ \t]*")
-  (setq-local parse-sexp-ignore-comments t)
+  (setq-local comment-start              "#"
+              comment-end                ""
+              comment-start-skip         "#+[ \t]*"
+              parse-sexp-ignore-comments t)
 
   ;; Indentation
   (setq indent-tabs-mode puppet-ts-indent-tabs-mode)
   (setq-local electric-indent-chars '(?\{ ?\} ?\( ?\) ?: ?, ?\n))
 
   ;; Paragraphs
-  (setq-local paragraph-ignore-fill-prefix t)
-  (setq-local paragraph-start "\f\\|[ \t]*$\\|#$")
-  (setq-local paragraph-separate "\\([ \t\f]*\\|#\\)$")
+  (setq-local paragraph-ignore-fill-prefix t
+              paragraph-start              "\f\\|[ \t]*$\\|#$"
+              paragraph-separate           "\\([ \t\f]*\\|#\\)$")
 
   ;; Treesitter
   (when (treesit-ready-p 'puppet)
@@ -1478,20 +1479,19 @@ fixing the particular syntax error.
                                             "resource_type")))
 
     ;; Font-Lock
-    (setq-local treesit-font-lock-feature-list puppet-ts-mode-feature-list)
-    (setq-local treesit-font-lock-settings
-                (apply #'treesit-font-lock-rules
-                       puppet-ts-mode-font-lock-settings))
+    (setq treesit-font-lock-feature-list puppet-ts-mode-feature-list)
+    (setq treesit-font-lock-settings (apply #'treesit-font-lock-rules
+                                            puppet-ts-mode-font-lock-settings))
 
     ;; Indentation
-    (setq-local treesit-simple-indent-rules puppet-ts-indent-rules)
+    (setq treesit-simple-indent-rules puppet-ts-indent-rules)
 
     ;; Imenu
     (setq-local treesit-simple-imenu-settings puppet-ts-simple-imenu-settings)
 
     ;; Alignment
-    (setq align-mode-rules-list puppet-ts-mode-align-rules)
-    (setq align-mode-exclude-rules-list puppet-ts-mode-align-exclude-rules)
+    (setq align-mode-rules-list         puppet-ts-mode-align-rules
+          align-mode-exclude-rules-list puppet-ts-mode-align-exclude-rules)
 
     ;; Xref
     (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
