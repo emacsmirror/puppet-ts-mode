@@ -1,10 +1,10 @@
 ;;; cap-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024 Stefan Möding
+;; Copyright (c) 2024, 2025 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-11-12 13:05:03 stm>
-;; Updated: <2024-11-15 17:54:42 stm>
+;; Updated: <2025-01-07 17:10:41 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -53,6 +53,17 @@ class foo (
    (completion-at-point)
    (should (looking-back "  $version" (pos-bol)))))
 
+(ert-deftest completion/scoped-variable ()
+  (puppet-test-with-temp-buffer
+   "
+$foo::bar = 1
+$fo
+"
+   (goto-char (point-min))
+   (end-of-line 3)
+   (completion-at-point)
+   (should (looking-back "foo::bar" (pos-bol)))))
+
 (ert-deftest completion/interpolated-variable ()
   (puppet-test-with-temp-buffer
    "
@@ -96,6 +107,21 @@ class foo (
    (end-of-line 6)
    (completion-at-point)
    (should (looking-back "  $facts" (pos-bol)))))
+
+(ert-deftest completion/trailing-colon ()
+  (puppet-test-with-temp-buffer
+   "
+class foo (
+  String  $package_name,
+) {
+  class { $p:
+  }
+}"
+   (goto-char (point-min))
+   (end-of-line 5)
+   (backward-char)
+   (completion-at-point)
+   (should (looking-back "  class { $package_name" (pos-bol)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; cap-test.el ends here

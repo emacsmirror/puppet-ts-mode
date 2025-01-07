@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-01-05 12:17:33 stm>
+;; Updated:          <2025-01-07 17:16:18 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1160,26 +1160,30 @@ The list can contain duplicates and it is not ordered in any way."
     (lambda (node)
       (substring (treesit-node-text node t) 1)))))
 
+(defsubst puppet-ts-start-of-token-before-point ()
+  "Return the buffer position for the start of the preceding token."
+  (save-excursion
+    (+ (point) (skip-syntax-backward "w_" (pos-bol)))))
+
 (defun puppet-ts-completion-at-point ()
   "Completion function for `puppet-ts-mode'.
 The function completes various Puppet items depending on context.
 
-It can complete variable names at point if the symbol before
-point looks like a Puppet variable.  It suggests all variables
-used in the current manifest and additional variable names that
-are customized with `puppet-ts-completion-variables'.
+It can complete variable names before point if the symbol looks
+like a Puppet variable.  It suggests all variables used in the
+current manifest and additional variable that are customized with
+`puppet-ts-completion-variables'.
 
-The function also completes resource type names and their
-parameters if point is positioned accordingly.  See the
-customization variables `puppet-ts-completion-resource-types' and
+The function also completes resource types and their parameters
+if point is positioned accordingly.  See the customization
+variables `puppet-ts-completion-resource-types' and
 `puppet-ts-resource-type-parameters'.
 
-The function is added to the `completion-at-point-functions' hook
-when `puppet-ts-mode' is enabled."
+This function is added to the `completion-at-point-functions'
+hook when `puppet-ts-mode' is enabled."
   (interactive "*")
-  (let* ((bounds (bounds-of-thing-at-point 'symbol))
-         (beg (or (car bounds) (point)))
-         (end (or (cdr bounds) (point)))
+  (let* ((beg (puppet-ts-start-of-token-before-point))
+         (end (point))
          (node (treesit-node-on beg end))
          (types (puppet-ts-hierarchy node)))
     (cond
@@ -1377,7 +1381,8 @@ type names and their parameter names.  The resource types can be
 customized with the list `puppet-ts-completion-resource-types'.
 The alist `puppet-ts-resource-type-parameters' is used to
 customize the completion candidates for a resource type
-parameter.
+parameter.  The default metaparameters that will be offered for
+completion can be customized in `puppet-ts-metaparameters'.
 
 Attribute and parameter blocks can be aligned with respect to the
 \"=>\" and \"=\" symbols by positioning point inside such a block
