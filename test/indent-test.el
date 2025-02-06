@@ -1,10 +1,10 @@
 ;;; indent-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024 Stefan Möding
+;; Copyright (c) 2024, 2025 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-04-28 16:54:55 stm>
-;; Updated: <2024-11-18 18:03:32 stm>
+;; Updated: <2025-02-23 14:34:57 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -367,6 +367,60 @@ class foo {
   bar {
     'extra indent after this':
       foo => 'bar';
+  }
+}"
+))))
+
+(ert-deftest indent/case ()
+  (puppet-test-with-temp-buffer
+      "
+case $foo {
+'foo': {
+#
+}
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+case $foo {
+  'foo': {
+    #
+  }
+}"
+))))
+
+(ert-deftest indent/selector ()
+  (puppet-test-with-temp-buffer
+      "
+$foo ? {
+'foo'   => 1,
+default => 2,
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+$foo ? {
+  'foo'   => 1,
+  default => 2,
+}"
+))))
+
+(ert-deftest indent/case-continued ()
+  (puppet-test-with-temp-buffer
+      "
+case $foo {
+'foo',
+'bar': {
+#
+}
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+case $foo {
+  'foo',
+  'bar': {
+    #
   }
 }"
 ))))
