@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-01-07 17:16:18 stm>
+;; Updated:          <2025-02-23 14:46:36 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -443,8 +443,10 @@ automatic alignment if electric."
      ;; compound statements
      ((node-is "elsif") parent-bol 0)
      ((node-is "else") parent-bol 0)
-     ;; additional statements
+     ;; case statement
+     ((match nil "case_option" nil 2 nil) first-sibling 0)
      ((parent-is "case") parent-bol puppet-ts-indent-level)
+     ;; selector expression
      ((parent-is "selector") parent-bol puppet-ts-indent-level)
      ;; arrays & hashes
      ((parent-is "array") parent-bol puppet-ts-indent-level)
