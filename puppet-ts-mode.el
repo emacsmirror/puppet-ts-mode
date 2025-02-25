@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-02-23 14:46:36 stm>
+;; Updated:          <2025-02-25 18:42:17 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -473,8 +473,9 @@ automatic alignment if electric."
   "Return a lambda function to test if a node has type TYPE.
 The macro can take more than one argument in which case the node
 type must match one of the given type names."
-  `(lambda (node)
-     (string-match-p (rx bos (or ,@type) eos) (treesit-node-type node))))
+  (let ((regex `(seq bos (or ,@type) eos)))
+    `(lambda (node)
+       (string-match-p ,(rx-to-string regex t) (treesit-node-type node)))))
 
 (defsubst puppet-ts--parent-resource-type (node)
   "Return the resource type that NODE belongs to."
