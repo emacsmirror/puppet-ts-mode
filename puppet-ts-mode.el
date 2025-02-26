@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-02-25 18:42:17 stm>
+;; Updated:          <2025-02-25 19:37:52 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -706,6 +706,9 @@ can be disabled by customizing `puppet-ts-greater-is-electric'."
                                                       "single_quoted_string"
                                                       "double_quoted_string"
                                                       "attribute_list"
+                                                      "resource_collector"
+                                                      "resource_reference"
+                                                      "resource_type"
                                                       "hash"
                                                       "selector")
                        t))
