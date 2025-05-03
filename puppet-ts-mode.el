@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-02-25 19:37:52 stm>
+;; Updated:          <2025-05-03 18:20:57 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -614,18 +614,18 @@ When called interactively, prompt for COMMAND."
 (add-to-list 'align-open-comment-modes 'puppet-ts-mode)
 
 (defconst puppet-ts-mode-align-rules
-  '((puppet-resource-arrow
-     (regexp . "\\(\\s-*\\)[=+]>\\(\\s-*\\)")
-     (group  . (1 2))
-     (modes  . '(puppet-ts-mode))
-     (separate . entire))
-    (puppet-param-default
+  '((puppet-param-default
      (regexp . "\\(\\s-+\\)$[a-z_][a-zA-Z0-9_]*\\(\\s-*\\)=\\(\\s-*\\)")
      (group  . (1 2 3))
      (modes  . '(puppet-ts-mode)))
     (puppet-param-nodefault
      (regexp . "\\(\\s-+\\)$[a-z_][a-zA-Z0-9_]*")
-     (modes  . '(puppet-ts-mode))))
+     (modes  . '(puppet-ts-mode)))
+    (puppet-resource-arrow
+     (regexp . "\\(\\s-*\\)[=+]>\\(\\s-*\\)")
+     (group  . (1 2))
+     (modes  . '(puppet-ts-mode))
+     (separate . entire)))
   "Align rules for Puppet attributes and parameters.")
 
 (defconst puppet-ts-mode-align-exclude-rules

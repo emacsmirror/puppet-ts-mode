@@ -1,10 +1,10 @@
 ;;; alignment-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024 Stefan Möding
+;; Copyright (c) 2024, 2025 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-12-11 20:54:25 stm>
+;; Updated: <2025-04-27 13:53:02 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -390,6 +390,21 @@ class foo (
   Boolean $bar    = true,
   Integer $foobar = 42,
 ) {
+}"))))
+
+(ert-deftest align/hash-multivar ()
+  (puppet-test-with-temp-buffer
+      "
+$dummy = {
+  foobar   =>   pick($x, $y),
+  bar  =>  $z,
+}"
+      (search-forward "foo")
+      (puppet-ts-align-block)
+      (should (string= (buffer-string) "
+$dummy = {
+  foobar => pick($x, $y),
+  bar    => $z,
 }"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
