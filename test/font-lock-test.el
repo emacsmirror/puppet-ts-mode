@@ -1,10 +1,10 @@
 ;;; font-lock-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024 Stefan Möding
+;; Copyright (c) 2024, 2025 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2024-03-02 13:05:03 stm>
-;; Updated: <2024-06-18 18:49:44 stm>
+;; Updated: <2025-12-09 13:50:05 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -74,15 +74,15 @@ FOO"
     (should (eq (puppet-test-face-at 15) 'puppet-ts-string))))
 
 (ert-deftest fontify/heredoc-with-escape ()
-  (puppet-test-with-temp-buffer "$foo = @(FOO)
+  (puppet-test-with-temp-buffer "$foo = @(\"FOO\"/)
 \\tfoo\\n
 FOO"
-    (should (eq (puppet-test-face-at 15) 'puppet-ts-escape))
-    (should (eq (puppet-test-face-at 16) 'puppet-ts-escape))
-    (should (eq (puppet-test-face-at 17) 'puppet-ts-string))
-    (should (eq (puppet-test-face-at 19) 'puppet-ts-string))
-    (should (eq (puppet-test-face-at 20) 'puppet-ts-escape))
-    (should (eq (puppet-test-face-at 21) 'puppet-ts-escape))))
+    (should (eq (puppet-test-face-at 18) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 19) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 20) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 22) 'puppet-ts-string))
+    (should (eq (puppet-test-face-at 23) 'puppet-ts-escape))
+    (should (eq (puppet-test-face-at 24) 'puppet-ts-escape))))
 
 ;; Interpolation is not (yet) detected in a single quoted string
 
