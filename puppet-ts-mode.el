@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-09 14:37:21 stm>
+;; Updated:          <2025-12-09 15:19:08 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -92,7 +92,6 @@
 ;;; Requirements
 
 (require 'treesit)
-(require 'thingatpt)
 (require 'align)
 (require 'xref)
 (require 'seq)
@@ -921,122 +920,6 @@ it can be derived from FILE.  Otherwise nil is returned."
   "}" > \n)
 
 
-;; Xref
-
-(defcustom puppet-ts-module-path
-  '("/etc/puppetlabs/code/environments/production/modules")
-  "Directories to search for modules when resolving cross references.
-The variable can hold a list of directories to allow more than
-a single search location (for example if you use a personal
-directory where you do development).  Every directory should be
-a top-level directory where a module has its own subdirectory
-using the module name as subdirectory name (see the Puppet
-autoloading rules).  The list is searched in order and the search
-terminates when the first match is found."
-  :group 'puppet-ts
-  :type '(repeat directory))
-
-(defun puppet-ts-module-root (file)
-  "Return the Puppet module root directory for FILE.
-Walk up the directory tree for FILE until a directory is found,
-that contains either a \"manifests\", \"types\" or \"lib\"
-subdirectory.  Return that directory name or nil if no directory
-is found."
-  (locate-dominating-file
-   file
-   (lambda (path)
-     (and (file-accessible-directory-p path)
-          (or (file-accessible-directory-p (expand-file-name "manifests" path))
-              (file-accessible-directory-p (expand-file-name "types" path))
-              (file-accessible-directory-p (expand-file-name "lib" path)))))))
-
-(defun puppet-ts-autoload-name (identifier &optional directory extension)
-  "Resolve IDENTIFIER into Puppet module and relative autoload name.
-Use DIRECTORY as module subdirectory \(defaults to \"manifests\"
-and EXTENSION as file extension \(defaults to \".pp\") when
-building the name.
-
-Return a cons cell where the first part is the module name and
-the second part is a relative file name below that module where
-the identifier would be defined according to the Puppet autoload
-rules."
-  (let* ((components (split-string identifier "::"))
-         (module (car components))
-         (dirs (cons (or directory "manifests") (butlast (cdr components))))
-         (file (if (cdr components)
-                   (car (last components))
-                 "init")))
-    (cons module
-          (concat (mapconcat #'file-name-as-directory dirs)
-                  file
-                  (or extension ".pp")))))
-
-(defun puppet-ts--xref-backend ()
-  "The Xref backend for `puppet-ts-mode'."
-  'puppet)
-
-(cl-defmethod xref-backend-identifier-at-point ((_backend (eql puppet)))
-  "Return the Puppet identifier at point."
-  (let ((thing (thing-at-point 'symbol)))
-    (and thing (substring-no-properties thing))))
-
-(cl-defmethod xref-backend-definitions ((_backend (eql puppet)) identifier)
-  "Find the definitions of a Puppet resource IDENTIFIER.
-First the location of the visited file is checked.  Then all
-directories from `puppet-ts-module-path' are searched for the
-module and file according to Puppet's autoloading rules."
-  (let* ((resource (downcase (if (string-prefix-p "::" identifier)
-                                 (substring identifier 2)
-                               identifier)))
-         (pupfiles (puppet-ts-autoload-name resource))
-         (typfiles (puppet-ts-autoload-name resource "types"))
-         (funfiles (puppet-ts-autoload-name resource "functions"))
-         (xrefs '()))
-    (if pupfiles
-        (let* ((module (car pupfiles))
-               ;; merged list of relative file names to classes/defines/types
-               (pathlist (mapcar #'cdr (list pupfiles typfiles funfiles)))
-               ;; list of directories where this module might be
-               (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
-                                puppet-ts-module-path))
-               ;; the regexp to find the resource definition in the file
-               (resdef (rx bol
-                           (or "class" "define" "function" "type")
-                           (1+ whitespace)
-                           (literal resource)
-                           word-boundary))
-               ;; files to visit when searching for the resource
-               (files '()))
-          ;; Check the current module directory (if the buffer actually
-          ;; visits a file) and all module subdirectories from
-          ;; `puppet-ts-module-path'.
-          (dolist (dir (if buffer-file-name
-                           (cons (puppet-ts-module-root buffer-file-name)
-                                 moddirs)
-                         moddirs))
-            ;; Try all relative file names below the module directory that
-            ;; might contain the resource; save the file name if the file
-            ;; exists and we haven't seen it (we might try to check a file
-            ;; twice if the current module is also below one of the dirs in
-            ;; `puppet-ts-module-path').
-            (dolist (path pathlist)
-              (let ((file (expand-file-name path dir)))
-                (if (and (not (member file files))
-                         (file-readable-p file))
-                    (push file files)))))
-          ;; Visit all found files to finally locate the resource definition
-          (dolist (file files)
-            (with-temp-buffer
-              (insert-file-contents-literally file)
-              (if (re-search-forward resdef nil t)
-                  (push (xref-make
-                         (match-string-no-properties 0)
-                         (xref-make-file-location
-                          file (line-number-at-pos (match-beginning 1)) 0))
-                        xrefs))))))
-    xrefs))
-
-
 ;; Completion
 
 (defcustom puppet-ts-completion-at-point-functions
@@ -1243,6 +1126,122 @@ hook when `puppet-ts-mode' is enabled."
      ;; Complete resource types.
      ((string= (car types) "name")
       (list beg end puppet-ts-completion-resource-types)))))
+
+
+;; Xref
+
+(defcustom puppet-ts-module-path
+  '("/etc/puppetlabs/code/environments/production/modules")
+  "Directories to search for modules when resolving cross references.
+The variable can hold a list of directories to allow more than
+a single search location (for example if you use a personal
+directory where you do development).  Every directory should be
+a top-level directory where a module has its own subdirectory
+using the module name as subdirectory name (see the Puppet
+autoloading rules).  The list is searched in order and the search
+terminates when the first match is found."
+  :group 'puppet-ts
+  :type '(repeat directory))
+
+(defun puppet-ts-module-root (file)
+  "Return the Puppet module root directory for FILE.
+Walk up the directory tree for FILE until a directory is found,
+that contains either a \"manifests\", \"types\" or \"lib\"
+subdirectory.  Return that directory name or nil if no directory
+is found."
+  (locate-dominating-file
+   file
+   (lambda (path)
+     (and (file-accessible-directory-p path)
+          (or (file-accessible-directory-p (expand-file-name "manifests" path))
+              (file-accessible-directory-p (expand-file-name "types" path))
+              (file-accessible-directory-p (expand-file-name "lib" path)))))))
+
+(defun puppet-ts-autoload-name (identifier &optional directory extension)
+  "Resolve IDENTIFIER into Puppet module and relative autoload name.
+Use DIRECTORY as module subdirectory \(defaults to \"manifests\"
+and EXTENSION as file extension \(defaults to \".pp\") when
+building the name.
+
+Return a cons cell where the first part is the module name and
+the second part is a relative file name below that module where
+the identifier would be defined according to the Puppet autoload
+rules."
+  (let* ((components (split-string identifier "::"))
+         (module (car components))
+         (dirs (cons (or directory "manifests") (butlast (cdr components))))
+         (file (if (cdr components)
+                   (car (last components))
+                 "init")))
+    (cons module
+          (concat (mapconcat #'file-name-as-directory dirs)
+                  file
+                  (or extension ".pp")))))
+
+(defun puppet-ts--xref-backend ()
+  "The Xref backend for `puppet-ts-mode'."
+  'puppet)
+
+(cl-defmethod xref-backend-identifier-at-point ((_backend (eql puppet)))
+  "Return the Puppet identifier at point."
+  (if-let* ((bounds (puppet-ts-symbol-at-point)))
+      (buffer-substring-no-properties (car bounds) (cdr bounds))))
+
+(cl-defmethod xref-backend-definitions ((_backend (eql puppet)) identifier)
+  "Find the definitions of a Puppet resource IDENTIFIER.
+First the location of the visited file is checked.  Then all
+directories from `puppet-ts-module-path' are searched for the
+module and file according to Puppet's autoloading rules."
+  (let* ((resource (downcase (if (string-prefix-p "::" identifier)
+                                 (substring identifier 2)
+                               identifier)))
+         (pupfiles (puppet-ts-autoload-name resource))
+         (typfiles (puppet-ts-autoload-name resource "types"))
+         (funfiles (puppet-ts-autoload-name resource "functions"))
+         (xrefs '()))
+    (if pupfiles
+        (let* ((module (car pupfiles))
+               ;; merged list of relative file names to classes/defines/types
+               (pathlist (mapcar #'cdr (list pupfiles typfiles funfiles)))
+               ;; list of directories where this module might be
+               (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
+                                puppet-ts-module-path))
+               ;; the regexp to find the resource definition in the file
+               (resdef (rx bol
+                           (or "class" "define" "function" "type")
+                           (1+ whitespace)
+                           (literal resource)
+                           word-boundary))
+               ;; files to visit when searching for the resource
+               (files '()))
+          ;; Check the current module directory (if the buffer actually
+          ;; visits a file) and all module subdirectories from
+          ;; `puppet-ts-module-path'.
+          (dolist (dir (if buffer-file-name
+                           (cons (puppet-ts-module-root buffer-file-name)
+                                 moddirs)
+                         moddirs))
+            ;; Try all relative file names below the module directory that
+            ;; might contain the resource; save the file name if the file
+            ;; exists and we haven't seen it (we might try to check a file
+            ;; twice if the current module is also below one of the dirs in
+            ;; `puppet-ts-module-path').
+            (dolist (path pathlist)
+              (let ((file (expand-file-name path dir)))
+                (if (and (not (member file files))
+                         (file-readable-p file))
+                    (push file files)))))
+          ;; Visit all found files to finally locate the resource definition
+          (dolist (file files)
+            (with-temp-buffer
+              (insert-file-contents-literally file)
+              (if (re-search-forward resdef nil t)
+                  (push (xref-make
+                         (match-string-no-properties 0)
+                         (xref-make-file-location
+                          file (line-number-at-pos (match-beginning 1)) 0))
+                        xrefs))))))
+    xrefs))
 
 
 ;; Language grammar
