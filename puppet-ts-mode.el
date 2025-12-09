@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-09 15:19:08 stm>
+;; Updated:          <2025-12-09 17:43:41 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -317,7 +317,7 @@ automatic alignment if electric."
     :language puppet
     (((double_quoted_string) @puppet-ts-string)
      ((single_quoted_string) @puppet-ts-string)
-     ((heredoc) @puppet-ts-string))
+     ((heredoc_body) @puppet-ts-string))
 
     :feature regexp
     :language puppet
@@ -333,7 +333,7 @@ automatic alignment if electric."
     :override t
     ((double_quoted_string (escape_sequence) @puppet-ts-escape)
      (single_quoted_string (escape_sequence) @puppet-ts-escape)
-     (heredoc (escape_sequence) @puppet-ts-escape))
+     (heredoc_body (escape_sequence) @puppet-ts-escape))
 
     :feature variable
     :language puppet
