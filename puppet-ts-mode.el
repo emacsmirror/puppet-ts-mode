@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-09 14:00:28 stm>
+;; Updated:          <2025-12-09 14:37:21 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1174,19 +1174,46 @@ The list can contain duplicates and it is not ordered in any way."
     (lambda (node)
       (substring (treesit-node-text node t) 1)))))
 
-(defsubst puppet-ts-start-of-token-before-point ()
-  "Return the buffer position for the start of the preceding token."
+(defun puppet-ts-symbol-at-point ()
+  "Return the begin and end positions of the symbol at point."
+  (interactive)
   (save-excursion
-    (+ (point) (skip-syntax-backward "w_" (pos-bol)))))
+    (let ((pos (point)))
+      ;; Skip back to the beginning of the alleged symbol.
+      (skip-syntax-backward "w_" (pos-bol))
+      ;; Look forwared to find the end of the symbol and make sure that
+      ;; point is not behind the end.
+      (if (and (looking-at "[a-z_][a-zA-Z0-9_]*\\(::[a-z_][a-zA-Z0-9_]*\\)*")
+               (<= pos (match-end 0)))
+          (cons (match-beginning 0) (match-end 0))))))
+
+(defun puppet-ts-complete-variable-at-point ()
+  "Complete variable names if the symbol at point begins with \"$\".
+The result includes all variables already used in the current manifest
+and also all variables customized in `puppet-ts-completion-variables'."
+  (interactive "*")
+  (let ((token (puppet-ts-symbol-at-point)))
+    (if (save-excursion
+          (goto-char (car token))
+          (looking-back "${?" (pos-bol)))
+        (let ((curr (buffer-substring-no-properties (car token) (cdr token)))
+              (vars (puppet-ts--manifest-variables)))
+          ;; Remove the name we are trying to complete if it is found
+          ;; only once; it will be the variable name at point and it
+          ;; really doesn't make sense to offer that as a candidate.
+          (if (eql (seq-count (lambda (elt) (string= elt curr)) vars) 1)
+              (setq vars (delete curr vars)))
+          (list (car token)
+                (cdr token)
+                (completion-table-dynamic
+                 (lambda (_)
+                   (seq-uniq
+                    ;; Also add supported global Puppet variables.
+                    (append vars puppet-ts-completion-variables)))))))))
 
 (defun puppet-ts-completion-at-point ()
   "Completion function for `puppet-ts-mode'.
 The function completes various Puppet items depending on context.
-
-It can complete variable names before point if the symbol looks
-like a Puppet variable.  It suggests all variables used in the
-current manifest and additional variable that are customized with
-`puppet-ts-completion-variables'.
 
 The function also completes resource types and their parameters
 if point is positioned accordingly.  See the customization
@@ -1196,27 +1223,12 @@ variables `puppet-ts-completion-resource-types' and
 This function is added to the `completion-at-point-functions'
 hook when `puppet-ts-mode' is enabled."
   (interactive "*")
-  (let* ((beg (puppet-ts-start-of-token-before-point))
-         (end (point))
+  (let* ((token (puppet-ts-symbol-at-point))
+         (beg (car token))
+         (end (cdr token))
          (node (treesit-node-on beg end))
          (types (puppet-ts-hierarchy node)))
     (cond
-     ;; Complete variable names if the symbol before point starts with "$".
-     ((save-excursion
-        (goto-char beg)
-        (looking-back "${?" (pos-bol)))
-      (let ((curr (buffer-substring-no-properties beg end))
-            (vars (puppet-ts--manifest-variables)))
-        ;; Remove the name we are trying to complete if it is found
-        ;; only once; it will be the variable name at point and it
-        ;; really doesn't make sense to offer that as a candidate.
-        (if (eql (seq-count (lambda (elt) (string= elt curr)) vars) 1)
-            (setq vars (delete curr vars)))
-        ;; Also add supported global Puppet variables to the result
-        (list beg end (completion-table-dynamic
-                       (lambda (_)
-                         (seq-uniq
-                          (append vars puppet-ts-completion-variables)))))))
      ;; Complete resource type parameters including metaparameters if point
      ;; is withing a resource type.
      ((and (member "resource_type" types)
