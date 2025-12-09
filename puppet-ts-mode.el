@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-05-03 18:20:57 stm>
+;; Updated:          <2025-12-09 14:00:28 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1039,6 +1039,14 @@ module and file according to Puppet's autoloading rules."
 
 ;; Completion
 
+(defcustom puppet-ts-completion-at-point-functions
+  '(puppet-ts-complete-variable-at-point)
+  "A list of functions to use for `completion-at-point'.
+The functions customized here are called in sequence when performing
+completion at point."
+  :group 'puppet-ts
+  :type '(repeat function))
+
 (defcustom puppet-ts-completion-variables
   '("facts" "trusted")
   "A list of non-local variable names used for completion.
@@ -1508,8 +1516,8 @@ fixing the particular syntax error.
     (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
 
     ;; Completion
-    (add-hook 'completion-at-point-functions
-              #'puppet-ts-completion-at-point nil 'local)
+    (dolist (func puppet-ts-completion-at-point-functions)
+      (add-hook 'completion-at-point-functions func nil 'local))
 
     (treesit-major-mode-setup)))
 
