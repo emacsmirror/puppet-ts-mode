@@ -108,7 +108,8 @@
   "Write Puppet manifests in Emacs."
   :prefix "puppet-ts-"
   :group 'languages
-  :link '(url-link :tag "Repository" "https://github.com/smoeding/puppet-ts-mode"))
+  :link '(url-link :tag "Repository"
+                   "https://github.com/smoeding/puppet-ts-mode"))
 
 (defvar puppet-ts--file-attribute-constants
   '("file" "directory" "link")
