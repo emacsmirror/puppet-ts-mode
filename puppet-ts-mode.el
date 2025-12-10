@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-09 17:43:41 stm>
+;; Updated:          <2025-12-10 16:24:41 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -923,7 +923,9 @@ it can be derived from FILE.  Otherwise nil is returned."
 ;; Completion
 
 (defcustom puppet-ts-completion-at-point-functions
-  '(puppet-ts-complete-variable-at-point)
+  '(puppet-ts-complete-variable-at-point
+    puppet-ts-complete-resource-type-at-point
+    puppet-ts-complete-resource-type-parameters-at-point)
   "A list of functions to use for `completion-at-point'.
 The functions customized here are called in sequence when performing
 completion at point."
@@ -933,7 +935,7 @@ completion at point."
 (defcustom puppet-ts-completion-variables
   '("facts" "trusted")
   "A list of non-local variable names used for completion.
-Do not use the \"$\" prefix when customizing variable names here."
+Do not use the \"$\" prefix when customizing variable names."
   :group 'puppet-ts
   :type '(repeat string))
 
@@ -1059,7 +1061,6 @@ The list can contain duplicates and it is not ordered in any way."
 
 (defun puppet-ts-symbol-at-point ()
   "Return the begin and end positions of the symbol at point."
-  (interactive)
   (save-excursion
     (let ((pos (point)))
       ;; Skip back to the beginning of the alleged symbol.
@@ -1074,58 +1075,66 @@ The list can contain duplicates and it is not ordered in any way."
   "Complete variable names if the symbol at point begins with \"$\".
 The result includes all variables already used in the current manifest
 and also all variables customized in `puppet-ts-completion-variables'."
-  (interactive "*")
-  (let ((token (puppet-ts-symbol-at-point)))
-    (if (save-excursion
-          (goto-char (car token))
-          (looking-back "${?" (pos-bol)))
-        (let ((curr (buffer-substring-no-properties (car token) (cdr token)))
-              (vars (puppet-ts--manifest-variables)))
-          ;; Remove the name we are trying to complete if it is found
-          ;; only once; it will be the variable name at point and it
-          ;; really doesn't make sense to offer that as a candidate.
-          (if (eql (seq-count (lambda (elt) (string= elt curr)) vars) 1)
-              (setq vars (delete curr vars)))
-          (list (car token)
-                (cdr token)
-                (completion-table-dynamic
-                 (lambda (_)
-                   (seq-uniq
-                    ;; Also add supported global Puppet variables.
-                    (append vars puppet-ts-completion-variables)))))))))
-
-(defun puppet-ts-completion-at-point ()
-  "Completion function for `puppet-ts-mode'.
-The function completes various Puppet items depending on context.
-
-The function also completes resource types and their parameters
-if point is positioned accordingly.  See the customization
-variables `puppet-ts-completion-resource-types' and
-`puppet-ts-resource-type-parameters'.
-
-This function is added to the `completion-at-point-functions'
-hook when `puppet-ts-mode' is enabled."
-  (interactive "*")
   (let* ((token (puppet-ts-symbol-at-point))
-         (beg (car token))
-         (end (cdr token))
+         (beg (or (car token) (point)))
+         (end (or (cdr token) (point))))
+    (if (save-excursion
+          (goto-char beg)
+          (looking-back "${?" (pos-bol)))
+        (list beg
+              end
+              (completion-table-dynamic
+               (lambda (_)
+                 (let ((var (buffer-substring-no-properties beg end))
+                       (all (puppet-ts--manifest-variables)))
+                   ;; Remove the name we are trying to complete if it is
+                   ;; found only once; it will be the variable name at point
+                   ;; and it really doesn't make sense to offer that as
+                   ;; a candidate.
+                   (if (eql (seq-count (lambda (elt) (string= elt var)) all) 1)
+                       (setq all (delete var all)))
+                   ;; Also add supported global Puppet variables.
+                   (append all puppet-ts-completion-variables)))
+               t)))))
+
+(defun puppet-ts-complete-resource-type-at-point ()
+  "Complete a resource type at point.
+See the variable `puppet-ts-completion-resource-types' for
+customization."
+  (let* ((token (puppet-ts-symbol-at-point))
+         (beg (or (car token) (point)))
+         (end (or (cdr token) (point)))
+         (node (treesit-node-on beg end))
+         (types (seq-take (puppet-ts-hierarchy node) 2)))
+    (if (or (treesit-node-match-p node (rx (or "manifest" "block")))
+            (equal types '("name" "resource_type"))
+            (equal types '("name" "statement")))
+        (list beg end puppet-ts-completion-resource-types))))
+
+(defun puppet-ts-complete-resource-type-parameters-at-point ()
+  "Complete resource type parameters including metaparameters at point.
+You can customize the variables `puppet-ts-resource-type-parameters' and
+`puppet-ts-metaparameters' to modify the suggestions."
+  (let* ((token (puppet-ts-symbol-at-point))
+         (beg (or (car token) (point)))
+         (end (or (cdr token) (point)))
          (node (treesit-node-on beg end))
          (types (puppet-ts-hierarchy node)))
-    (cond
-     ;; Complete resource type parameters including metaparameters if point
-     ;; is withing a resource type.
-     ((and (member "resource_type" types)
-           (string-match-p (rx (or "name" "resource_body" "resource_type"))
-                           (car types)))
-      (let* ((resparam (assoc (puppet-ts-resource-type node)
-                              puppet-ts-resource-type-parameters))
-             (allparam (append puppet-ts-metaparameters (cdr resparam))))
-        (list beg end (completion-table-dynamic
-                       (lambda (_)
-                         (seq-sort #'string< (seq-uniq allparam)))))))
-     ;; Complete resource types.
-     ((string= (car types) "name")
-      (list beg end puppet-ts-completion-resource-types)))))
+    (if (or (treesit-node-match-p node (rx (or "resource_body"
+                                               "resource_type")))
+            (equal (seq-take types 2) '("attribute_list" "resource_body"))
+            (equal (seq-take types 4) '("name" "attribute"
+                                        "attribute_list" "resource_body")))
+        (list beg
+              end
+              (completion-table-dynamic
+               (lambda (_)
+                 ;; Return standard metaparameters plus the resource type
+                 ;; specific params as completion candidates.
+                 (append puppet-ts-metaparameters
+                         (cdr (assoc (puppet-ts-resource-type node)
+                                     puppet-ts-resource-type-parameters))))
+               t)))))
 
 
 ;; Xref
@@ -1527,7 +1536,7 @@ fixing the particular syntax error.
     (add-hook 'xref-backend-functions #'puppet-ts--xref-backend)
 
     ;; Completion
-    (dolist (func puppet-ts-completion-at-point-functions)
+    (dolist (func (reverse puppet-ts-completion-at-point-functions))
       (add-hook 'completion-at-point-functions func nil 'local))
 
     (treesit-major-mode-setup)))
