@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-11-12 13:05:03 stm>
-;; Updated: <2025-12-11 09:34:55 stm>
+;; Updated: <2025-12-11 09:55:13 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -125,6 +125,18 @@ class foo (
 
 
 ;;;; Complete resource type parameter at point
+
+(ert-deftest completion/type-metaparameter ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+ensure => preset,
+t
+}"
+   (goto-char (point-min))
+   (end-of-line 4)
+   (completion-at-point)
+   (should (looking-back "tag" (pos-bol)))))
 
 (ert-deftest completion/single-type-parameter-with-value ()
   (puppet-test-with-temp-buffer
