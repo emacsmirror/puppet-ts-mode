@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-10 16:24:41 stm>
+;; Updated:          <2025-12-11 09:41:31 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1124,6 +1124,7 @@ You can customize the variables `puppet-ts-resource-type-parameters' and
     (if (or (treesit-node-match-p node (rx (or "resource_body"
                                                "resource_type")))
             (equal (seq-take types 2) '("attribute_list" "resource_body"))
+            (equal (seq-take types 3) '("name" "ERROR" "resource_type"))
             (equal (seq-take types 4) '("name" "attribute"
                                         "attribute_list" "resource_body")))
         (list beg

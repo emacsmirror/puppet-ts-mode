@@ -4,7 +4,7 @@
 
 ;; Author: Stefan Möding
 ;; Created: <2024-11-12 13:05:03 stm>
-;; Updated: <2025-01-07 17:10:41 stm>
+;; Updated: <2025-12-11 09:34:55 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -37,7 +37,7 @@
 (declare-function puppet-test-with-temp-buffer (content &rest body))
 
 
-;;;; Completion at point
+;;;; Complete variable at point
 
 (ert-deftest completion/unique-variable ()
   (puppet-test-with-temp-buffer
@@ -112,7 +112,7 @@ class foo (
   (puppet-test-with-temp-buffer
    "
 class foo (
-  String  $package_name,
+  String $package_name,
 ) {
   class { $p:
   }
@@ -122,6 +122,117 @@ class foo (
    (backward-char)
    (completion-at-point)
    (should (looking-back "  class { $package_name" (pos-bol)))))
+
+
+;;;; Complete resource type parameter at point
+
+(ert-deftest completion/single-type-parameter-with-value ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+e => preset,
+}"
+   (goto-char (point-min))
+   (beginning-of-line 3)
+   (forward-char)
+   (completion-at-point)
+   (should (looking-back "ensure" (pos-bol)))))
+
+(ert-deftest completion/first-type-parameter-with-value ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+e => preset,
+gid => 42,
+system => true,
+}"
+   (goto-char (point-min))
+   (beginning-of-line 3)
+   (forward-char)
+   (completion-at-point)
+   (should (looking-back "ensure" (pos-bol)))))
+
+(ert-deftest completion/second-type-parameter-with-value ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+ensure => preset,
+g => 42,
+system => true,
+}"
+   (goto-char (point-min))
+   (beginning-of-line 4)
+   (forward-char)
+   (completion-at-point)
+   (should (looking-back "gid" (pos-bol)))))
+
+(ert-deftest completion/last-type-parameter-with-value ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+ensure => preset,
+gid => 42,
+sy => true,
+}"
+   (goto-char (point-min))
+   (beginning-of-line 5)
+   (forward-char 2)
+   (completion-at-point)
+   (should (looking-back "system" (pos-bol)))))
+
+(ert-deftest completion/single-type-parameter ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+e
+}"
+   (goto-char (point-min))
+   (beginning-of-line 3)
+   (forward-char)
+   (completion-at-point)
+   (should (looking-back "ensure" (pos-bol)))))
+
+(ert-deftest completion/first-type-parameter ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+e
+gid => 42,
+system => true,
+}"
+   (goto-char (point-min))
+   (beginning-of-line 3)
+   (forward-char)
+   (completion-at-point)
+   (should (looking-back "ensure" (pos-bol)))))
+
+(ert-deftest completion/second-type-parameter ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+ensure => preset,
+g
+system => true,
+}"
+   (goto-char (point-min))
+   (beginning-of-line 4)
+   (forward-char)
+   (completion-at-point)
+   (should (looking-back "gid" (pos-bol)))))
+
+(ert-deftest completion/last-type-parameter ()
+  (puppet-test-with-temp-buffer
+   "
+group { 'foo':
+ensure => preset,
+gid => 42,
+sy
+}"
+   (goto-char (point-min))
+   (beginning-of-line 5)
+   (forward-char 2)
+   (completion-at-point)
+   (should (looking-back "system" (pos-bol)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; cap-test.el ends here
