@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-11 09:49:03 stm>
+;; Updated:          <2025-12-11 10:23:06 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -927,7 +927,7 @@ it can be derived from FILE.  Otherwise nil is returned."
   '(puppet-ts-complete-variable-at-point
     puppet-ts-complete-resource-type-at-point
     puppet-ts-complete-resource-type-parameters-at-point)
-  "A list of functions to use for `completion-at-point'.
+  "A list of functions to call for `completion-at-point'.
 The functions customized here are called in sequence when performing
 completion at point."
   :group 'puppet-ts
@@ -936,7 +936,9 @@ completion at point."
 (defcustom puppet-ts-completion-variables
   '("facts" "trusted")
   "A list of non-local variable names used for completion.
-Do not use the \"$\" prefix when customizing variable names."
+These names are candidates for completion of variable names even if they
+are not used in the current buffer.  The names are customized here
+without the \"$\" prefix."
   :group 'puppet-ts
   :type '(repeat string))
 
@@ -1073,7 +1075,7 @@ The list can contain duplicates and it is not ordered in any way."
           (cons (match-beginning 0) (match-end 0))))))
 
 (defun puppet-ts-complete-variable-at-point ()
-  "Complete variable names if the symbol at point begins with \"$\".
+  "Complete variable names if the symbol at point has a leading \"$\".
 The result includes all variables already used in the current manifest
 and also all variables customized in `puppet-ts-completion-variables'."
   (let* ((token (puppet-ts-symbol-at-point))
