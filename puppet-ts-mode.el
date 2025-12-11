@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.1.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-11 10:23:06 stm>
+;; Updated:          <2025-12-11 13:09:30 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1123,7 +1123,7 @@ You can customize the variables `puppet-ts-resource-type-parameters' and
          (end (or (cdr token) (point)))
          (node (treesit-node-on beg end))
          (types (puppet-ts-hierarchy node)))
-    (if (or (equal (car types) '("resource_body" "resource_type"))
+    (if (or (member (car types) '("resource_body" "resource_type"))
             (equal (seq-take types 2) '("attribute_list" "resource_body"))
             (equal (seq-take types 3) '("name" "ERROR" "resource_type"))
             (equal (seq-take types 4) '("name" "attribute"
