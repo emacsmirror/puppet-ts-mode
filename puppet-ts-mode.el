@@ -1122,6 +1122,7 @@ You can customize the variables `puppet-ts-resource-type-parameters' and
          (beg (or (car token) (point)))
          (end (or (cdr token) (point)))
          (node (treesit-node-on beg end))
+         (type (puppet-ts-resource-type node))
          (types (puppet-ts-hierarchy node)))
     (if (or (member (car types) '("resource_body" "resource_type"))
             (equal (seq-take types 2) '("attribute_list" "resource_body"))
@@ -1135,8 +1136,7 @@ You can customize the variables `puppet-ts-resource-type-parameters' and
                  ;; Return standard metaparameters plus the resource type
                  ;; specific params as completion candidates.
                  (append puppet-ts-metaparameters
-                         (cdr (assoc (puppet-ts-resource-type node)
-                                     puppet-ts-resource-type-parameters))))
+                         (cdr (assoc type puppet-ts-resource-type-parameters))))
                t)))))
 
 
