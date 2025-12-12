@@ -6,7 +6,7 @@
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.2.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-12 13:47:18 stm>
+;; Updated:          <2025-12-12 14:16:28 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
