@@ -1,12 +1,12 @@
 ;;; puppet-ts-mode.el --- Major mode for Puppet using Tree-sitter -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2024, 2025  Stefan Möding
+;; Copyright (c) 2024, 2025, 2026  Stefan Möding
 
 ;; Author:           Stefan Möding <stm@kill-9.net>
 ;; Maintainer:       Stefan Möding <stm@kill-9.net>
 ;; Version:          0.2.0
 ;; Created:          <2024-03-02 13:05:03 stm>
-;; Updated:          <2025-12-12 14:16:28 stm>
+;; Updated:          <2026-01-23 17:55:13 stm>
 ;; URL:              https://github.com/smoeding/puppet-ts-mode
 ;; Keywords:         languages
 ;; Package-Requires: ((emacs "29.1"))
@@ -1285,31 +1285,34 @@ The function removes existing entries for the Puppet language in
 
 (defun puppet-ts-interpolate (suppress)
   "Insert \"${}\" when point is in a double quoted string.
-A single \"$\" is inserted if point is not in a double quoted
-string.  With prefix argument SUPPRESS the braces are always left
-out."
+A single \"$\" is inserted if point is not in a double quoted string.
+With prefix argument SUPPRESS the braces are always left out."
   (interactive "P*")
-  (if (treesit-parent-until (treesit-node-at (point))
-                            (puppet-ts-node-type-predicate "double_quoted_string")
-                            t)
-      ;; We are inside a double quoted string
-      (if mark-active
-          ;; region active: enclose in {...}
-          (let ((beg (region-beginning))
-                (end (region-end)))
-            (goto-char beg)
+  (let ((node (treesit-parent-until
+               (treesit-node-on (point) (point))
+               (puppet-ts-node-type-predicate "double_quoted_string")
+               t)))
+    ;; Interpolation should only happen when point is *inside* the string.
+    (if (and node (> (point) (treesit-node-start node)))
+        ;; We are inside a double quoted string
+        (with-undo-amalgamate
+          (if mark-active
+              ;; region active: enclose in {...}
+              (let ((beg (region-beginning))
+                    (end (region-end)))
+                (goto-char beg)
+                (self-insert-command 1)
+                (if suppress
+                    (goto-char (1+ end))
+                  (insert "{")
+                  (goto-char (+ end 2))
+                  (insert "}")))
+            ;; region not active
             (self-insert-command 1)
-            (if suppress
-                (goto-char (1+ end))
-              (insert "{")
-              (goto-char (+ end 2))
-              (insert "}")))
-        ;; region not active
-        (self-insert-command 1)
-        (unless suppress
-          (insert "{}")
-          (forward-char -1)))
-    (self-insert-command 1)))
+            (unless suppress
+              (insert "{}")
+              (forward-char -1))))
+      (self-insert-command 1))))
 
 (defun puppet-ts-clear-string ()
   "Clear string at point."

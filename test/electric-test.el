@@ -1,10 +1,10 @@
 ;;; electric-test.el --- Unit Test Suite  -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2025 Stefan Möding
+;; Copyright (c) 2025, 2026 Stefan Möding
 
 ;; Author: Stefan Möding
 ;; Created: <2025-02-25 13:42:03 stm>
-;; Updated: <2025-02-25 18:17:10 stm>
+;; Updated: <2026-01-23 17:22:33 stm>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -121,5 +121,44 @@ class foo (
   String  $foo    = 2,
 ) {
 }"))))
+
+(ert-deftest electric/interpolation ()
+  (puppet-test-with-temp-buffer
+   "\"\"
+"
+  (goto-char (point-min))
+  (forward-char)
+  (save-window-excursion
+    (set-window-buffer nil (current-buffer))
+    (execute-kbd-macro "$"))
+  (should (string= (buffer-string)
+   "\"${}\"
+"))))
+
+(ert-deftest electric/no-interpolation-1 ()
+  (puppet-test-with-temp-buffer
+   "
+\"foo\"
+"
+  (goto-char (point-min))
+  (save-window-excursion
+    (set-window-buffer nil (current-buffer))
+    (execute-kbd-macro "$"))
+  (should (string= (buffer-string)
+   "$
+\"foo\"
+"))))
+
+(ert-deftest electric/no-interpolation-2 ()
+  (puppet-test-with-temp-buffer
+   "\"foo\"
+"
+  (goto-char (point-min))
+  (save-window-excursion
+    (set-window-buffer nil (current-buffer))
+    (execute-kbd-macro "$"))
+  (should (string= (buffer-string)
+   "$\"foo\"
+"))))
 
 ;;; electric-test.el ends here
